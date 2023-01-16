@@ -99,3 +99,18 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+task testShamLib(type:Exec) {
+    workingDir 'src/main/java/frc/robot/ShamLib/test'
+    commandLine 'cmd', '/c', 'copyFiles.bat'
+}
+
+task deleteShamLibTests(type:Exec) {
+    workingDir 'src/main/java/frc/robot/ShamLib/test'
+    commandLine 'cmd', '/c', 'clearFiles.bat'
+}
+
+if(project.hasProperty("shamLib")) {
+    test.mustRunAfter(testShamLib)
+    deleteShamLibTests.mustRunAfter(test)
+}
