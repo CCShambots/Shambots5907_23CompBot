@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.ShamLib.SMF.StateMachine;
 
 import static frc.robot.Constants.Claw.*;
@@ -12,6 +13,13 @@ public class Claw extends StateMachine<Claw.State> {
 
     public Claw() {
         super("Claw", State.UNDETERMINED, State.class);
+
+        defineTransitions();
+    }
+
+    private void defineTransitions() {
+        addOmniTransition(State.CLOSED, new InstantCommand(() -> solenoid.set(!SOLENOID_CLAW_OPEN_STATE)));
+        addOmniTransition(State.OPENED, new InstantCommand(() -> solenoid.set(SOLENOID_CLAW_OPEN_STATE)));
     }
 
     @Override
@@ -31,8 +39,7 @@ public class Claw extends StateMachine<Claw.State> {
 
     @Override
     protected void determineSelf() {
-        //TODO: assuming true is closed and false is opened, switch if testing reveals otherwise
-        setState(solenoid.get() ? State.CLOSED : State.OPENED);
+        setState(solenoid.get() == SOLENOID_CLAW_OPEN_STATE ? State.OPENED : State.CLOSED);
     }
 
     @Override

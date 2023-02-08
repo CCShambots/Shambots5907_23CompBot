@@ -16,5 +16,8 @@ public final class Constants {
   public static final class Claw {
     public static final int PCM_ID = 0;
     public static final int SOLENOID_ID = 0;
+
+    //TODO: idk if this is right
+    public static final boolean SOLENOID_CLAW_OPEN_STATE = false;
   }
 }
