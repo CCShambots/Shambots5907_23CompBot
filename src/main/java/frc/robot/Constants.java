@@ -4,16 +4,41 @@
 
 package frc.robot;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
+import com.ctre.phoenix.led.*;
+import frc.robot.ShamLib.Candle.RGB;
+
+import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
+
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  }
+
+  public static class Lights {
+    public static final int CANDLE_ID = 0;
+    public static final double brightness = 1;
+    public static final int NUM_LEDS = 50;
+
+    public static final double BOUNCE_SPEED = 0.5;
+    public static final double BLINK_SPEED = 0.5;
+
+    public static final Animation DISABLED_ANIMATION =
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 5);
+
+    public static final RGB IDLE_RGB = new RGB(0, 0, 255);
+
+    public static final RGB ELEMENT_GRABBED_RGB = new RGB(0, 255, 0);
+    public static final Animation DEPLOYING_ANIMATION =
+            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LEDS);
+
+    public static final RGB SCORING_RGB = new RGB(0, 255, 0);
+
+
+    public static final RGB UPRIGHT_CONE = new RGB(255, 255, 0);
+
+    public static final Animation DOWNED_CONE_ANIMATION =
+            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
+
+    public static final RGB CUBE_RGB = new RGB(144,22,153);
   }
 }
