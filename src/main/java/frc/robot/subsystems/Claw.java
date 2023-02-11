@@ -28,14 +28,10 @@ public class Claw extends StateMachine<Claw.State> {
     }
 
     @Override
-    protected void onDisable() {
-
-    }
+    protected void onDisable() {}
 
     @Override
-    protected void update() {
-
-    }
+    protected void update() {}
 
     @Override
     protected void determineSelf() {
@@ -43,9 +39,7 @@ public class Claw extends StateMachine<Claw.State> {
     }
 
     @Override
-    protected void additionalSendableData(SendableBuilder builder) {
-
-    }
+    protected void additionalSendableData(SendableBuilder builder) {}
 
     enum State {
         UNDETERMINED, OPENED, CLOSED
