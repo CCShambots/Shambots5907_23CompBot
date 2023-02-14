@@ -4,12 +4,13 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.ShamLib.SMF.StateMachine;
 
 import static frc.robot.Constants.Claw.*;
 
 public class Claw extends StateMachine<Claw.State> {
-    Solenoid solenoid = new Solenoid(PCM_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID);
+    Solenoid solenoid = new Solenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID);
 
     public Claw() {
         super("Claw", State.UNDETERMINED, State.class);
@@ -47,7 +48,7 @@ public class Claw extends StateMachine<Claw.State> {
 
     }
 
-    enum State {
+    public enum State {
         UNDETERMINED, OPENED, CLOSED
     }
 }

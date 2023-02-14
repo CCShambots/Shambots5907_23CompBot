@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -44,12 +45,15 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     //TODO: UNDO THIS OR ELSE NO RUNNY RUNNY
-    //CommandScheduler.getInstance().run();
+    CommandScheduler.getInstance().run();
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    SubsystemManagerFactory.getInstance().disableAllSubsystems();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -75,6 +79,8 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    SubsystemManagerFactory.getInstance().prepSubsystems();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
