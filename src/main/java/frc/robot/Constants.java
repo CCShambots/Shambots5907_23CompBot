@@ -21,7 +21,6 @@ public final class Constants {
     public static final int COMPRESSOR_ID = 1;
     public static final int SOLENOID_ID = 2;
 
-    //TODO: idk if this is right
-    public static final boolean SOLENOID_CLAW_OPEN_STATE = false;
+    public static final boolean SOLENOID_CLAW_OPEN_STATE = false; //TODO: find value
   }
 }
