@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    SubsystemManagerFactory.getInstance().enableAllSubsystems();
+    SubsystemManagerFactory.getInstance().prepSubsystems();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -71,7 +71,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    SubsystemManagerFactory.getInstance().enableAllSubsystems();
   }
 
   @Override
@@ -81,7 +80,7 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
 
-    SubsystemManagerFactory.getInstance().enableAllSubsystems();
+    SubsystemManagerFactory.getInstance().prepSubsystems();
 
 
 
