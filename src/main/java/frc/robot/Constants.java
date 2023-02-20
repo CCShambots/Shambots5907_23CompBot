@@ -133,7 +133,7 @@ public final class Constants {
 
     //Drive motor coefficients
     public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(
-            .5,
+            .4,
             0,
             0,
             0.25,

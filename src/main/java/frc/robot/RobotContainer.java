@@ -13,7 +13,11 @@ public class RobotContainer {
   Drivetrain dt;
 
   public RobotContainer() {
-    dt = new Drivetrain(controller);
+    dt = new Drivetrain(
+            () -> -controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> controller.getRightX()
+    );
     dt.setFieldRelative(true);
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
@@ -22,10 +26,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // controller.x().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.XShape)));
-    // controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.TeleopDrive)));
-    // controller.a().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.Idle)));
-    // controller.y().onTrue(new InstantCommand(() -> dt.resetGyro(Rotation2d.fromDegrees(0))));
+    controller.x().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.XShape)));
+    controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.TeleopDrive)));
+    controller.a().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.Idle)));
+    controller.y().onTrue(new InstantCommand(() -> dt.resetGyro(Rotation2d.fromDegrees(0))));
   }
 
   public Command getAutonomousCommand() {

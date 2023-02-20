@@ -16,19 +16,27 @@ import frc.robot.ShamLib.swerve.DriveCommand;
 import frc.robot.ShamLib.swerve.ModuleInfo;
 import frc.robot.ShamLib.swerve.SwerveDrive;
 
+import java.util.function.DoubleSupplier;
+
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final SwerveDrive drive;
-    private final CommandXboxController controller;
+    private final DoubleSupplier x;
+    private final DoubleSupplier y;
+    private final DoubleSupplier theta;
 
 //    private final Limelight ll = new Limelight();
 
     private final Transform3d llToBot = new Transform3d(new Pose3d(), Constants.SwerveDrivetrain.limelightPose).inverse();
 
-    public Drivetrain(CommandXboxController controller) {
+    public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta) {
         super("Drivetrain", DrivetrainState.Undetermined, DrivetrainState.class);
+
+        this.x = x;
+        this.y = y;
+        this.theta = theta;
 
         drive = new SwerveDrive(
                 PIGEON_ID,
@@ -50,8 +58,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 ModuleInfo.getMK4IL1Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], true)
         );
 
-        this.controller = controller;
-
         defineTransitions();
         defineStateCommands();
 
@@ -63,9 +69,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         // controller.b().onTrue(drive.calculateDriveKS(controller.a()));
         // controller.x().onTrue(drive.calculateDriveKV(DRIVE_GAINS.kS, controller.a(), () -> controller.y().getAsBoolean()));
-        controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
+        /*controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
         controller.b().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(1, Rotation2d.fromDegrees(0)))));
         controller.x().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(-1, Rotation2d.fromDegrees(0)))));
+         */
     }
 
     private void defineTransitions() {
@@ -100,9 +107,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.TeleopDrive,
                 new DriveCommand(
                         drive,
-                        () -> -controller.getLeftX(),
-                        () -> -controller.getLeftY(),
-                        () -> -controller.getRightX(),
+                        x,
+                        y,
+                        theta,
                         MAX_LINEAR_SPEED,
                         MAX_LINEAR_ACCELERATION,
                         MAX_ROTATION,
