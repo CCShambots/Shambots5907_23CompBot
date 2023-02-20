@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import frc.robot.ShamLib.motors.PIDFGains;
+import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -113,37 +113,24 @@ public final class Constants {
 
   public static final class SwerveModule {
 
-    // Drive motor PID controller coefficients
-    // public static final double P_DRIVE = 0.175;
-    public static final double P_DRIVE = 0.0;
-    public static final double I_DRIVE = 0;
-    public static final double D_DRIVE = 0;
-    public static final double KF_DRIVE = 0.0679;
-
-    // Use this ratio to convert from Falcon angular velocity to wheel angular velocity
-    public static final double DRIVE_RATIO = 8.14;
-
-    // Turn motor PID controller coefficients
-    // public static final double P_TURN = 9;
-    public static final double P_TURN = 0.6;
-    public static final double I_TURN = 0;
-    public static final double D_TURN = 0; //0.1
-    public static final double KF_TURN = 0.06464446306847016; //0.15
     public static final double MAX_TURN_SPEED = 50; // Rad/S //50
-    public static final double MAX_TURN_ACCEL = 400; // Rad/S^2
 
-    public static final PIDFGains TURN_GAINS = new PIDFGains(
-            P_TURN,
-            I_TURN,
-            D_TURN,
-            KF_TURN
+    //Turn motor coefficients
+    public static final PIDSVGains TURN_GAINS = new PIDSVGains(
+            0,
+            0,
+            0,
+            0,
+            0
     );
 
-    public static final PIDFGains DRIVE_GAINS = new PIDFGains(
-            P_DRIVE,
-            I_DRIVE,
-            D_DRIVE,
-            KF_DRIVE
+    //Drive motor coefficients
+    public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(
+            0,
+            0,
+            0,
+            0,
+            0
     );
 
     public static final int kTimeoutMs = 30;//TODO: change these if needed vv
