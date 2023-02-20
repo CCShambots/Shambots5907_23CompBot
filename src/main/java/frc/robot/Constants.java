@@ -57,7 +57,6 @@ public final class Constants {
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * Math.PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
-    //TODO: figure out which is which
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
             new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back left
@@ -94,25 +93,25 @@ public final class Constants {
     public static final int MODULE_1_DRIVE_ID = 11;
     public static final int MODULE_1_TURN_ID = 12;
     public static final int MODULE_1_ENCODER_ID = 11;
-    public static final double MODULE_1_OFFSET = -136.23;
+    public static final double MODULE_1_OFFSET = 45.97;
 
     //back left
     public static final int MODULE_2_DRIVE_ID = 13;
     public static final int MODULE_2_TURN_ID = 14;
     public static final int MODULE_2_ENCODER_ID = 13;
-    public static final double MODULE_2_OFFSET = -68.99;
+    public static final double MODULE_2_OFFSET = -69.79;
 
     //back right
     public static final int MODULE_3_DRIVE_ID = 15;
     public static final int MODULE_3_TURN_ID = 16;
     public static final int MODULE_3_ENCODER_ID = 15;
-    public static final double MODULE_3_OFFSET = 45.61;
+    public static final double MODULE_3_OFFSET = -135.7;
 
     //front right
     public static final int MODULE_4_DRIVE_ID = 17;
     public static final int MODULE_4_TURN_ID = 18;
     public static final int MODULE_4_ENCODER_ID = 17;
-    public static final double MODULE_4_OFFSET = -139.83;
+    public static final double MODULE_4_OFFSET = -139.48;
 
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
@@ -120,43 +119,25 @@ public final class Constants {
 
   public static final class SwerveModule {
 
-    // Drive motor PID controller coefficients
-    // public static final double P_DRIVE = 0.175;
-    public static final double P_DRIVE = 0.0;
-    public static final double I_DRIVE = 0;
-    public static final double D_DRIVE = 0;
-    public static final double KF_DRIVE = 0.0679;
-
-    // Use this ratio to convert from Falcon angular velocity to wheel angular velocity
-    public static final double DRIVE_RATIO = 8.14;
-
-    // Turn motor PID controller coefficients
-    // public static final double P_TURN = 9;
-    public static final double P_TURN = 0.7; //0.7
-    public static final double I_TURN = 0;
-    public static final double D_TURN = 0; //0.1
-    public static final double KF_TURN = 0.06464446306847016; //0.15
-    public static final double MAX_TURN_SPEED = 150; // Rad/S //50
-    public static final double MAX_TURN_ACCEL = 400; // Rad/S^2
-    // public static final double MAX_TURN_SPEED = 50; // Rad/S //50
-
+    public static final double MAX_TURN_SPEED = 1000; // motor rots / sec
+    public static final double MAX_TURN_ACCEL = 1000; // motor rots / sec^2
 
     //Turn motor coefficients
     public static final PIDSVGains TURN_GAINS = new PIDSVGains(
+            10,
             0,
             0,
-            0,
-            0,
-            0
+            0.3,
+            0.112
     );
 
     //Drive motor coefficients
     public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(
+            .5,
             0,
             0,
-            0,
-            0,
-            0
+            0.25,
+            0.112
     );
 
     public static final int kTimeoutMs = 30;//TODO: change these if needed vv

@@ -35,8 +35,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DRIVE_GAINS,
                 TURN_GAINS,
                 MAX_LINEAR_SPEED,
-                MAX_LINEAR_ACCELERATION,
                 MAX_TURN_SPEED,
+                MAX_TURN_ACCEL,
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
@@ -44,9 +44,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
-                ModuleInfo.getMK4IL1Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], true),
+                ModuleInfo.getMK4IL1Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
                 ModuleInfo.getMK4IL1Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
-                ModuleInfo.getMK4IL1Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
+                ModuleInfo.getMK4IL1Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], true),
                 ModuleInfo.getMK4IL1Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], true)
         );
 
@@ -56,6 +56,16 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         defineStateCommands();
 
         SmartDashboard.putData(drive.getField());
+
+        for(int i = 0; i<4; i++) {
+            SmartDashboard.putData("/Drivetrain/modules/module-" + (i+1), drive.getModules().get(i));
+        }
+
+        // controller.b().onTrue(drive.calculateDriveKS(controller.a()));
+        // controller.x().onTrue(drive.calculateDriveKV(DRIVE_GAINS.kS, controller.a(), () -> controller.y().getAsBoolean()));
+        controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
+        controller.b().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(1, Rotation2d.fromDegrees(0)))));
+        controller.x().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(-1, Rotation2d.fromDegrees(0)))));
     }
 
     private void defineTransitions() {
