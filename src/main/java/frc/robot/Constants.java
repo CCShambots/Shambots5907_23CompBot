@@ -67,9 +67,9 @@ public final class Constants {
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(moduleOffsets);
 
-    public static final double P_HOLDANGLETELE = 3.5; //.5
-    public static final double I_HOLDANGLETELE = 0.25;
-    public static final double D_HOLDANGLETELE = 0;
+    public static final double P_HOLDANGLETELE = 0.25; //.5
+    public static final double I_HOLDANGLETELE = 0;//0.25;
+    public static final double D_HOLDANGLETELE = 0;//0.25;
 
     public static final double P_HOLDANGLEAUTO = 5; //4
     public static final double I_HOLDANGLEAUTO = .25; //.25

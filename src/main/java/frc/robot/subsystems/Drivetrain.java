@@ -90,9 +90,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.TeleopDrive,
                 new DriveCommand(
                         drive,
-                        () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
-                        () -> -controller.getRawAxis(2),
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getRightX(),
                         MAX_LINEAR_SPEED,
                         MAX_LINEAR_ACCELERATION,
                         MAX_ROTATION,
@@ -172,6 +172,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
+        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
+        builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
     }
 
     public enum DrivetrainState {
