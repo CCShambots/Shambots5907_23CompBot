@@ -41,13 +41,13 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
                 true,
-                "Drivetrain",
+                "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
-                ModuleInfo.getMK4IL1Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
+                ModuleInfo.getMK4IL1Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], true),
                 ModuleInfo.getMK4IL1Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
                 ModuleInfo.getMK4IL1Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
-                ModuleInfo.getMK4IL1Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], false)
+                ModuleInfo.getMK4IL1Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], true)
         );
 
         this.controller = controller;
@@ -90,9 +90,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.TeleopDrive,
                 new DriveCommand(
                         drive,
-                        () -> -controller.getLeftY(),
                         () -> -controller.getLeftX(),
-                        () -> -controller.getRawAxis(2),
+                        () -> -controller.getLeftY(),
+                        () -> -controller.getRightX(),
                         MAX_LINEAR_SPEED,
                         MAX_LINEAR_ACCELERATION,
                         MAX_ROTATION,
@@ -172,6 +172,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
+        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
+        builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
     }
 
     public enum DrivetrainState {

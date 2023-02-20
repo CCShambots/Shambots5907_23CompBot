@@ -23,8 +23,11 @@ import java.util.function.UnaryOperator;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class Claw {
+    public static final int COMPRESSOR_ID = 1;
+    public static final int SOLENOID_ID = 2;
+
+    public static final boolean SOLENOID_CLAW_OPEN_STATE = false; //TODO: find value
   }
 
 
@@ -58,15 +61,15 @@ public final class Constants {
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
             new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back left
-            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), //
-            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2)
+            new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back right
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) //front right
     };
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(moduleOffsets);
 
-    public static final double P_HOLDANGLETELE = 3.5; //.5
-    public static final double I_HOLDANGLETELE = 0.25;
-    public static final double D_HOLDANGLETELE = 0;
+    public static final double P_HOLDANGLETELE = 0.25; //.5
+    public static final double I_HOLDANGLETELE = 0;//0.25;
+    public static final double D_HOLDANGLETELE = 0;//0.25;
 
     public static final double P_HOLDANGLEAUTO = 5; //4
     public static final double I_HOLDANGLEAUTO = .25; //.25
@@ -87,25 +90,29 @@ public final class Constants {
 
     public static final int PIGEON_ID = 01;
 
+    //front left
     public static final int MODULE_1_DRIVE_ID = 11;
     public static final int MODULE_1_TURN_ID = 12;
     public static final int MODULE_1_ENCODER_ID = 11;
-    public static final double MODULE_1_OFFSET = 76.7;
+    public static final double MODULE_1_OFFSET = -136.23;
 
+    //back left
     public static final int MODULE_2_DRIVE_ID = 13;
     public static final int MODULE_2_TURN_ID = 14;
     public static final int MODULE_2_ENCODER_ID = 13;
-    public static final double MODULE_2_OFFSET = 156.6;
+    public static final double MODULE_2_OFFSET = -68.99;
 
+    //back right
     public static final int MODULE_3_DRIVE_ID = 15;
     public static final int MODULE_3_TURN_ID = 16;
     public static final int MODULE_3_ENCODER_ID = 15;
-    public static final double MODULE_3_OFFSET = 59.8;
+    public static final double MODULE_3_OFFSET = 45.61;
 
+    //front right
     public static final int MODULE_4_DRIVE_ID = 17;
     public static final int MODULE_4_TURN_ID = 18;
     public static final int MODULE_4_ENCODER_ID = 17;
-    public static final double MODULE_4_OFFSET = -153.1;
+    public static final double MODULE_4_OFFSET = -139.83;
 
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
@@ -113,7 +120,26 @@ public final class Constants {
 
   public static final class SwerveModule {
 
-    public static final double MAX_TURN_SPEED = 50; // Rad/S //50
+    // Drive motor PID controller coefficients
+    // public static final double P_DRIVE = 0.175;
+    public static final double P_DRIVE = 0.0;
+    public static final double I_DRIVE = 0;
+    public static final double D_DRIVE = 0;
+    public static final double KF_DRIVE = 0.0679;
+
+    // Use this ratio to convert from Falcon angular velocity to wheel angular velocity
+    public static final double DRIVE_RATIO = 8.14;
+
+    // Turn motor PID controller coefficients
+    // public static final double P_TURN = 9;
+    public static final double P_TURN = 0.7; //0.7
+    public static final double I_TURN = 0;
+    public static final double D_TURN = 0; //0.1
+    public static final double KF_TURN = 0.06464446306847016; //0.15
+    public static final double MAX_TURN_SPEED = 150; // Rad/S //50
+    public static final double MAX_TURN_ACCEL = 400; // Rad/S^2
+    // public static final double MAX_TURN_SPEED = 50; // Rad/S //50
+
 
     //Turn motor coefficients
     public static final PIDSVGains TURN_GAINS = new PIDSVGains(
