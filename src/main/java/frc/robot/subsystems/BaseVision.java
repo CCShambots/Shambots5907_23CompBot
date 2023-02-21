@@ -38,6 +38,7 @@ public class BaseVision extends SubsystemBase {
         Pose3d poseWithCorrectTranslation = ll.getPose3d().transformBy(new Transform3d(newTranslation, new Rotation3d()));
 
         //Rotate the camera to face the correct way
+        Pose3d endPoint = poseWithCorrectTranslation.transformBy(new Transform3d(new Translation3d(), initialCameraPose.getRotation()));
 
         return endPoint;
     }
