@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    SubsystemManagerFactory.getInstance().prepSubsystems();
+    SubsystemManagerFactory.getInstance().notifyAutonomousStart();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
 
-    SubsystemManagerFactory.getInstance().prepSubsystems();
+    SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
 
 
