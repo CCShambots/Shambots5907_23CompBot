@@ -23,17 +23,6 @@ public class Claw extends StateMachine<Claw.State> {
     }
 
     @Override
-    protected void onEnable() {
-        requestTransition(State.OPENED);
-    }
-
-    @Override
-    protected void onDisable() {}
-
-    @Override
-    protected void update() {}
-
-    @Override
     protected void determineSelf() {
         setState(solenoid.get() == SOLENOID_CLAW_OPEN_STATE ? State.OPENED : State.CLOSED);
     }
