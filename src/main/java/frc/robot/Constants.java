@@ -49,8 +49,8 @@ public final class Constants {
     public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
 
     // Maximum linear chassis speed in meters per second (MK4 standard modules capable of 4.1)
-    public static final double MAX_LINEAR_SPEED = 2;
-    public static final double MAX_LINEAR_ACCELERATION = 4;
+    public static final double MAX_LINEAR_SPEED = 4;
+    public static final double MAX_LINEAR_ACCELERATION = 8;
 
     // Maximum chassis rotational speed in radians per second
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * Math.PI;
@@ -59,9 +59,9 @@ public final class Constants {
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
-            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back left
+            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), //back left
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back right
-            new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2) //front right
+            new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2) //front right
     };
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(moduleOffsets);
@@ -133,7 +133,7 @@ public final class Constants {
 
     //Drive motor coefficients
     public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(
-            .4,
+            .25,
             0,
             0,
             0.25,

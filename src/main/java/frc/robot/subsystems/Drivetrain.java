@@ -69,10 +69,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         // controller.b().onTrue(drive.calculateDriveKS(controller.a()));
         // controller.x().onTrue(drive.calculateDriveKV(DRIVE_GAINS.kS, controller.a(), () -> controller.y().getAsBoolean()));
-        /*controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
-        controller.b().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(1, Rotation2d.fromDegrees(0)))));
-        controller.x().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(-1, Rotation2d.fromDegrees(0)))));
-         */
+        // controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
+        // controller.b().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(1, Rotation2d.fromDegrees(0)))));
+        // controller.x().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(-1, Rotation2d.fromDegrees(0)))));
+        
     }
 
     private void defineTransitions() {
@@ -146,7 +146,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.drive(speeds, allowHoldAngleChange);
     }
 
-    public void setModuleStates(SwerveModuleState[] states) {
+    public void setModuleStates(SwerveModuleState... states) {
         drive.setModuleStates(states);
     }
 
@@ -164,6 +164,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public void resetGyro(Rotation2d angle) {
         drive.resetGyro(angle);
+    }
+
+    public void resetGyro() {
+        drive.resetGyro();
     }
 
     @Override

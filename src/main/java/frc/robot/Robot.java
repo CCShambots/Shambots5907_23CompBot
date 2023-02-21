@@ -82,8 +82,6 @@ public class Robot extends TimedRobot {
 
     SubsystemManagerFactory.getInstance().prepSubsystems();
 
-
-
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
