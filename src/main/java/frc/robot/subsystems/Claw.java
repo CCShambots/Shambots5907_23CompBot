@@ -22,17 +22,6 @@ public class Claw extends StateMachine<Claw.State> {
         addOmniTransition(State.OPENED, new InstantCommand(() -> solenoid.set(SOLENOID_CLAW_OPEN_STATE)));
     }
 
-    //TODO: This is probably not the correct behavior, but we can leave it for now
-    @Override
-    protected void onTeleopStart() {
-        requestTransition(State.OPENED);
-    }
-
-    @Override
-    protected void onAutonomousStart() {
-        requestTransition(State.OPENED);
-    }
-
     @Override
     protected void determineSelf() {
         setState(solenoid.get() == SOLENOID_CLAW_OPEN_STATE ? State.OPENED : State.CLOSED);
