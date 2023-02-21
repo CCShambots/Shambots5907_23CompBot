@@ -30,7 +30,7 @@ public class RobotContainer {
 
   private void configureBindings() {
     controller.x().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.XShape)));
-    controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.TeleopDrive)));
+    controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.FieldOrientedTeleopDrive)));
     // controller.a().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.Idle)));
     controller.a().onTrue(new InstantCommand(() -> dt.resetGyro()));
 

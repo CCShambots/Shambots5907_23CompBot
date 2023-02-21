@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -89,36 +90,43 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 })
         );
 
-        addTransition(
-                DrivetrainState.Idle,
-                DrivetrainState.TeleopDrive,
-                new InstantCommand()
+        addOmniTransition(
+                DrivetrainState.FieldOrientedTeleopDrive,
+                new InstantCommand(() -> setFieldRelative(true))
         );
 
-        addTransition(
-                DrivetrainState.XShape,
-                DrivetrainState.TeleopDrive,
-                new InstantCommand()
+        addOmniTransition(
+                DrivetrainState.BotOrientedTeleopDrive,
+                new InstantCommand(() -> setFieldRelative(false))
         );
     }
 
     private void defineStateCommands() {
         registerStateCommand(
-                DrivetrainState.TeleopDrive,
-                new DriveCommand(
-                        drive,
-                        x,
-                        y,
-                        theta,
-                        MAX_LINEAR_SPEED,
-                        MAX_LINEAR_ACCELERATION,
-                        MAX_ROTATION,
-                        MAX_ROT_ACCEL,
-                        Constants.ControllerConversions.DEADBAND,
-                        Constants.ControllerConversions.conversionFunction,
-                        true,
-                        this
-                )
+                DrivetrainState.FieldOrientedTeleopDrive,
+                getDefaultTeleopDriveCommand()
+        );
+
+        registerStateCommand(
+                DrivetrainState.BotOrientedTeleopDrive,
+                getDefaultTeleopDriveCommand()
+        );
+    }
+
+    private DriveCommand getDefaultTeleopDriveCommand() {
+        return new DriveCommand(
+                drive,
+                x,
+                y,
+                theta,
+                MAX_LINEAR_SPEED,
+                MAX_LINEAR_ACCELERATION,
+                MAX_ROTATION,
+                MAX_ROT_ACCEL,
+                Constants.ControllerConversions.DEADBAND,
+                Constants.ControllerConversions.conversionFunction,
+                true,
+                this
         );
     }
 
@@ -171,6 +179,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     @Override
+    protected void onTeleopStart() {
+        requestTransition(DrivetrainState.FieldOrientedTeleopDrive);
+    }
+
+    @Override
     protected void onDisable() {
         requestTransition(DrivetrainState.Idle);
     }
@@ -193,6 +206,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     public enum DrivetrainState {
-        Undetermined, XShape, TeleopDrive, Idle
+        Undetermined, XShape, FieldOrientedTeleopDrive, BotOrientedTeleopDrive, Idle
     }
 }
