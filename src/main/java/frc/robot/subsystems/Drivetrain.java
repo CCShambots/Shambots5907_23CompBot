@@ -171,11 +171,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     @Override
-    protected void onEnable() {
-
-    }
-
-    @Override
     protected void onDisable() {
         requestTransition(DrivetrainState.Idle);
     }
