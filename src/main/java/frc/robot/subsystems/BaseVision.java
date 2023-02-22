@@ -29,18 +29,17 @@ public class BaseVision extends SubsystemBase {
      * @return pose of the limelight
      */
     public Pose3d getPose3D() {
+
+        //Extract the original translation of the camera
         Translation3d initialTranslation = initialCameraPose.getTranslation();
 
-        //Calculate the translation for where the camera actually is relative to the bot
+        //Rotate the camera's translation around the origin to respect the turret angle
         Translation3d newTranslation = initialTranslation.rotateBy(new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
 
-        //This pose has the correct translation for the camera
-        Pose3d poseWithCorrectTranslation = ll.getPose3d().transformBy(new Transform3d(newTranslation, new Rotation3d()));
+        //Combine that translation with the orientation of the camera
+        Transform3d transform = new Transform3d(new Pose3d(), new Pose3d(newTranslation, initialCameraPose.getRotation()));
 
-        //Rotate the camera to face the correct way
-        Pose3d endPoint = poseWithCorrectTranslation.transformBy(new Transform3d(new Translation3d(), initialCameraPose.getRotation()));
-
-        return endPoint;
+        return ll.getPose3d().transformBy(transform.inverse());
     }
 
 
