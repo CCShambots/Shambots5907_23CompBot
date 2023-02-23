@@ -49,8 +49,11 @@ public final class Constants {
     public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
 
     // Maximum linear chassis speed in meters per second (MK4 standard modules capable of 4.1)
-    public static final double MAX_LINEAR_SPEED = 4;
-    public static final double MAX_LINEAR_ACCELERATION = 8;
+    public static final double MAX_LINEAR_SPEED = 3;
+    public static final double MAX_LINEAR_ACCELERATION = 6;
+
+    public static final double MAX_LINEAR_SPEED_AUTO = 2.5;
+    public static final double MAX_LINEAR_ACCELERATION_AUTO = 5;
 
     // Maximum chassis rotational speed in radians per second
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * Math.PI;
@@ -66,15 +69,15 @@ public final class Constants {
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(moduleOffsets);
 
-    public static final double P_HOLDANGLETELE = 0.25; //.5
-    public static final double I_HOLDANGLETELE = 0;//0.25;
-    public static final double D_HOLDANGLETELE = 0;//0.25;
+    public static final double P_HOLDANGLETELE = 0.25;
+    public static final double I_HOLDANGLETELE = 0;
+    public static final double D_HOLDANGLETELE = 0;
 
-    public static final double P_HOLDANGLEAUTO = 5; //4
-    public static final double I_HOLDANGLEAUTO = .25; //.25
+    public static final double P_HOLDANGLEAUTO = 10; 
+    public static final double I_HOLDANGLEAUTO = 0; 
     public static final double D_HOLDANGLEAUTO = 0;
 
-    public static final double P_HOLDTRANSLATION = 1; //1
+    public static final double P_HOLDTRANSLATION = 3;
     public static final double I_HOLDTRANSLATION = 0;
     public static final double D_HOLDTRANSLATION = 0;
 

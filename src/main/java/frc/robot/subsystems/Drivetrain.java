@@ -5,11 +5,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -18,6 +17,8 @@ import frc.robot.ShamLib.swerve.ModuleInfo;
 import frc.robot.ShamLib.swerve.SwerveDrive;
 
 import java.util.function.DoubleSupplier;
+
+import com.pathplanner.lib.PathPlanner;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
@@ -99,6 +100,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.BotOrientedTeleopDrive,
                 new InstantCommand(() -> setFieldRelative(false))
         );
+
+        addOmniTransition(DrivetrainState.Trajectory, new InstantCommand());
     }
 
     private void defineStateCommands() {
@@ -111,6 +114,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.BotOrientedTeleopDrive,
                 getDefaultTeleopDriveCommand()
         );
+
+        registerStateCommand(DrivetrainState.Trajectory, drive.getTrajectoryCommand(
+            PathPlanner.loadPath("test", Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
+              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO), true, this)
+              .andThen(new InstantCommand(() -> requestTransition(DrivetrainState.FieldOrientedTeleopDrive))));
     }
 
     private DriveCommand getDefaultTeleopDriveCommand() {
@@ -206,6 +214,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     public enum DrivetrainState {
-        Undetermined, XShape, FieldOrientedTeleopDrive, BotOrientedTeleopDrive, Idle
+        Undetermined, XShape, FieldOrientedTeleopDrive, BotOrientedTeleopDrive, Trajectory, Idle
     }
 }

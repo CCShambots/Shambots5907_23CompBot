@@ -1,12 +1,13 @@
 package frc.robot;
 
-import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
 
 public class RobotContainer {
@@ -29,10 +30,14 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    controller.x().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.XShape)));
-    controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.FieldOrientedTeleopDrive)));
+    controller.x().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.XShape)));
+    controller.b().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FieldOrientedTeleopDrive)));
     // controller.a().onTrue(new InstantCommand(() -> dt.requestTransition(Drivetrain.DrivetrainState.Idle)));
     controller.a().onTrue(new InstantCommand(() -> dt.resetGyro()));
+
+    new JoystickButton(rightHandCont, 1).onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.Trajectory)));
+
+
 
   }
 
