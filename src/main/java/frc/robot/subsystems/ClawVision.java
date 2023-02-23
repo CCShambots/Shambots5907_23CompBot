@@ -8,7 +8,7 @@ import static frc.robot.Constants.Vision.*;
 import static frc.robot.subsystems.ClawVision.VisionState.*;
 
 public class ClawVision extends StateMachine<ClawVision.VisionState> {
-    private final Limelight ll = new Limelight();
+    private final Limelight ll = new Limelight("limelight-arm");
 
     public ClawVision() {
         super("Vision", Undetermined, VisionState.class);

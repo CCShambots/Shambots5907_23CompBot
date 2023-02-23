@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public class BaseVision extends SubsystemBase {
 
-    private final Limelight ll = new Limelight("base-ll");
+    private final Limelight ll = new Limelight("limelight-base");
     private final Pose3d initialCameraPose;
     private final Supplier<Rotation2d> turretAngleSupplier;
 
