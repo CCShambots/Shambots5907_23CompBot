@@ -40,8 +40,7 @@ public final class Constants {
 
   public static final class SwerveDrivetrain {
 
-    //TODO: Remove
-    public static final Pose3d limelightPose = new Pose3d(Units.inchesToMeters(-5), 0, Units.inchesToMeters(31), new Rotation3d());
+    public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, Math.toRadians(90)));
 
     // Distance between centers of right and left wheels on robot in meters
     public static final double TRACK_WIDTH = Units.inchesToMeters(18.75);
@@ -52,7 +51,7 @@ public final class Constants {
     public static final double MAX_LINEAR_SPEED = 3;
     public static final double MAX_LINEAR_ACCELERATION = 6;
 
-    public static final double MAX_LINEAR_SPEED_AUTO = 2.5;
+    public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
     public static final double MAX_LINEAR_ACCELERATION_AUTO = 5;
 
     // Maximum chassis rotational speed in radians per second
@@ -73,7 +72,7 @@ public final class Constants {
     public static final double I_HOLDANGLETELE = 0;
     public static final double D_HOLDANGLETELE = 0;
 
-    public static final double P_HOLDANGLEAUTO = 10; 
+    public static final double P_HOLDANGLEAUTO = 5; 
     public static final double I_HOLDANGLEAUTO = 0; 
     public static final double D_HOLDANGLEAUTO = 0;
 

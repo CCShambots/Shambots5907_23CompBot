@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -15,7 +17,9 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.DriveCommand;
 import frc.robot.ShamLib.swerve.ModuleInfo;
 import frc.robot.ShamLib.swerve.SwerveDrive;
+import frc.robot.ShamLib.vision.Limelight;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.PathPlanner;
@@ -29,9 +33,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final DoubleSupplier y;
     private final DoubleSupplier theta;
 
-//    private final Limelight ll = new Limelight();
+   private final Limelight ll = new Limelight("limelight-base");
 
     private final Transform3d llToBot = new Transform3d(new Pose3d(), Constants.SwerveDrivetrain.limelightPose).inverse();
+    private final Transform2d botToLL = new Transform2d(new Pose2d(), Constants.SwerveDrivetrain.limelightPose.toPose2d());
 
     public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta) {
         super("Drivetrain", DrivetrainState.Undetermined, DrivetrainState.class);
@@ -62,12 +67,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         defineTransitions();
         defineStateCommands();
-
-        SmartDashboard.putData(drive.getField());
-
-        for(int i = 0; i<4; i++) {
-            SmartDashboard.putData("/Drivetrain/modules/module-" + (i+1), drive.getModules().get(i));
-        }
 
         // controller.b().onTrue(drive.calculateDriveKS(controller.a()));
         // controller.x().onTrue(drive.calculateDriveKV(DRIVE_GAINS.kS, controller.a(), () -> controller.y().getAsBoolean()));
@@ -148,14 +147,18 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public void updateOdometry() {
         drive.updateOdometry();
+
+        drive.getField().getObject("ll").setPose(drive.getPose().transformBy(botToLL)); //TODO: Remove
+
         drive.updateField2dObject();
 
-//        if(ll.hasTarget()) {
-//            Pose3d rawLLPose = ll.getPose3d();
-//
-//
-//            drive.addVisionMeasurement(rawLLPose.transformBy(llToBot).toPose2d());
-//        }
+
+       if(ll.hasTarget()) {
+           Pose3d rawLLPose = ll.getPose3d();
+
+
+           drive.addVisionMeasurement(rawLLPose.transformBy(llToBot).toPose2d());
+       }
     }
 
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
@@ -212,6 +215,21 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
     }
+
+    
+
+    @Override
+    public Map<String, Sendable> additionalSendables() {
+        return Map.of(
+            "field", drive.getField(),
+            "module-1", drive.getModules().get(0),
+            "module-2", drive.getModules().get(1),
+            "module-3", drive.getModules().get(2),
+            "module-4", drive.getModules().get(3)
+        );
+    }
+
+
 
     public enum DrivetrainState {
         Undetermined, XShape, FieldOrientedTeleopDrive, BotOrientedTeleopDrive, Trajectory, Idle
