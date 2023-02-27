@@ -67,13 +67,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         defineTransitions();
         defineStateCommands();
-
-        // controller.b().onTrue(drive.calculateDriveKS(controller.a()));
-        // controller.x().onTrue(drive.calculateDriveKV(DRIVE_GAINS.kS, controller.a(), () -> controller.y().getAsBoolean()));
-        // controller.a().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(0, new Rotation2d(0)))));
-        // controller.b().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(1, Rotation2d.fromDegrees(0)))));
-        // controller.x().onTrue(new InstantCommand(() -> setAllModules(new SwerveModuleState(-1, Rotation2d.fromDegrees(0)))));
-        
     }
 
     private void defineTransitions() {
@@ -215,8 +208,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
     }
-
-    
 
     @Override
     public Map<String, Sendable> additionalSendables() {
