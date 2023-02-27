@@ -26,8 +26,12 @@ public final class Constants {
   public static final class Vision {
     public static Pose3d baseLimelightPose = new Pose3d(inchesToMeters(-5), 0, inchesToMeters(31), new Rotation3d());
 
+    //Base
     public static final int APRIL_TAG_PIPELINE = 0;
-    public static final int ELEMENT_DETECTOR_PIPELINE = 0;
-    public static final int CONE_ORIENTATION_PIPELINE = 1;
+
+    //Claw
+    public static final int CONE_DETECTOR_PIPELINE = 0;
+    public static final int CUBE_DETECTOR_PIPELINE = 1;
+    public static final int CONE_ORIENTATION_PIPELINE = 2;
   }
 }

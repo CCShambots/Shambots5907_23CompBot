@@ -13,13 +13,15 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     public ClawVision() {
         super("Vision", Undetermined, VisionState.class);
 
-        addOmniTransition(ElementDetector, () -> setPipeline(ElementDetector));
+        addOmniTransition(ConeDetector, () -> setPipeline(ConeDetector));
+        addOmniTransition(CubeDetector, () -> setPipeline(CubeDetector));
         addOmniTransition(ConeAngle, () -> setPipeline(ConeAngle));
     }
 
     public enum VisionState {
-        Undetermined(ELEMENT_DETECTOR_PIPELINE),
-        ElementDetector(ELEMENT_DETECTOR_PIPELINE),
+        Undetermined(CONE_DETECTOR_PIPELINE),
+        ConeDetector(CONE_DETECTOR_PIPELINE),
+        CubeDetector(CUBE_DETECTOR_PIPELINE),
         ConeAngle(CONE_ORIENTATION_PIPELINE);
 
         public final int pipelineID;
@@ -62,7 +64,7 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     @Override
     protected void determineSelf() {
         ll.setPipeline(Undetermined.pipelineID);
-        setState(ElementDetector);
+        setState(ConeDetector);
     }
 
 }
