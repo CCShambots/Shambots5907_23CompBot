@@ -148,8 +148,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
        if(ll.hasTarget()) {
            Pose3d rawLLPose = ll.getPose3d();
-
-
            drive.addVisionMeasurement(rawLLPose.transformBy(llToBot).toPose2d());
        }
     }
