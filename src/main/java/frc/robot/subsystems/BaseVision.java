@@ -33,6 +33,10 @@ public class BaseVision extends SubsystemBase {
         return initialPose.transformBy(new Transform3d(new Pose3d(), getLimelightPose()).inverse());
     }
 
+    /**
+     * Returns the pose of the liemlight relative to the robot, accounting for the angle of the turret
+     * @return relative pose
+     */
     public Pose3d getLimelightPose() {
         double turretAngle = turretAngleSupplier.get().getRadians(); //Radians
 
