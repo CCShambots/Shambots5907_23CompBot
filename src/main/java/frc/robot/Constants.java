@@ -13,6 +13,11 @@ import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+
+import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -145,5 +150,15 @@ public final class Constants {
     public static final int kTimeoutMs = 30;//TODO: change these if needed vv
     public static final int kPIDLoopIdx = 0;
     public static final int kSlotIdx = 0;
+  public static final class Vision {
+    public static Pose3d baseLimelightPose = new Pose3d(inchesToMeters(-5), 0, inchesToMeters(31), new Rotation3d());
+
+    //Base
+    public static final int APRIL_TAG_PIPELINE = 0;
+
+    //Claw
+    public static final int CONE_DETECTOR_PIPELINE = 0;
+    public static final int CUBE_DETECTOR_PIPELINE = 1;
+    public static final int CONE_ORIENTATION_PIPELINE = 2;
   }
 }
