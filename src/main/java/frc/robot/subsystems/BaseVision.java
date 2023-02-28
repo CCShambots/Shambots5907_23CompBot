@@ -23,23 +23,27 @@ public class BaseVision extends SubsystemBase {
         this.turretAngleSupplier = turretAngleSupplier;
     }
 
-
     /**
      * Get the current pose of the limelight reading
-     * @return pose of the limelight
+     * @return pose of the limelight (in field space)
      */
     public Pose3d getPose3D() {
+        Pose3d initialPose = ll.getPose3d();
 
-        //Extract the original translation of the camera
-        Translation3d initialTranslation = initialCameraPose.getTranslation();
+        return initialPose.transformBy(new Transform3d(new Pose3d(), getLimelightPose()).inverse());
+    }
 
-        //Rotate the camera's translation around the origin to respect the turret angle
-        Translation3d newTranslation = initialTranslation.rotateBy(new Rotation3d(0, 0, turretAngleSupplier.get().getRadians()));
+    public Pose3d getLimelightPose() {
+        double turretAngle = turretAngleSupplier.get().getRadians(); //Radians
 
-        //Combine that translation with the orientation of the camera
-        Transform3d transform = new Transform3d(new Pose3d(), new Pose3d(newTranslation, initialCameraPose.getRotation()));
+        //Find the actual translation of the camera relative to the robot.
+        Translation3d currentTranslation = initialCameraPose.getTranslation().
+                rotateBy(new Rotation3d(0, 0, turretAngle));
 
-        return ll.getPose3d().transformBy(transform.inverse());
+        Rotation3d initialRotation = initialCameraPose.getRotation();
+
+        return new Pose3d(currentTranslation,
+                new Rotation3d(initialRotation.getX(), initialRotation.getY(), initialRotation.getZ() + turretAngle));
     }
 
 
