@@ -1,15 +1,11 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -17,10 +13,11 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.DriveCommand;
 import frc.robot.ShamLib.swerve.ModuleInfo;
 import frc.robot.ShamLib.swerve.SwerveDrive;
-import frc.robot.ShamLib.vision.Limelight;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathPlanner;
 
@@ -33,17 +30,17 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final DoubleSupplier y;
     private final DoubleSupplier theta;
 
-   private final Limelight ll = new Limelight("limelight-base");
+    private final Supplier<Pose3d> llPose;
+    private final BooleanSupplier llHasPose;
 
-    private final Transform3d llToBot = new Transform3d(new Pose3d(), Constants.SwerveDrivetrain.limelightPose).inverse();
-    private final Transform2d botToLL = new Transform2d(new Pose2d(), Constants.SwerveDrivetrain.limelightPose.toPose2d());
-
-    public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta) {
-        super("Drivetrain", DrivetrainState.Undetermined, DrivetrainState.class);
+    public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta, Supplier<Pose3d> llPoseSupplier, BooleanSupplier llHasPose) {
+        super("Drivetrain", DrivetrainState.UNDETERMINED, DrivetrainState.class);
 
         this.x = x;
         this.y = y;
         this.theta = theta;
+        this.llPose = llPoseSupplier;
+        this.llHasPose = llHasPose;
 
         drive = new SwerveDrive(
                 PIGEON_ID,
@@ -71,12 +68,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     private void defineTransitions() {
         addOmniTransition(
-                DrivetrainState.XShape,
+                DrivetrainState.X_SHAPE,
                 new InstantCommand(() -> setModuleStates(X_SHAPE_ARRAY))
         );
 
         addOmniTransition(
-                DrivetrainState.Idle,
+                DrivetrainState.IDLE,
                 new InstantCommand(() -> {
                     setAllModules(STOPPED_STATE);
                     stopModules();
@@ -84,33 +81,33 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
 
         addOmniTransition(
-                DrivetrainState.FieldOrientedTeleopDrive,
+                DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE,
                 new InstantCommand(() -> setFieldRelative(true))
         );
 
         addOmniTransition(
-                DrivetrainState.BotOrientedTeleopDrive,
+                DrivetrainState.BOT_ORIENTED_TELEOP_DRIVE,
                 new InstantCommand(() -> setFieldRelative(false))
         );
 
-        addOmniTransition(DrivetrainState.Trajectory, new InstantCommand());
+        addOmniTransition(DrivetrainState.TRAJECTORY, new InstantCommand());
     }
 
     private void defineStateCommands() {
         registerStateCommand(
-                DrivetrainState.FieldOrientedTeleopDrive,
+                DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE,
                 getDefaultTeleopDriveCommand()
         );
 
         registerStateCommand(
-                DrivetrainState.BotOrientedTeleopDrive,
+                DrivetrainState.BOT_ORIENTED_TELEOP_DRIVE,
                 getDefaultTeleopDriveCommand()
         );
 
-        registerStateCommand(DrivetrainState.Trajectory, drive.getTrajectoryCommand(
+        registerStateCommand(DrivetrainState.TRAJECTORY, drive.getTrajectoryCommand(
             PathPlanner.loadPath("test", Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
               Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO), true, this)
-              .andThen(new InstantCommand(() -> requestTransition(DrivetrainState.FieldOrientedTeleopDrive))));
+              .andThen(new InstantCommand(() -> requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE))));
     }
 
     private DriveCommand getDefaultTeleopDriveCommand() {
@@ -141,15 +138,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     public void updateOdometry() {
         drive.updateOdometry();
 
-        drive.getField().getObject("ll").setPose(drive.getPose().transformBy(botToLL)); //TODO: Remove
-
         drive.updateField2dObject();
 
-
-       if(ll.hasTarget()) {
-           Pose3d rawLLPose = ll.getPose3d();
-           drive.addVisionMeasurement(rawLLPose.transformBy(llToBot).toPose2d());
-       }
+        //Only integrate vision measurement if the limelight has a target
+        if(llHasPose.getAsBoolean()) {
+            drive.addVisionMeasurement(llPose.get().toPose2d());
+        }
     }
 
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
@@ -182,12 +176,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void onTeleopStart() {
-        requestTransition(DrivetrainState.FieldOrientedTeleopDrive);
+        requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
     @Override
     protected void onDisable() {
-        requestTransition(DrivetrainState.Idle);
+        requestTransition(DrivetrainState.IDLE);
     }
 
     @Override
@@ -197,7 +191,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void determineSelf() {
-        setState(DrivetrainState.Idle);
+        setState(DrivetrainState.IDLE);
     }
 
     @Override
@@ -218,9 +212,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
     }
 
-
-
     public enum DrivetrainState {
-        Undetermined, XShape, FieldOrientedTeleopDrive, BotOrientedTeleopDrive, Trajectory, Idle
+        UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE
     }
 }
