@@ -47,6 +47,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DRIVE_GAINS,
                 TURN_GAINS,
                 MAX_LINEAR_SPEED,
+                MAX_LINEAR_ACCELERATION,
                 MAX_TURN_SPEED,
                 MAX_TURN_ACCEL,
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
