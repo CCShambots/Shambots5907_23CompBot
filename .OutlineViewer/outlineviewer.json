@@ -1,1 +1,13 @@
-{}
+{
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)"
+  },
+  "Retained Values": {
+    "open": false
+  },
+  "transitory": {
+    "SmartDashboard": {
+      "open": true
+    }
+  }
+}
