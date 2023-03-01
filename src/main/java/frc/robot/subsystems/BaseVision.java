@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.ShamLib.vision.Limelight;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class BaseVision extends SubsystemBase {
@@ -48,6 +49,14 @@ public class BaseVision extends SubsystemBase {
 
         return new Pose3d(currentTranslation,
                 new Rotation3d(initialRotation.getX(), initialRotation.getY(), initialRotation.getZ() + turretAngle));
+    }
+
+    public Supplier<Pose3d> getLLPoseSupplier() {
+        return this::getLimelightPose;
+    }
+
+    public BooleanSupplier getLLHasTargetSupplier() {
+        return ll::hasTarget;
     }
 
 
