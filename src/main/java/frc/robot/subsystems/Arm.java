@@ -224,8 +224,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void update() {
-        // pullAbsoluteAngles();
-
         rotator.update();
     }
 
