@@ -20,6 +20,7 @@ import frc.robot.util.math.Range;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 import static java.lang.Math.PI;
+import static java.lang.Math.toRadians;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -47,7 +48,7 @@ public final class Constants {
 
   public static final class SwerveDrivetrain {
 
-    public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, Math.toRadians(90)));
+    public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, toRadians(90)));
 
     // Distance between centers of right and left wheels on robot in meters
     public static final double TRACK_WIDTH = Units.inchesToMeters(18.75);
@@ -163,11 +164,13 @@ public final class Constants {
   }
 
   public static class Arm {
+    //Physial constants for arm dimensions
     public static final double baseToTurret = inchesToMeters(5.5 + 1.44);//Distance from the floor to the top of the turret plate
     public static final double turretToArm = inchesToMeters(14.5); //Distance from the turret to the arm (when the elevator is at 0)
     public static final double armToWrist = inchesToMeters(28.765564);
     public static final double wristToEndEffector = inchesToMeters(12.9016);
 
+    //Turret hardawre details
     public static final int TURRET_ID = 21;
     public static final double TURRET_INPUT_TO_OUTPUT =
             (1.0/1.0) * //TODO: Gear ratio on motor
@@ -179,6 +182,7 @@ public final class Constants {
     public static final double TURRET_ENCODER_OFFSET = 270; //Degrees
     public static final Range turretRange = Range.fromDegrees(-180, 180);
 
+    //Elevator hardware details
     public static final int ELEVATOR_ID = 22;
     public static final double ELEVATOR_INPUT_TO_OUTPUT =
                 (1.0 / 15.0) * //Motor gearbox //TODO: Check
@@ -190,6 +194,7 @@ public final class Constants {
     public static final double ELEVATOR_MAX_VEL = Units.inchesToMeters(20); //m/sec //TODO: Adjust these
     public static final double ELEVATOR_MAX_ACCEL = Units.inchesToMeters(10); //m/sec^2
 
+    //Shoulder hardware details
     public static final int SHOULDER_ID = 23;
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/100.0) * (1.0 / 1.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 0; //TODO
@@ -199,6 +204,7 @@ public final class Constants {
     public static final double SHOULDER_MAX_VEL = PI/4; //Radians/sec
     public static final double SHOULDER_MAX_ACCEL = PI/16; //Radians/sec^2
 
+    //Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 2048) * (1.0 / 100.0) * 2* PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 1; //TODO
@@ -207,16 +213,23 @@ public final class Constants {
     public static final double WRIST_MAX_VEL = PI/2; //Radians/sec
     public static final double WRIST_MAX_ACCEL = PI/2; //Radians/sec^2
 
+    //Rotator hardware details
     public static final int ROTATOR_ID = 25;
-    public static final double ROTATOR_ENCODER_OFFSET = Math.toRadians(0); //Radians //TODO
+    public static final double ROTATOR_ENCODER_OFFSET = toRadians(0); //Radians //TODO
     public static final Range rotatorRange = Range.fromDegrees(-180, 180);
 
+    //PID gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
 
     public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
+
+    //Other constants
+    public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
+
+
 
   }
 }

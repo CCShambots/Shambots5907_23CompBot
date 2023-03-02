@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenixpro.configs.MotorOutputConfigs;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -9,12 +8,12 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.rev.PositionSpark;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
+import frc.robot.commands.arm.TrackConeAngleCommand;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
@@ -48,11 +47,34 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     private final PositionSpark rotator = new PositionSpark(ROTATOR_ID, kBrushless, ROTATOR_GAINS, ROTATOR_ENCODER_OFFSET, Math.toRadians(1));
 
     private final ClawVision clawVision = new ClawVision();
+    private final Claw claw = new Claw();
 
 
     public Arm() {
-        super("Arm", Undetermined, ArmMode.class);
+        super("Arm", UNDETERMINED, ArmMode.class);
 
+        configureHardware();
+
+        addChildSubsystem(clawVision);
+
+        defineTransitions();
+        registerStateCommands();
+
+        //TODO: check if abs encoders are zero and disable joint on startup if so
+    }
+
+    private void defineTransitions() {
+        addOmniTransition(IDLE, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_DETECTOR)));
+
+        addOmniTransition(CONE_ANGLE, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_ANGLE)));
+    }
+
+    private void registerStateCommands() {
+        registerStateCommand(CONE_ANGLE, new TrackConeAngleCommand(this, clawVision)
+                .andThen(transitionCommand(IDLE)));
+    }
+
+    private void configureHardware() {
         shoulderEncoder.setInverted(true);
 
         MotorOutputConfigs shoulderConfig = new MotorOutputConfigs();
@@ -72,27 +94,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         wristConfig.NeutralMode = Brake;
         wristConfig.Inverted = Clockwise_Positive;
         wrist.getConfigurator().apply(wristConfig);
-
-        addChildSubsystem(clawVision);
-
-        addOmniTransition(TrackCone, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_ANGLE)));
-        addOmniTransition(Idle, new InstantCommand());
-
-        //TODO: Bring this into a separate command
-        LinearFilter filter = LinearFilter.singlePoleIIR(.3, 0.02);
-        registerStateCommand(TrackCone, new RunCommand(() -> {
-            double remainder = Math.IEEEremainder(clawVision.getConeAngle().getRadians() + PI/2, PI);
-
-
-            double offset = Math.IEEEremainder(remainder + rotator.getPosition(), 2* PI);
-
-            rotator.setTarget(filter.calculate(offset));
-        }).andThen(new InstantCommand(() -> requestTransition(Idle))));
-
-
-
-        //TODO: check if abs encoders are zero and disable joint on startup if so
     }
+
 
     public Command calculateTurretFF(Trigger increment, BooleanSupplier interrupt) {
         return turret.calculateKV(TURRET_GAINS.getS(), 0.05, increment, interrupt);
@@ -155,7 +158,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public void goToPose(Pose3d pose) {
         ArmState target = runIK(pose);
         if(target != null) {
-            pullAbsoluteAngles(); //TODO: Remove when no longer necessary
+//            pullAbsoluteAngles(); //TODO: Remove when no longer necessary
             goToArmState(target);
         } else {
         }
@@ -171,11 +174,52 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         return kinematics.forwardKinematics(state);
     }
 
+    /**
+     * Set the target of the turret
+     * @param target target angle (in radians)
+     */
+    public void setTurretTarget(double target) {
+        turret.setTarget(target);
+    }
+
+    /**
+     * Set the target of the elevator
+     * @param target target height (in meters)
+     */
+    public void setElevatorTarget(double target) {
+        elevator.setTarget(target);
+    }
+
+    /**
+     * Set the target of the shoulder
+     * @param target target angle (in radians)
+     */
+    public void setShoulderTarget(double target) {
+        shoulder.setTarget(target);
+    }
+
+    /**
+     * Set the target of the wrist
+     * @param target target angle (in radians)
+     */
+    public void setWristTarget(double target) {
+        wrist.setTarget(target);
+    }
+
+    /**
+     * Set the target of the rotator
+     * @param target target angle (in radians)
+     */
+    public void setRotatorTarget(double target) {
+        rotator.setTarget(target);
+    }
+
+
     @Override
     protected void determineSelf() {
         pullAbsoluteAngles();
 
-        setState(Idle);
+        setState(IDLE);
     }
 
     @Override
@@ -294,7 +338,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     public enum ArmMode {
-        Undetermined, Idle, TrackCone
+        UNDETERMINED, IDLE, CONE_ANGLE
     }
 
 
