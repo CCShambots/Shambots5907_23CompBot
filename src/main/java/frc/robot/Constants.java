@@ -19,6 +19,7 @@ import frc.robot.ShamLib.motors.v5.PIDFGains;
 import frc.robot.util.math.Range;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
+import static java.lang.Math.PI;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -61,8 +62,8 @@ public final class Constants {
     public static final double MAX_LINEAR_ACCELERATION_AUTO = 5;
 
     // Maximum chassis rotational speed in radians per second
-    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * Math.PI;
-    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * Math.PI);
+    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
+    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
     public static final Translation2d[] moduleOffsets = {
@@ -147,10 +148,6 @@ public final class Constants {
             0.25,
             0.112
     );
-
-    public static final int kTimeoutMs = 30;//TODO: change these if needed vv
-    public static final int kPIDLoopIdx = 0;
-    public static final int kSlotIdx = 0;
   }
 
   public static final class Vision {
@@ -166,57 +163,60 @@ public final class Constants {
   }
 
   public static class Arm {
-    public static final double baseToTurret = inchesToMeters(3); //Distance from the floor to the turret
-    public static final double turretToArm = inchesToMeters(8.5); //Distance from the turret to the arm (when the elevator is at 0)
-    public static final double armToWrist = inchesToMeters(24.766);
-    public static final double wristToEndEffector = inchesToMeters(9);
+    public static final double baseToTurret = inchesToMeters(5.5 + 1.44);//Distance from the floor to the top of the turret plate
+    public static final double turretToArm = inchesToMeters(14.5); //Distance from the turret to the arm (when the elevator is at 0)
+    public static final double armToWrist = inchesToMeters(28.765564);
+    public static final double wristToEndEffector = inchesToMeters(12.9016);
 
-    public static final int TURRET_ID = 99;
-    public static final double TURRET_INPUT_TO_OUTPUT = 1; //Ticks --> Radians
-    public static final int TURRET_ENCODER_PORT = 7;
-    public static final int TURRET_ENCODER_OFFSET = 0; //Radians
+    public static final int TURRET_ID = 21;
+    public static final double TURRET_INPUT_TO_OUTPUT =
+            (1.0/1.0) * //TODO: Gear ratio on motor
+            (10 / 140) *
+            2 * PI //To radians
+    ; //Rotations --> Radians
+    public static final int TURRET_POT_PORT = 0; //Analog port
+    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
+    public static final double TURRET_ENCODER_OFFSET = 270; //Degrees
     public static final Range turretRange = Range.fromDegrees(-180, 180);
 
-    public static final int ELEVATOR_ID = 51;
-    public static final int ELEVATOR_FOLLOWER_ID = 52;
+    public static final int ELEVATOR_ID = 22;
     public static final double ELEVATOR_INPUT_TO_OUTPUT =
-            (1.0 / 2048.0) * //Motor revolutions
-                    (12.0 / 50.0) * //Stage 1
-                    (14.0 / 60.0) * //Stage 2
-                    1.751 * Math.PI //Pitch diameter (1.751") --> distance traveled by chain (in inches)
-                    *0.0254
-            ;
-    public static final Range elevatorRange = new Range(0, inchesToMeters(24));
-    public static final double ELEVATOR_MAX_VEL = 20; //in/sec
-    public static final double ELEVATOR_MAX_ACCEL = 10; //in/sec^2
+                (1.0 / 15.0) * //Motor gearbox //TODO: Check
+                (18.0 / 54.0) * //Actual gears
+                1.273 * PI * //Pitch diameter (1.273") --> distance traveled by chain (in inches)
+                0.0254 //inches to meters
+            ; //Converts motor revolutions to meters
+    public static final Range elevatorRange = new Range(0, inchesToMeters(26));
+    public static final double ELEVATOR_MAX_VEL = Units.inchesToMeters(20); //m/sec //TODO: Adjust these
+    public static final double ELEVATOR_MAX_ACCEL = Units.inchesToMeters(10); //m/sec^2
 
-    public static final int SHOULDER_ID = 62;
-    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/2048) * (1.0/100.0) * (18.0 / 16.0) * 2 * Math.PI; //Ticks --> Radians
-    public static final int SHOULDER_ENCODER_PORT = 8;
-    public static final double SHOULDER_ENCODER_OFFSET = 147.5; //Degrees
-    public static final Range shoulderRange = Range.fromDegrees(-28, 50);
-    public static final double SHOULDER_MAX_VEL = Math.PI/4; //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = Math.PI/16; //Radians/sec^2
+    public static final int SHOULDER_ID = 23;
+    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/100.0) * (1.0 / 1.0) * 2 * PI; //Rotations --> Radians
+    public static final int SHOULDER_ENCODER_PORT = 0; //TODO
+    public static final double SHOULDER_ENCODER_OFFSET = 0; //TODO //Degrees
+    public static final Range shoulderRange = Range.fromDegrees(-28, 50); //TODO
+    //TODO: Adust
+    public static final double SHOULDER_MAX_VEL = PI/4; //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = PI/16; //Radians/sec^2
 
-    public static final int WRIST_ID = 61;
-    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 2048) * (1.0 / 100.0) * 2*Math.PI; //Ticks --> Radians
-    public static final int WRIST_ENCODER_PORT = 9;
-    public static final double WRIST_ENCODER_OFFSET = -89; //Degrees
-    public static final Range wristRange = Range.fromDegrees(-95, 95);
-    public static final double WRIST_MAX_VEL = Math.PI/2; //Radians/sec
-    public static final double WRIST_MAX_ACCEL = Math.PI/2; //Radians/sec^2
+    public static final int WRIST_ID = 24;
+    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 2048) * (1.0 / 100.0) * 2* PI; //Ticks --> Radians
+    public static final int WRIST_ENCODER_PORT = 1; //TODO
+    public static final double WRIST_ENCODER_OFFSET = -89; //Degrees //TODO
+    public static final Range wristRange = Range.fromDegrees(-95, 95); //Degrees //TODO:
+    public static final double WRIST_MAX_VEL = PI/2; //Radians/sec
+    public static final double WRIST_MAX_ACCEL = PI/2; //Radians/sec^2
 
-    public static final int ROTATOR_ID = 60;
-    public static final double ROTATOR_INPUT_TO_OUTPUT = 2 * Math.PI; //Rotations --> Radians
-    public static final double ROTATOR_ENCODER_OFFSET = Math.toRadians(55.1); //Radians
+    public static final int ROTATOR_ID = 25;
+    public static final double ROTATOR_ENCODER_OFFSET = Math.toRadians(0); //Radians //TODO
     public static final Range rotatorRange = Range.fromDegrees(-180, 180);
 
-    public static final PIDFGains TURRET_GAINS = new PIDFGains(0, 0, 0, 0);
-    public static final PIDFGains ELEVATOR_GAINS = new PIDFGains(0.075, 0, 0, 0.0521864237843311);
-    public static final PIDFGains SHOULDER_GAINS = new PIDFGains(01, 0, 0, 0.06182775705379789);
-    public static final PIDFGains WRIST_GAINS = new PIDFGains(0.1, 0, 0, 0.07269191648520058);
+    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+    public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+    public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+    public static final PIDSVGains WRIST_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
 
-    public static final PIDFGains ROTATOR_PIDF_GAINS = new PIDFGains(2.5, 0, 100, 0);
+    public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
 
   }
 }
