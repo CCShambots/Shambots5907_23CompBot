@@ -33,7 +33,8 @@ import static java.lang.Math.toRadians;
 public final class Constants {
   public static final class Claw {
     public static final int COMPRESSOR_ID = 1;
-    public static final int SOLENOID_ID = 2;
+    public static final int SOLENOID_ID_1 = 0;
+    public static final int SOLENOID_ID_2 = 1;
 
     public static final boolean SOLENOID_CLAW_OPEN_STATE = false; //TODO: find value
   }
