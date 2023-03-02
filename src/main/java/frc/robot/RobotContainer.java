@@ -53,7 +53,6 @@ public class RobotContainer {
 
     autoLoader = instantiateAutoLoader();
 
-
     configureBindings();
   }
 

@@ -1,12 +1,15 @@
 package frc.robot.subsystems;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -20,6 +23,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathPlanner;
+import frc.robot.ShamLib.swerve.TrajectoryBuilder;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
@@ -53,7 +57,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                true,
+                true, //TODO: Make this false before comp
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
@@ -104,11 +108,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.BOT_ORIENTED_TELEOP_DRIVE,
                 getDefaultTeleopDriveCommand()
         );
-
-        registerStateCommand(DrivetrainState.TRAJECTORY, drive.getTrajectoryCommand(
-            PathPlanner.loadPath("test", Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
-              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO), true, this)
-              .andThen(new InstantCommand(() -> requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE))));
     }
 
     private DriveCommand getDefaultTeleopDriveCommand() {
@@ -149,6 +148,30 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
         drive.drive(speeds, allowHoldAngleChange);
+    }
+
+    public Command runTrajectory(PathPlannerTrajectory trajectory, boolean resetPose, DrivetrainState endState) {
+        return new SequentialCommandGroup(
+                new InstantCommand(
+                        () -> registerStateCommand(
+                                DrivetrainState.TRAJECTORY,
+                                drive.getTrajectoryCommand(trajectory, resetPose)
+                                        .andThen(new InstantCommand(() -> {
+                                            registerStateCommand(DrivetrainState.TRAJECTORY, new InstantCommand());
+                                            requestTransition(endState);
+                                        }))
+                        )
+                ),
+                new InstantCommand(() -> requestTransition(DrivetrainState.TRAJECTORY))
+        );
+    }
+
+    public Command runTrajectory(PathPlannerTrajectory trajectory, DrivetrainState endState) {
+        return runTrajectory(trajectory, false, endState);
+    }
+
+    public TrajectoryBuilder getTrajectoryBuilder() {
+        return drive.getTrajectoryBuilder();
     }
 
     public void setModuleStates(SwerveModuleState... states) {
