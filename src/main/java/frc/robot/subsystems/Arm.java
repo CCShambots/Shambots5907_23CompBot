@@ -69,7 +69,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         addChildSubsystem(clawVision);
 
-        addOmniTransition(TrackCone, new InstantCommand(() -> clawVision.requestTransition(VisionState.ConeAngle)));
+        addOmniTransition(TrackCone, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_ANGLE)));
         addOmniTransition(Idle, new InstantCommand());
 
         //TODO: Bring this into a separate command
