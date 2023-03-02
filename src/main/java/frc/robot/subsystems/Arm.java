@@ -65,13 +65,11 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private void defineTransitions() {
         addOmniTransition(IDLE, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_DETECTOR)));
+        addOmniTransition(TRACKING_CONE, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_ANGLE)));
 
-        addOmniTransition(CONE_ANGLE, new InstantCommand(() -> clawVision.requestTransition(VisionState.CONE_ANGLE)));
     }
 
     private void registerStateCommands() {
-        registerStateCommand(CONE_ANGLE, new TrackConeAngleCommand(this, clawVision)
-                .andThen(transitionCommand(IDLE)));
     }
 
     private void configureHardware() {
@@ -336,7 +334,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     public enum ArmMode {
-        UNDETERMINED, IDLE, CONE_ANGLE
+        UNDETERMINED, IDLE, SEEKING_POSITION, HOLDING_POSITION, TRAJECTORY, TRACKING_CONE,
+
+        //Flags
+        HOLDING_OBJECT, LOCKED_CONE_ANGLE
     }
 
 
