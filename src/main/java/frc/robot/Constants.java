@@ -134,20 +134,20 @@ public final class Constants {
 
     //Turn motor coefficients
     public static final PIDSVGains TURN_GAINS = new PIDSVGains(
-            10,
+            10, //10
             0,
             0,
-            0.3,
-            0.112
+            0.3, //0.3
+            0.121057 //0.112
     );
 
     //Drive motor coefficients
     public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(
-            .25,
+            0.25, 
             0,
             0,
-            0.25,
-            0.112
+            0.35, 
+            .11066 
     );
   }
 

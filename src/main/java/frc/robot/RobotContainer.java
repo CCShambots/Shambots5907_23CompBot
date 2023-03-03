@@ -3,9 +3,12 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
@@ -75,6 +78,11 @@ public class RobotContainer {
     rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
     leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+
+    leftStick.topLeft().onTrue(dt.calculateModuleDrive(leftStick.topBase(), leftStick.trigger(), () -> leftStick.topRight().getAsBoolean()));
+    // leftStick.topLeft().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(90)))));
+    // leftStick.topBase().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)))));
+    leftStick.button(5).onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(0)))));
   }
 
   public Command getAutonomousCommand() {
