@@ -6,9 +6,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
+import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
@@ -19,7 +23,7 @@ import java.util.Map;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
-public class RobotContainer {
+public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   //Declare HIDs
   private final CommandFlightStick leftStick = new CommandFlightStick(0);
@@ -27,7 +31,9 @@ public class RobotContainer {
 
   //Declare subsystems
   private final BaseVision baseVision;
-  private final Drivetrain dt;
+
+  private final Arm arm;
+  private final Drivetrain drivetrain;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
@@ -35,10 +41,13 @@ public class RobotContainer {
   private final Map<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
   public RobotContainer() {
+    super("Robot", State.UNDETERMINED, State.class);
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, Rotation2d::new); //TODO: Give turret information to the vision subsystem
 
-    dt = new Drivetrain(
+    arm = new Arm();
+
+    drivetrain = new Drivetrain(
           () -> -leftStick.getX(),
           () -> -leftStick.getY(),
           () -> -rightStick.getRawAxis(0),
@@ -49,12 +58,46 @@ public class RobotContainer {
     //Load the trajectories into the hashmap
     loadPaths("test");
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    SubsystemManagerFactory.getInstance().registerSubsystem(drivetrain);
 
     autoLoader = instantiateAutoLoader();
 
 
     configureBindings();
+    registerSubsystems();
+
+    registerTransitions();
+  }
+
+  private void registerTransitions() {
+    addOmniTransition(State.DISABLED, new SequentialCommandGroup(
+            drivetrain.transitionCommand(DrivetrainState.IDLE),
+            arm.transitionCommand(ArmMode.IDLE)
+    ));
+
+    addOmniTransition(State.TELEOP, new SequentialCommandGroup(
+            drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
+            arm.transitionCommand(ArmMode.SEEKING_POSITION) //TODO: make state SEEKING_STOW
+    ));
+
+    addOmniTransition(State.AUTONOMOUS, new SequentialCommandGroup(
+            drivetrain.transitionCommand(DrivetrainState.TRAJECTORY) //TODO: change to dt.runTrajectoryCommand or whatever
+    ));
+  }
+
+  private void registerSubsystems() {
+    addChildSubsystem(drivetrain);
+    addChildSubsystem(arm);
+  }
+
+  @Override
+  protected void onTeleopStart() {
+    requestTransition(State.TELEOP);
+  }
+
+  @Override
+  protected void onAutonomousStart() {
+    requestTransition(State.AUTONOMOUS);
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
@@ -71,10 +114,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
-    rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+    rightStick.trigger().onTrue(new InstantCommand(() -> drivetrain.requestTransition(DrivetrainState.X_SHAPE)));
+    rightStick.trigger().onFalse(new InstantCommand(() -> drivetrain.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
-    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+    leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
   }
 
   public Command getAutonomousCommand() {
@@ -100,6 +143,15 @@ public class RobotContainer {
    */
   public void loadPaths(String... names) {
     loadPaths(false, names);
+  }
+
+  @Override
+  protected void determineSelf() {
+    setState(State.DISABLED);
+  }
+
+  public enum State {
+    UNDETERMINED, DISABLED, AUTONOMOUS, TELEOP
   }
 
   public enum AutoRoutes {

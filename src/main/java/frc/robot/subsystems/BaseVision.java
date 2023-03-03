@@ -7,7 +7,7 @@ import frc.robot.ShamLib.vision.Limelight;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class BaseVision extends SubsystemBase {
+public class BaseVision {
 
     private final Limelight ll = new Limelight("limelight-base");
     private final Pose3d initialCameraPose;
