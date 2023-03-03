@@ -3,15 +3,13 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
@@ -31,6 +29,7 @@ public class RobotContainer {
   //Declare subsystems
   private final BaseVision baseVision;
   private final Drivetrain dt;
+  private final Arm arm;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
@@ -42,17 +41,20 @@ public class RobotContainer {
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
     dt = new Drivetrain(
-          () -> -leftStick.getX(),
           () -> -leftStick.getY(),
+          () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
           baseVision.getLLPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
 
+    this.arm = new Arm();
+
     //Load the trajectories into the hashmap
     loadPaths("test");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
 
     autoLoader = instantiateAutoLoader();
 
@@ -79,15 +81,26 @@ public class RobotContainer {
 
     leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
 
-    leftStick.topLeft().onTrue(dt.calculateModuleDrive(leftStick.topBase(), leftStick.trigger(), () -> leftStick.topRight().getAsBoolean()));
+    // leftStick.topLeft().onTrue(dt.calculateModuleDrive(leftStick.topBase(), leftStick.trigger(), () -> leftStick.topRight().getAsBoolean()));
     // leftStick.topLeft().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(90)))));
     // leftStick.topBase().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(-90)))));
-    leftStick.button(5).onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(0)))));
+    // leftStick.button(5).onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(0)))));
+
+    // leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topBase(), () -> leftStick.topRight().getAsBoolean()));
+    // leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topBase(), () -> leftStick.topRight().getAsBoolean()));
+    // leftStick.topBase().onTrue(arm.func1());
+    // leftStick.topRight().onTrue(arm.func2());
+    // leftStick.topLeft().onTrue(arm.func3());
   }
 
   public Command getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
+
+  public Runnable runArmControlLoops() {
+    return arm.runControlLoops();
+  }
+
 
   /**
    * Load a sequence of paths directly into the map of trajectories.
