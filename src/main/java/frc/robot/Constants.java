@@ -37,7 +37,7 @@ public final class Constants {
     public static final int SOLENOID_ID_1 = 2;
     public static final int SOLENOID_ID_2 = 3;
 
-    public static final boolean SOLENOID_CLAW_OPEN_STATE = false; //TODO: find value
+    public static final boolean SOLENOID_CLAW_OPEN_STATE = true;
   }
 
 
