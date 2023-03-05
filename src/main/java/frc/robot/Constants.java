@@ -200,12 +200,12 @@ public final class Constants {
 
     //Shoulder hardware details
     public static final int SHOULDER_ID = 23;
-    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/100.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
+    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/70.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-35, 90); //TODO
-    public static final double SHOULDER_MAX_VEL = toRadians(90); //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(90); //Radians/sec^2
+    public static final double SHOULDER_MAX_VEL = toRadians(45); //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(45); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
@@ -224,17 +224,15 @@ public final class Constants {
     //PID gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
-    public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(10, 0, 0, 0.4, .234);
-    public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(0, 0, 0);
-    public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.109056); 
-    public static final PIDGains WRIST_CONT_GAINS = new PIDGains(5, 0, 0);
+    public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
+    public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(1.5, 0, 0);
+    public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
+    public static final PIDGains WRIST_CONT_GAINS = new PIDGains(3.5, 0, 0);
 
     public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
-
-
 
   }
 }

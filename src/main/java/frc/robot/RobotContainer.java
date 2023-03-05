@@ -28,7 +28,7 @@ public class RobotContainer {
 
   //Declare subsystems
   private final BaseVision baseVision;
-  private final Drivetrain dt;
+  // private final Drivetrain dt;
   private final Arm arm;
 
   //Declare autonomous loader
@@ -40,20 +40,20 @@ public class RobotContainer {
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
-    dt = new Drivetrain(
-          () -> -leftStick.getY(),
-          () -> -leftStick.getX(),
-          () -> -rightStick.getRawAxis(0),
-          baseVision.getLLPoseSupplier(),
-          baseVision.getLLHasTargetSupplier()
-    );
+    // dt = new Drivetrain(
+          // () -> -leftStick.getY(),
+          // () -> -leftStick.getX(),
+          // () -> -rightStick.getRawAxis(0),
+          // baseVision.getLLPoseSupplier(),
+          // baseVision.getLLHasTargetSupplier()
+    // );
 
     this.arm = new Arm();
 
     //Load the trajectories into the hashmap
     loadPaths("test");
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    // SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
 
     autoLoader = instantiateAutoLoader();
@@ -76,10 +76,10 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
-    rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+    // rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
+    // rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
-    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+    // leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
 
     // leftStick.topLeft().onTrue(dt.calculateModuleDrive(leftStick.topBase(), leftStick.trigger(), () -> leftStick.topRight().getAsBoolean()));
     // leftStick.topLeft().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, Rotation2d.fromDegrees(90)))));
