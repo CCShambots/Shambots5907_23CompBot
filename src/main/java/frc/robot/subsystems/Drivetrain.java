@@ -55,7 +55,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                true,
+                false,
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
@@ -187,7 +187,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void onTeleopStart() {
-        requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+        // requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
     @Override

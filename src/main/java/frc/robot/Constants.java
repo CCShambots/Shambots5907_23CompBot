@@ -199,7 +199,7 @@ public final class Constants {
 
     //Shoulder hardware details
     public static final int SHOULDER_ID = 23;
-    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/100.0) * (1.0 / 1.0) * 2 * PI; //Rotations --> Radians
+    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/100.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-35, 90); //TODO
@@ -226,7 +226,7 @@ public final class Constants {
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(10, 0, 0, 0.4, .234);
     public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(0, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.109056); 
-    public static final PIDGains WRIST_CONT_GAINS = new PIDGains(14, 0, 0);
+    public static final PIDGains WRIST_CONT_GAINS = new PIDGains(5, 0, 0);
 
     public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
 

@@ -88,9 +88,9 @@ public class RobotContainer {
 
     // leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topBase(), () -> leftStick.topRight().getAsBoolean()));
     // leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topBase(), () -> leftStick.topRight().getAsBoolean()));
-    // leftStick.topBase().onTrue(arm.func1());
-    // leftStick.topRight().onTrue(arm.func2());
-    // leftStick.topLeft().onTrue(arm.func3());
+    leftStick.topBase().onTrue(arm.func1());
+    leftStick.topRight().onTrue(arm.func2());
+    leftStick.topLeft().onTrue(arm.func3());
   }
 
   public Command getAutonomousCommand() {

@@ -6,9 +6,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -64,6 +64,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         configureHardware();
 
         addChildSubsystem(clawVision);
+        addChildSubsystem(claw);
 
         defineTransitions();
         registerStateCommands();
@@ -149,10 +150,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         return () -> {
             double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
             
-            double clampRange = toRadians(45);
+            double clampRange = toRadians(90);
             wristPIDOutput = Math.max(-clampRange, Math.min(clampRange, wristPIDOutput));
 
-            // System.out.println(wristPIDOutput);
+            SmartDashboard.putNumber("lmao", wristPIDOutput);
 
             wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
         };
@@ -352,15 +353,15 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        builder.addDoubleProperty("turret/angle", () -> toDegrees(getTurretAngle()), null);
-        builder.addDoubleProperty("turret/target", () -> toDegrees(getTurretTarget()), null);
-        builder.addDoubleProperty("turret/error", () -> getError(toDegrees(getTurretTarget()), toDegrees(getTurretAngle())), null);
-        builder.addDoubleProperty("turret/absolute", () -> turretPotentiometer.get(), null);
+        // builder.addDoubleProperty("turret/angle", () -> toDegrees(getTurretAngle()), null);
+        // builder.addDoubleProperty("turret/target", () -> toDegrees(getTurretTarget()), null);
+        // builder.addDoubleProperty("turret/error", () -> getError(toDegrees(getTurretTarget()), toDegrees(getTurretAngle())), null);
+        // builder.addDoubleProperty("turret/absolute", () -> turretPotentiometer.get(), null);
 
-        builder.addDoubleProperty("elevator/output", () -> Units.metersToInches(getElevatorHeight()), null);
-        builder.addDoubleProperty("elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
-        builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
-        builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
+        // builder.addDoubleProperty("elevator/output", () -> Units.metersToInches(getElevatorHeight()), null);
+        // builder.addDoubleProperty("elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
+        // builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
+        // builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
 
         builder.addDoubleProperty("shoulder/angle", () -> toDegrees(shoulder.getEncoderPosition()), null);
         builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
@@ -380,17 +381,16 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
 
         builder.addDoubleProperty("rotator/output", () -> rotator.getAppliedOutput(), null);
-
         builder.addDoubleProperty("rotator/angle", () -> toDegrees(getRotatorAngle()), null);
         builder.addDoubleProperty("rotator/target", () -> toDegrees(getRotatorTarget()), null);
         builder.addDoubleProperty("rotator/error", () -> getError(toDegrees(getRotatorTarget()), toDegrees(getRotatorAngle())), null);
 
-        builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
-        builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
-        builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
-        builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
-        builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
-        builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
+        // builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
+        // builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
+        // builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
+        // builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
+        // builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
+        // builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
     }
 
     public enum ArmMode {
