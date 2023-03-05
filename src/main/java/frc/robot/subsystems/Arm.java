@@ -17,6 +17,7 @@ import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
 import frc.robot.ShamLib.motors.rev.PositionSpark;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
+import frc.robot.subsystems.Claw.State;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
@@ -74,13 +75,13 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Command func1() {
         return new InstantCommand(() -> {
-            setWristTarget(0);
+            claw.requestTransition(State.OPENED);
         });
     } 
 
     public Command func2() {
         return new InstantCommand(() -> {
-            setWristTarget(toRadians(-45));
+            claw.requestTransition(State.CLOSED);
         });
     }
 

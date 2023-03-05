@@ -12,15 +12,12 @@ import static frc.robot.Constants.Claw.*;
 public class Claw extends StateMachine<Claw.State> {
     Solenoid solenoid = new Solenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID);
 
-    //Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
-
     public Claw() {
         super("Claw", State.UNDETERMINED, State.class);
 
-        //compressor.enableDigital();
-
         defineTransitions();
     }
+
 
     private void defineTransitions() {
         addOmniTransition(State.CLOSED, new InstantCommand(() -> solenoid.set(!SOLENOID_CLAW_OPEN_STATE)));
