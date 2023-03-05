@@ -15,7 +15,7 @@ public final class Constants {
   }
 
   public static class Lights {
-    public static final int CANDLE_ID = 0;
+    public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
     public static final int NUM_LEDS = 50;
 
