@@ -19,6 +19,7 @@ public class Claw extends StateMachine<Claw.State> {
         defineTransitions();
     }
 
+
     private void defineTransitions() {
         addOmniTransition(State.CLOSED, new InstantCommand(() -> solenoid.set(SOLENOID_CLAW_OPEN_STATE ? kReverse : kForward)));
         addOmniTransition(State.OPENED, new InstantCommand(() -> solenoid.set(SOLENOID_CLAW_OPEN_STATE ? kForward : kReverse)));

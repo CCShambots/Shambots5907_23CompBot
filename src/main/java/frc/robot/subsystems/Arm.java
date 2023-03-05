@@ -1,19 +1,23 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenixpro.configs.MotorOutputConfigs;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
 import frc.robot.ShamLib.motors.rev.PositionSpark;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
-import frc.robot.commands.arm.TrackConeAngleCommand;
+import frc.robot.subsystems.Claw.State;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
@@ -33,16 +37,21 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     private final ArmKinematics kinematics = new ArmKinematics(baseToTurret, turretToArm, armToWrist, wristToEndEffector);
 
 
-    private final MotionMagicTalonFXPro turret = new MotionMagicTalonFXPro(TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT);
+    private final MotionMagicTalonFXPro turret = new MotionMagicTalonFXPro(TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL);
     private final AnalogPotentiometer turretPotentiometer = new AnalogPotentiometer(TURRET_POT_PORT, TURRET_POT_RATIO, TURRET_ENCODER_OFFSET);
 
     private final MotionMagicTalonFXPro elevator = new MotionMagicTalonFXPro(ELEVATOR_ID, ELEVATOR_GAINS, ELEVATOR_INPUT_TO_OUTPUT, ELEVATOR_MAX_VEL, ELEVATOR_MAX_ACCEL);
 
-    private final MotionMagicTalonFXPro shoulder = new MotionMagicTalonFXPro(SHOULDER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT, SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL);
+    private final MotionMagicTalonFXPro shoulder = new MotionMagicTalonFXPro(SHOULDER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT, SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL, 5000);
     private final ThroughBoreEncoder shoulderEncoder = new ThroughBoreEncoder(SHOULDER_ENCODER_PORT, SHOULDER_ENCODER_OFFSET);
+    private final ProfiledPIDController shoulderPID = new ProfiledPIDController(SHOULDER_CONT_GAINS.p, SHOULDER_CONT_GAINS.i, SHOULDER_CONT_GAINS.d, 
+        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL)); 
 
-    private final MotionMagicTalonFXPro wrist = new MotionMagicTalonFXPro(WRIST_ID, WRIST_GAINS, WRIST_INPUT_TO_OUTPUT, WRIST_MAX_VEL, WRIST_MAX_ACCEL);
+    private final VelocityTalonFXPro wrist = new VelocityTalonFXPro(WRIST_ID, WRIST_GAINS, WRIST_INPUT_TO_OUTPUT);
     private final ThroughBoreEncoder wristEncoder = new ThroughBoreEncoder(WRIST_ENCODER_PORT, WRIST_ENCODER_OFFSET);
+    private final ProfiledPIDController wristPID = new ProfiledPIDController(WRIST_CONT_GAINS.p, WRIST_CONT_GAINS.i, WRIST_CONT_GAINS.d, 
+        new TrapezoidProfile.Constraints(WRIST_MAX_VEL, WRIST_MAX_ACCEL));
+    private double wristTarget = 0;
 
     private final PositionSpark rotator = new PositionSpark(ROTATOR_ID, kBrushless, ROTATOR_GAINS, ROTATOR_ENCODER_OFFSET, Math.toRadians(1));
 
@@ -56,11 +65,30 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         configureHardware();
 
         addChildSubsystem(clawVision);
+        addChildSubsystem(claw);
 
         defineTransitions();
         registerStateCommands();
 
         //TODO: check if abs encoders are zero and disable joint on startup if so
+    }
+
+    public Command func1() {
+        return new InstantCommand(() -> {
+            claw.requestTransition(State.OPENED);
+        });
+    } 
+
+    public Command func2() {
+        return new InstantCommand(() -> {
+            claw.requestTransition(State.CLOSED);
+        });
+    }
+
+    public Command func3() {
+        return new InstantCommand(() -> {
+            setWristTarget(toRadians(-45));
+        });
     }
 
     private void defineTransitions() {
@@ -73,19 +101,26 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     private void configureHardware() {
-        shoulderEncoder.setInverted(true);
+        shoulderEncoder.setInverted(false);
+        wristEncoder.setInverted(true);
 
-        MotorOutputConfigs shoulderConfig = new MotorOutputConfigs();
-        shoulder.getConfigurator().refresh(shoulderConfig);
-        shoulderConfig.NeutralMode = Brake;
-        shoulderConfig.Inverted = Clockwise_Positive;
-        shoulder.getConfigurator().apply(shoulderConfig);
+        MotorOutputConfigs turretConfig = new MotorOutputConfigs();
+        turret.getConfigurator().refresh(turretConfig);
+        turretConfig.NeutralMode = Brake;
+        turretConfig.Inverted = Clockwise_Positive;
+        turret.getConfigurator().apply(turretConfig);
 
         MotorOutputConfigs elevatorConfig = new MotorOutputConfigs();
         elevator.getConfigurator().refresh(elevatorConfig);
         elevatorConfig.NeutralMode = Brake;
-        elevatorConfig.Inverted = Clockwise_Positive;
+        elevatorConfig.Inverted = CounterClockwise_Positive;
         elevator.getConfigurator().apply(elevatorConfig);
+
+        MotorOutputConfigs shoulderConfig = new MotorOutputConfigs();
+        shoulder.getConfigurator().refresh(shoulderConfig);
+        shoulderConfig.NeutralMode = Coast;
+        shoulderConfig.Inverted = CounterClockwise_Positive;
+        shoulder.getConfigurator().apply(shoulderConfig);
 
         MotorOutputConfigs wristConfig = new MotorOutputConfigs();
         wrist.getConfigurator().refresh(wristConfig);
@@ -98,16 +133,33 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public Command calculateTurretFF(Trigger increment, BooleanSupplier interrupt) {
         return turret.calculateKV(TURRET_GAINS.getS(), 0.05, increment, interrupt);
     }
+    public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {
+        return elevator.calculateKV(ELEVATOR_GAINS.getS(), 0.05, increment, interrupt);
+    }
     public Command calculateShoulderFF(Trigger increment, BooleanSupplier interrupt) {
         return shoulder.calculateKV(SHOULDER_GAINS.getS(), 0.05, increment, interrupt);
     }
     public Command calculateWristFF(Trigger increment, BooleanSupplier interrupt) {
-        return shoulder.calculateKV(SHOULDER_GAINS.getS(), 0.05, increment, interrupt);
+        return wrist.calculateKV(WRIST_GAINS.getS(), 0.25, increment, interrupt);
     }
 
     public InstantCommand reset() {
         return new InstantCommand(this::pullAbsoluteAngles);
     }
+
+    public Runnable runControlLoops() {
+        return () -> {
+            double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
+            
+            double clampRange = toRadians(90);
+            wristPIDOutput = Math.max(-clampRange, Math.min(clampRange, wristPIDOutput));
+
+            SmartDashboard.putNumber("lmao", wristPIDOutput);
+
+            wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
+        };
+    }
+    
 
     public Command pos1() {
         return new InstantCommand(() -> {
@@ -148,7 +200,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             turret.setTarget(state.getTurretAngle());
             elevator.setTarget(state.getElevatorExtension());
             shoulder.setTarget(state.getShoulderAngle());
-            wrist.setTarget(state.getWristAngle());
+            setWristTarget(state.getWristAngle());
             rotator.setTarget(state.getRotatorAngle());
         }
     }
@@ -201,7 +253,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
      * @param target target angle (in radians)
      */
     public void setWristTarget(double target) {
-        wrist.setTarget(target);
+        wristTarget = target;
+        wristPID.setGoal(target);
+
     }
 
     /**
@@ -293,44 +347,51 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     public void pullAbsoluteAngles() {
-        turret.resetPosition(turretPotentiometer.get() * (180 / (2 * PI)));
+        turret.resetPosition(turretPotentiometer.get() * (PI / 180));
         shoulder.resetPosition(shoulderEncoder.getRadians());
         wrist.resetPosition(wristEncoder.getRadians());
     }
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        builder.addDoubleProperty("turret/angle", () -> toDegrees(getTurretAngle()), null);
-        builder.addDoubleProperty("turret/target", () -> toDegrees(getTurretTarget()), null);
-        builder.addDoubleProperty("turret/error", () -> getError(toDegrees(getTurretTarget()), toDegrees(getTurretAngle())), null);
-        builder.addDoubleProperty("turret/absolute", () -> turretPotentiometer.get(), null);
+        // builder.addDoubleProperty("turret/angle", () -> toDegrees(getTurretAngle()), null);
+        // builder.addDoubleProperty("turret/target", () -> toDegrees(getTurretTarget()), null);
+        // builder.addDoubleProperty("turret/error", () -> getError(toDegrees(getTurretTarget()), toDegrees(getTurretAngle())), null);
+        // builder.addDoubleProperty("turret/absolute", () -> turretPotentiometer.get(), null);
 
-        builder.addDoubleProperty("elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
-        builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
-        builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
+        // builder.addDoubleProperty("elevator/output", () -> Units.metersToInches(getElevatorHeight()), null);
+        // builder.addDoubleProperty("elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
+        // builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
+        // builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
 
-        builder.addDoubleProperty("shoulder/angle", () -> toDegrees(getShoulderAngle()), null);
+        builder.addDoubleProperty("shoulder/angle", () -> toDegrees(shoulder.getEncoderPosition()), null);
         builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
-        builder.addDoubleProperty("shoulder/error", () -> getError(toDegrees(getShoulderAngle()), toDegrees(getShoulderTarget())), null);
+        builder.addDoubleProperty("shoulder/error", () -> getError(toDegrees(shoulder.getEncoderPosition()), toDegrees(getShoulderTarget())), null);
         builder.addDoubleProperty("shoulder/absolute", () -> shoulderEncoder.getDegrees(), null);
 
-        builder.addDoubleProperty("wrist/angle", () -> toDegrees(getWristAngle()), null);
+        builder.addDoubleProperty("wrist/angle", () -> toDegrees(wrist.getEncoderPosition()), null);
+        builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
         builder.addDoubleProperty("wrist/target", () -> toDegrees(getWristTarget()), null);
-        builder.addDoubleProperty("wrist/error", () -> getError(toDegrees(getWristAngle()), toDegrees(getWristTarget())), null);
+        builder.addDoubleProperty("wrist/error", () -> getError(toDegrees(wrist.getEncoderVelocity()), toDegrees(getWristTarget())), null);
         builder.addDoubleProperty("wrist/absolute", () -> wristEncoder.getDegrees(), null);
 
-        builder.addDoubleProperty("rotator/output", () -> rotator.getAppliedOutput(), null);
+        builder.addDoubleProperty("wrist/raw", () -> wrist.getPosition().getValue(), null);
+        builder.addDoubleProperty("wrist/raw-power", () -> wrist.get(), null);
 
+        builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
+        builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
+
+        builder.addDoubleProperty("rotator/output", () -> rotator.getAppliedOutput(), null);
         builder.addDoubleProperty("rotator/angle", () -> toDegrees(getRotatorAngle()), null);
         builder.addDoubleProperty("rotator/target", () -> toDegrees(getRotatorTarget()), null);
         builder.addDoubleProperty("rotator/error", () -> getError(toDegrees(getRotatorTarget()), toDegrees(getRotatorAngle())), null);
 
-        builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
-        builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
-        builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
-        builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
-        builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
-        builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
+        // builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
+        // builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
+        // builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
+        // builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
+        // builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
+        // builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
     }
 
     public enum ArmMode {

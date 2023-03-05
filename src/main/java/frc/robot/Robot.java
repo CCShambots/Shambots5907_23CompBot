@@ -34,6 +34,8 @@ public class Robot extends TimedRobot {
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
     PathPlannerServer.startServer(5811); //TODO: disable before comp
+
+    // addPeriodic(robotContainer.runArmControlLoops(), 0.005);
   }
 
   /**
