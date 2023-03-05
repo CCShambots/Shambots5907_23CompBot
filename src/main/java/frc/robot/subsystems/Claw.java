@@ -15,7 +15,7 @@ public class Claw extends StateMachine<Claw.State> {
 
     public Claw() {
         super("Claw", State.UNDETERMINED, State.class);
-
+        // solenoid.set(kForward);
         defineTransitions();
     }
 
