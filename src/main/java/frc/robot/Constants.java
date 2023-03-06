@@ -17,6 +17,7 @@ import java.util.function.UnaryOperator;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
+import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
@@ -195,7 +196,7 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 5000; //rot/sec
+    public static final double ELEVATOR_MAX_VEL = 1000; //rot/sec 5000
     public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2
 
     //Shoulder hardware details
@@ -203,16 +204,16 @@ public final class Constants {
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/70.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
-    public static final Range shoulderRange = Range.fromDegrees(-35, 90); //TODO
-    public static final double SHOULDER_MAX_VEL = toRadians(45); //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(45); //Radians/sec^2
+    public static final Range shoulderRange = Range.fromDegrees(-35, 110); //TODO
+    public static final double SHOULDER_MAX_VEL = toRadians(12); //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(12); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 49.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 9;
     public static final double WRIST_ENCODER_OFFSET = 93.733337; //Degrees
-    public static final Range wristRange = Range.fromDegrees(-130, 0); //Degrees //TODO:
+    public static final Range wristRange = Range.fromDegrees(-155, 0); //Degrees //TODO:
     public static final double WRIST_MAX_VEL = toRadians(180); //Radians/sec
     public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
 
@@ -233,6 +234,16 @@ public final class Constants {
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
+    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(2);
+    public static final double SHOULDER_ELEVATOR_THRESHOLD = toRadians(70); // The point at which we can start moving the elevator whilst moving the shoulder
+    public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
+
+
+    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(108), toRadians(-151), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(102), toRadians(-114), 0);
+    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-81), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(12), toRadians(32), toRadians(-9), 0);
+    public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
 
   }
 }

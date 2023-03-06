@@ -187,7 +187,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void onTeleopStart() {
-        // requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+        requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
     @Override
