@@ -6,11 +6,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
 import java.util.HashMap;
@@ -24,10 +27,12 @@ public class RobotContainer {
   //Declare HIDs
   private final CommandFlightStick leftStick = new CommandFlightStick(0);
   private final CommandFlightStick rightStick = new CommandFlightStick(1);
+  private final CommandXboxController operatorCont = new CommandXboxController(2);
 
   //Declare subsystems
   private final BaseVision baseVision;
   private final Drivetrain dt;
+  private final Arm arm;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
@@ -39,17 +44,20 @@ public class RobotContainer {
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
     dt = new Drivetrain(
-          () -> -leftStick.getX(),
           () -> -leftStick.getY(),
+          () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
           baseVision.getLLPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
 
+    this.arm = new Arm();
+
     //Load the trajectories into the hashmap
     loadPaths("test");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
 
     autoLoader = instantiateAutoLoader();
 
@@ -74,11 +82,28 @@ public class RobotContainer {
     rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
     leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+
+    operatorCont.leftBumper().onTrue(arm.openClaw());
+    operatorCont.rightBumper().onTrue(arm.closeClaw());
+
+    operatorCont.a().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_STOWED)));
+    operatorCont.b().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.PICKUP_DOUBLE)));
+
+    operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
+    operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
+    operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
+
+    
   }
 
   public Command getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
+
+  public Runnable runArmControlLoops() {
+    return arm.runControlLoops();
+  }
+
 
   /**
    * Load a sequence of paths directly into the map of trajectories.

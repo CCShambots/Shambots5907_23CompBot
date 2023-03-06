@@ -10,6 +10,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -57,7 +58,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                true, //TODO: Make this false before comp
+                false,
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
@@ -125,6 +126,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 true,
                 this
         );
+    }
+
+    public Command calculateModuleTurn(Trigger increment, BooleanSupplier interrupt) {
+        return drive.calculateTurnKV(TURN_GAINS.getS(), increment, interrupt);
+    }
+
+    public Command calculateModuleDrive(Trigger increment, Trigger invert, BooleanSupplier interrupt) {
+        return drive.calculateDriveKV(DRIVE_GAINS.getS(), increment, invert, interrupt);
     }
 
     public boolean isFieldRelative() {
