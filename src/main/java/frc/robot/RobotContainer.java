@@ -6,10 +6,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.auto.red.RedScorePickupBalanceAuto;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
@@ -54,12 +56,14 @@ public class RobotContainer {
     this.arm = new Arm();
 
     //Load the trajectories into the hashmap
-    loadPaths("test");
+    loadPaths("test", "red-pickup-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
 
     autoLoader = instantiateAutoLoader();
+
+
 
     configureBindings();
   }
@@ -69,7 +73,8 @@ public class RobotContainer {
 
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
-            TEST, new InstantCommand()
+            TEST, new InstantCommand(),
+            RED_SCORE_PICKUP_BALANCE, new RedScorePickupBalanceAuto(this)
     ));
 
     SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
@@ -126,7 +131,38 @@ public class RobotContainer {
     loadPaths(false, names);
   }
 
+  public Map<String, PathPlannerTrajectory> paths() {
+    return trajectories;
+  }
+
+  public Command runTraj(PathPlannerTrajectory traj) {
+    return dt.runTrajectory(traj, DrivetrainState.IDLE);
+  }
+
+  public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
+    return dt.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
+  }
+
+  public Command runTraj(String traj) {
+    return runTraj(paths().get(traj));
+  }
+
+  public Command runTraj(String traj, boolean resetPose) {
+    return runTraj(paths().get(traj), resetPose);
+  }
+
+  public Arm arm() {
+    return arm;
+  }
+
+  public Command waitForReady() {
+    return new WaitUntilCommand(() ->
+            dt.getState() == DrivetrainState.IDLE &&
+            arm.getState() == ArmMode.STOWED
+    );
+  }
+
   public enum AutoRoutes {
-    TEST
+    TEST, RED_SCORE_PICKUP_BALANCE
   }
 }

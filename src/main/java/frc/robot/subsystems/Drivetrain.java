@@ -159,6 +159,13 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.drive(speeds, allowHoldAngleChange);
     }
 
+    /**
+     *
+     * @param trajectory the trajectory to run
+     * @param resetPose whether to reset the pose of the robot at the beginning of the traj
+     * @param endState the state to end the trajectory in
+     * @return the command to run
+     */
     public Command runTrajectory(PathPlannerTrajectory trajectory, boolean resetPose, DrivetrainState endState) {
         return new SequentialCommandGroup(
                 new InstantCommand(
