@@ -20,7 +20,6 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    m_driverController.b().onTrue(new InstantCommand());
   }
 
   public Command getAutonomousCommand() {

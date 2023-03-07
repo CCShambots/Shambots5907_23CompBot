@@ -9,9 +9,38 @@ import frc.robot.ShamLib.Candle.RGB;
 
 import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+
+import static edu.wpi.first.math.util.Units.inchesToMeters;
+
+/**
+ * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
+ * constants. This class should not be used for any other purpose. All constants should be declared
+ * globally (i.e. public static). Do not put anything functional in this class.
+ *
+ * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * constants are needed, to reduce verbosity.
+ */
 public final class Constants {
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class Claw {
+    public static final int COMPRESSOR_ID = 1;
+    public static final int SOLENOID_ID = 2;
+
+    public static final boolean SOLENOID_CLAW_OPEN_STATE = false; //TODO: find value
+  }
+
+  public static final class Vision {
+    public static Pose3d baseLimelightPose = new Pose3d(inchesToMeters(-5), 0, inchesToMeters(31), new Rotation3d());
+
+    //Base
+    public static final int APRIL_TAG_PIPELINE = 0;
+
+    //Claw
+    public static final int CONE_DETECTOR_PIPELINE = 0;
+    public static final int CUBE_DETECTOR_PIPELINE = 1;
+    public static final int CONE_ORIENTATION_PIPELINE = 2;
   }
 
   public static class Lights {
