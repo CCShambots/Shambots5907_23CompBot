@@ -27,6 +27,8 @@ import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathPlanner;
 import frc.robot.ShamLib.swerve.TrajectoryBuilder;
+import frc.robot.commands.drivetrain.AutoBalanceCommand;
+import frc.robot.commands.drivetrain.DockChargingStationCommand;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
@@ -99,6 +101,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
 
         addOmniTransition(DrivetrainState.TRAJECTORY, new InstantCommand());
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
     }
 
     private void defineStateCommands() {
@@ -111,6 +116,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 DrivetrainState.BOT_ORIENTED_TELEOP_DRIVE,
                 getDefaultTeleopDriveCommand()
         );
+
+        registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
+                new DockChargingStationCommand(this, 1),
+                new AutoBalanceCommand(this, 1),
+                transitionCommand(DrivetrainState.X_SHAPE)
+        ));
     }
 
     private DriveCommand getDefaultTeleopDriveCommand() {
@@ -272,6 +283,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     public enum DrivetrainState {
-        UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE
+        UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE, DOCKING, BALANCING
     }
 }

@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
-public class EngageChargingStationCommand extends CommandBase {
+public class DockChargingStationCommand extends CommandBase {
     private int direction;
     private Drivetrain dt;
 
-    public EngageChargingStationCommand(Drivetrain dt, int direction) {
+    public DockChargingStationCommand(Drivetrain dt, int direction) {
         addRequirements(dt);
 
         this.direction = Math.max(Math.min(1, direction), -1);
