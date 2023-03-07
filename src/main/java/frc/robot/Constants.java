@@ -258,10 +258,7 @@ public final class Constants {
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(41), toRadians(-32), 0);
 
   }
-
-  public static void pullAllianceFromFMS() {
-    boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
-    alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+  
   public static class Lights {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
@@ -289,4 +286,10 @@ public final class Constants {
 
     public static final RGB CUBE_RGB = new RGB(144,22,153);
   }
+
+  public static void pullAllianceFromFMS() {
+    boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
+    alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+  }
+  
 }
