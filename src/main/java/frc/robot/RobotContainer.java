@@ -17,6 +17,7 @@ import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
+import frc.robot.subsytems.Lights;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +39,10 @@ public class RobotContainer {
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
+  
+  private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Map<String, PathPlannerTrajectory> trajectories = new HashMap<>();
+  private final Lights l = new Lights();
 
   public RobotContainer() {
 
