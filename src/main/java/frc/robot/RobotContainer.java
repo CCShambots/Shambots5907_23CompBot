@@ -39,6 +39,8 @@ public class RobotContainer {
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
+  
+  private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
   private final Lights l = new Lights();
 
