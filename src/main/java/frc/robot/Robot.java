@@ -36,6 +36,8 @@ public class Robot extends TimedRobot {
     PathPlannerServer.startServer(5811); //TODO: disable before comp
 
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
+
+    Constants.pullAllianceFromFMS();
   }
 
   /**

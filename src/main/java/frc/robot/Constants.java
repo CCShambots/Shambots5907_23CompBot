@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
@@ -33,6 +35,9 @@ import static java.lang.Math.toRadians;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static Alliance alliance = Alliance.Red;
+
   public static final class Claw {
     public static final int COMPRESSOR_ID = 1;
     public static final int SOLENOID_ID_1 = 2;
@@ -63,7 +68,7 @@ public final class Constants {
     public static final double MAX_LINEAR_ACCELERATION = 6;
 
     public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
-    public static final double MAX_LINEAR_ACCELERATION_AUTO = 5;
+    public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
 
     // Maximum chassis rotational speed in radians per second
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
@@ -205,8 +210,8 @@ public final class Constants {
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-35, 110); //TODO
-    public static final double SHOULDER_MAX_VEL = toRadians(12); //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(12); //Radians/sec^2
+    public static final double SHOULDER_MAX_VEL = toRadians(20); //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(10); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
@@ -240,11 +245,17 @@ public final class Constants {
     
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(108), toRadians(-151), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(102), toRadians(-114), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(102), toRadians(-114), 0);
-    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-81), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(12), toRadians(32), toRadians(-9), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(96), toRadians(-107), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(16), toRadians(-81), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(12), toRadians(37), toRadians(-11), 0);
+    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
+    public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(41), toRadians(-32), 0);
 
+  }
+
+  public static void pullAllianceFromFMS() {
+    boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
+    alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
   }
 }

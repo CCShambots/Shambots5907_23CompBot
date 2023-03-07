@@ -63,7 +63,7 @@ public class RobotContainer {
 
     autoLoader = instantiateAutoLoader();
 
-
+    SmartDashboard.putData(autoLoader.getSendableChooser());
 
     configureBindings();
   }
@@ -97,8 +97,9 @@ public class RobotContainer {
     operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
     operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
     operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
+    operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
 
-    
+    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
   public Command getAutonomousCommand() {
@@ -118,8 +119,8 @@ public class RobotContainer {
    */
   public void loadPaths(boolean reversed, String... names) {
     for (String n : names) {
-      trajectories.put(n, PathPlanner.loadPath(n, Constants.SwerveDrivetrain.MAX_LINEAR_SPEED,
-              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION, reversed));
+      trajectories.put(n, PathPlanner.loadPath(n, Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
+              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, reversed));
     }
   }
 
@@ -153,6 +154,10 @@ public class RobotContainer {
 
   public Arm arm() {
     return arm;
+  }
+
+  public Drivetrain dt() {
+    return dt;
   }
 
   public Command waitForReady() {

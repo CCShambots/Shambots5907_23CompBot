@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -216,6 +217,15 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void onTeleopStart() {
+        Rotation2d rotation = drive.getPose().getRotation();
+
+        if(Constants.alliance == Alliance.Red) {
+            Rotation2d newRot = rotation.rotateBy(Rotation2d.fromDegrees(180));
+            drive.resetGyro(newRot);
+        } else {
+            drive.resetGyro(rotation);
+        }
+
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 

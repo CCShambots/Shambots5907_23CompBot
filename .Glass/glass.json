@@ -16,6 +16,9 @@
             "open": true
           },
           "open": true,
+          "shoulder": {
+            "open": true
+          },
           "turret": {
             "open": true
           },
@@ -44,6 +47,8 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard//Drivetrain/field": "Field2d",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/InstantCommand": "Command",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/auto-route": "String Chooser"
     },
     "windows": {

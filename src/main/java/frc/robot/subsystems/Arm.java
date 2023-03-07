@@ -101,16 +101,19 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(STOWED, PICKUP_DOUBLE, () -> goToArmState(PICKUP_DOUBLE_POS));
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
+        addTransition(STOWED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
 
         //hard logics :( 
         addTransition(STOWED, SEEKING_HIGH);
         removeTransition(SEEKING_HIGH, STOWED);
         addTransition(SEEKING_HIGH, HIGH);
+        addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
 
         addTransition(STOWED, SEEKING_PICKUP_GROUND);
         addTransition(HIGH, SEEKING_PICKUP_GROUND);
         removeTransition(SEEKING_PICKUP_GROUND, STOWED);
         addTransition(SEEKING_PICKUP_GROUND, PICKUP_GROUND);
+
 
     }
 
@@ -161,6 +164,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         SEEKING_PICKUP_GROUND, PICKUP_GROUND,
         LOW_SCORE, MID_SCORE,
         SEEKING_HIGH, HIGH,
+        HIGH_CUBE,
         SOFT_STOP
     }
 
@@ -211,7 +215,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             //Shoulder code
             double shoulderPIDOutput = shoulderPID.calculate(shoulderEncoder.getRadians(), shoulderTarget);
             
-            double shoulderClampRange = toRadians(12);
+            double shoulderClampRange = toRadians(20);
             shoulderPIDOutput = Math.max(-shoulderClampRange, Math.min(shoulderClampRange, shoulderPIDOutput));
 
             shoulder.setTarget(shoulderPIDOutput + shoulderPID.getSetpoint().velocity);
