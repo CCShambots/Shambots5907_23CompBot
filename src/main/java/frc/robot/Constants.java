@@ -16,6 +16,11 @@ import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import com.ctre.phoenix.led.*;
+import frc.robot.ShamLib.Candle.RGB;
+
+import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
@@ -257,5 +262,31 @@ public final class Constants {
   public static void pullAllianceFromFMS() {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
     alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+  public static class Lights {
+    public static final int CANDLE_ID = 30;
+    public static final double brightness = 1;
+    public static final int NUM_LEDS = 50;
+
+    public static final double BOUNCE_SPEED = 0.5;
+    public static final double BLINK_SPEED = 0.5;
+
+    public static final Animation DISABLED_ANIMATION =
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 5);
+
+    public static final RGB IDLE_RGB = new RGB(0, 0, 255);
+
+    public static final RGB ELEMENT_GRABBED_RGB = new RGB(0, 255, 0);
+    public static final Animation DEPLOYING_ANIMATION =
+            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LEDS);
+
+    public static final RGB SCORING_RGB = new RGB(0, 255, 0);
+
+
+    public static final RGB UPRIGHT_CONE_RGB = new RGB(255, 255, 0);
+
+    public static final Animation DOWNED_CONE_ANIMATION =
+            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
+
+    public static final RGB CUBE_RGB = new RGB(144,22,153);
   }
 }
