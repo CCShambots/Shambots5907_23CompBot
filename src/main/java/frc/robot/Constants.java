@@ -214,9 +214,9 @@ public final class Constants {
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/70.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
-    public static final Range shoulderRange = Range.fromDegrees(-35, 110); //TODO
-    public static final double SHOULDER_MAX_VEL = toRadians(20); //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(10); //Radians/sec^2
+    public static final Range shoulderRange = Range.fromDegrees(-35, 115); //TODO
+    public static final double SHOULDER_MAX_VEL = toRadians(40); //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(30); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
@@ -236,7 +236,7 @@ public final class Constants {
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
-    public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(1.5, 0, 0);
+    public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
     public static final PIDGains WRIST_CONT_GAINS = new PIDGains(3.5, 0, 0);
 
@@ -249,8 +249,8 @@ public final class Constants {
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     
     //Arm setpoints
-    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(108), toRadians(-151), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(96), toRadians(-107), 0);
+    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(112), toRadians(-150), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(16), toRadians(-81), 0);
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(12), toRadians(37), toRadians(-11), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);

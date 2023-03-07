@@ -215,7 +215,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             //Shoulder code
             double shoulderPIDOutput = shoulderPID.calculate(shoulderEncoder.getRadians(), shoulderTarget);
             
-            double shoulderClampRange = toRadians(20);
+            double shoulderClampRange = toRadians(40);
             shoulderPIDOutput = Math.max(-shoulderClampRange, Math.min(shoulderClampRange, shoulderPIDOutput));
 
             shoulder.setTarget(shoulderPIDOutput + shoulderPID.getSetpoint().velocity);
