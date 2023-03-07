@@ -55,6 +55,9 @@ public final class Constants {
   }
 
   public static final class SwerveDrivetrain {
+    public static final double AUTO_BALANCE_SPEED = 0.6;
+    public static final double ENGAGE_SPEED = 1;
+
 
     public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, toRadians(90)));
 

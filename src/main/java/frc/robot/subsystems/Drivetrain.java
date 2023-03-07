@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
@@ -127,6 +128,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 true,
                 this
         );
+    }
+
+    public double getPitch() {
+        return drive.getPitch();
+    }
+
+    public double getRoll() {
+        return drive.getRoll();
     }
 
     public Command calculateModuleTurn(Trigger increment, BooleanSupplier interrupt) {
