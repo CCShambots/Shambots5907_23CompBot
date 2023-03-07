@@ -7,6 +7,7 @@ import frc.robot.ShamLib.Candle.CANdleEX;
 import frc.robot.ShamLib.SMF.StateMachine;
 
 import static frc.robot.Constants.Lights.*;
+import static frc.robot.Constants.Lights.UPRIGHT_CONE_RGB;
 import static frc.robot.subsytems.Lights.LightState.*;
 
 public class Lights extends StateMachine<Lights.LightState> {
@@ -14,8 +15,27 @@ public class Lights extends StateMachine<Lights.LightState> {
     private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LEDS);
 
     public Lights() {
-        super("Lights", Disabled, LightState.class);
-        candle.animate(Disabled.animation);
+        super("Lights", DISABLED, LightState.class);
+        candle.animate(DISABLED.animation);
+
+        addAnimationTransition(DISABLED);
+        addOmniTransition(LightState.UPRIGHT_CONE, new InstantCommand(() -> candle.setLEDs(UPRIGHT_CONE_RGB)));
+        addOmniTransition(CUBE, new InstantCommand(() -> candle.setLEDs(CUBE_RGB)));
+    }
+
+    public enum LightState {
+        DISABLED(DISABLED_ANIMATION), //Where the state machine will start and immediately exit
+        ARM_DEPLOYING(DEPLOYING_ANIMATION), //The arm is going to score a game element
+        ARM_SCORING(null), //The arm has locked in and is scoring
+        GAME_PIECE_GRABBED(null), //A game piece has been grabbed and is inside the bot
+        UPRIGHT_CONE(null), //The arm will grab an upright cone next
+        DOWNED_CONE(DOWNED_CONE_ANIMATION), //The arm will grab a downed cone next
+        CUBE(null); //The arm will grab a cube next
+
+        private final Animation animation;
+        LightState(Animation animation) {
+            this.animation = animation;
+        }
     }
 
     private void addAnimationTransition(LightState state) {
@@ -24,13 +44,13 @@ public class Lights extends StateMachine<Lights.LightState> {
 
     @Override
     protected void onEnable() {
-
+        requestTransition(UPRIGHT_CONE);
     }
 
     @Override
     protected void onDisable() {
-        setState(Disabled);
-        candle.animate(Disabled.animation);
+        setState(DISABLED);
+        candle.animate(DISABLED.animation);
     }
 
     @Override
@@ -40,28 +60,12 @@ public class Lights extends StateMachine<Lights.LightState> {
 
     @Override
     protected void determineSelf() {
-        setState(Idle);
-        candle.setLEDs(IDLE_RGB);
+        setState(DISABLED);
+        candle.animate(DISABLED_ANIMATION);
     }
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
 
-    }
-
-    public enum LightState {
-        Disabled(DISABLED_ANIMATION), //Where the state machine will start and immediately exit
-        Idle(null),
-        ArmDeploying(DEPLOYING_ANIMATION), //The arm is going to score a game element
-        ArmScoring(null), //The arm has locked in and is scoring
-        GamePieceGrabbed(null), //A game piece has been grabbed and is inside the bot
-        UprightCone(null), //The arm will grab an upright cone next
-        DownedCone(DOWNED_CONE_ANIMATION), //The arm will grab a downed cone next
-        Cube(null); //The arm will grab a cube next
-
-        private final Animation animation;
-        LightState(Animation animation) {
-            this.animation = animation;
-        }
     }
 }

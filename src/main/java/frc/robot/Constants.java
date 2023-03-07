@@ -34,7 +34,7 @@ public final class Constants {
     public static final RGB SCORING_RGB = new RGB(0, 255, 0);
 
 
-    public static final RGB UPRIGHT_CONE = new RGB(255, 255, 0);
+    public static final RGB UPRIGHT_CONE_RGB = new RGB(255, 255, 0);
 
     public static final Animation DOWNED_CONE_ANIMATION =
             new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
