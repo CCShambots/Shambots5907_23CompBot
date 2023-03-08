@@ -83,8 +83,6 @@ public class RobotContainer {
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
     .withPosition(4, 2).withSize(2, 2);
-
-    SmartDashboard.putBoolean("override alliance", Constants.overrideAlliance);
     
     configureBindings();
   }
