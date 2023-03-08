@@ -245,11 +245,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         Rotation2d rotation = drive.getPose().getRotation();
 
         if(Constants.alliance == Alliance.Red) {
-            Rotation2d newRot = rotation.rotateBy(Rotation2d.fromDegrees(180));
-            drive.resetGyro(newRot);
-        } else {
-            drive.resetGyro(rotation);
+            rotation = rotation.rotateBy(Rotation2d.fromDegrees(180));
         }
+
+        drive.resetGyro(rotation);
+        drive.resetRotationOffset(rotation);
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
