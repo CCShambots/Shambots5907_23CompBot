@@ -42,6 +42,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final Supplier<Pose3d> llPose;
     private final BooleanSupplier llHasPose;
 
+    private boolean positiveDockDirection = true; //Whether the docking should run in a positive or negative direction
+
     public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta, Supplier<Pose3d> llPoseSupplier, BooleanSupplier llHasPose) {
         super("Drivetrain", DrivetrainState.UNDETERMINED, DrivetrainState.class);
 
@@ -119,12 +121,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
 
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
-                new DockChargingStationCommand(this, 1),
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
                 transitionCommand(DrivetrainState.BALANCING)
         ));
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
-            new AutoBalanceCommand(this, 1),
+            new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1),
             transitionCommand(DrivetrainState.X_SHAPE)
         ));
     }
@@ -267,6 +269,18 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     protected void determineSelf() {
         setState(DrivetrainState.IDLE);
+    }
+
+    public boolean isPositiveDockDirection() {
+        return positiveDockDirection;
+    }
+
+    public void setPositiveDockDirection(boolean positiveDockDirection) {
+        this.positiveDockDirection = positiveDockDirection;
+    }
+
+    public Command setPositiveDockDirectionCommand(boolean value) {
+        return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
     @Override

@@ -8,16 +8,16 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
-public class RedScoreBalanceAuto extends SequentialCommandGroup {
+public class RedScorePickup extends SequentialCommandGroup {
 
-    public RedScoreBalanceAuto(RobotContainer rc) {
+    public RedScorePickup(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 rc.arm().transitionCommand(Arm.ArmMode.HIGH_CUBE),
                 new WaitCommand(2),
                 rc.arm().openClaw(),
                 new ParallelCommandGroup(
-                    rc.runTraj("red-dock-right", true),
+                    rc.runTraj("red-pickup-right", true),
                     new SequentialCommandGroup(
                             new WaitCommand(1),
                             rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED)
@@ -25,7 +25,12 @@ public class RedScoreBalanceAuto extends SequentialCommandGroup {
                 ),
                 rc.dt().waitForState(DrivetrainState.IDLE),
                 rc.arm().waitForState(ArmMode.STOWED),
-                rc.dt().transitionCommand(DrivetrainState.DOCKING)
+                rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
+                rc.arm().waitForState(ArmMode.PICKUP_GROUND),
+                new WaitCommand(3),
+                rc.arm().closeClaw(),
+                new WaitCommand(0.5),
+                rc.arm().transitionCommand(ArmMode.SEEKING_STOWED)
         );
     }
 }

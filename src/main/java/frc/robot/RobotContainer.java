@@ -11,8 +11,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
-import frc.robot.commands.auto.red.RedScoreBalanceAuto;
-import frc.robot.commands.auto.red.RedScorePickupBalanceAuto;
+import frc.robot.commands.auto.red.RedScoreBalanceCenter;
+import frc.robot.commands.auto.red.RedScoreBalanceRight;
+import frc.robot.commands.auto.red.RedScorePickup;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
@@ -20,7 +21,6 @@ import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsytems.Lights;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,9 +80,9 @@ public class RobotContainer {
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
             TEST, new InstantCommand(),
-            RED_SCORE_PICKUP_BALANCE, new RedScorePickupBalanceAuto(this),
-            RED_SCORE_BALANCE, new RedScoreBalanceAuto(this)
-
+            RED_SCORE_PICKUP, new RedScorePickup(this),
+            RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
+            RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this)
     ));
 
     SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
@@ -182,6 +182,6 @@ public class RobotContainer {
   }
 
   public enum AutoRoutes {
-    TEST, RED_SCORE_PICKUP_BALANCE, RED_SCORE_BALANCE
+    TEST, RED_SCORE_PICKUP, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER
   }
 }
