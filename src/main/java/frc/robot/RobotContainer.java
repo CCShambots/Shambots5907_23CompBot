@@ -107,6 +107,10 @@ public class RobotContainer {
     operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
     operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
 
+    operatorCont.leftTrigger(0.8)
+      .and(() -> operatorCont.rightTrigger(0.8)
+      .getAsBoolean()).onTrue(arm.transitionCommand(ArmMode.SOFT_STOP));
+
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
