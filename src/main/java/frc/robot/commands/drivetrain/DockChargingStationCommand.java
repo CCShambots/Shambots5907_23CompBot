@@ -19,7 +19,7 @@ public class DockChargingStationCommand extends CommandBase {
     @Override
     public void execute() {
         //TODO: x is long ways right??
-        ChassisSpeeds speeds = new ChassisSpeeds(Constants.SwerveDrivetrain.ENGAGE_SPEED * direction, 0, 0);
+        ChassisSpeeds speeds = new ChassisSpeeds(Constants.SwerveDrivetrain.DOCK_SPEED * direction, 0, 0);
         dt.drive(speeds, false);
     }
 
@@ -31,6 +31,6 @@ public class DockChargingStationCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         //TODO: assumes this is in degreese and +-180
-        return Math.abs(dt.getPitch() + dt.getRoll()) > 10;
+        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > 20;
     }
 }

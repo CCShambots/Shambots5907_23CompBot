@@ -15,7 +15,6 @@
           "elevator": {
             "open": true
           },
-          "open": true,
           "shoulder": {
             "open": true
           },
@@ -30,9 +29,6 @@
           "field": {
             "open": true
           },
-          "module-1": {
-            "open": true
-          },
           "modules": {
             "module-1": {
               "open": true
@@ -40,12 +36,16 @@
             "open": true
           }
         },
+        "SendableChooser[0]": {
+          "open": true
+        },
         "open": true
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard//Drivetrain/field": "Field2d",
+      "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/InstantCommand": "Command",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",

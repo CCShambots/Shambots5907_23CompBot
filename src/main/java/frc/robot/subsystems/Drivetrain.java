@@ -102,7 +102,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         addOmniTransition(DrivetrainState.TRAJECTORY, new InstantCommand());
 
-        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.IDLE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.TRAJECTORY, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
     }
 
@@ -119,8 +120,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
                 new DockChargingStationCommand(this, 1),
-                new AutoBalanceCommand(this, 1),
-                transitionCommand(DrivetrainState.X_SHAPE)
+                transitionCommand(DrivetrainState.BALANCING)
+        ));
+
+        registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
+            new AutoBalanceCommand(this, 1),
+            transitionCommand(DrivetrainState.X_SHAPE)
         ));
     }
 
@@ -269,6 +274,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
+
+        builder.addDoubleProperty("pitch", () -> getPitch(), null);
+        builder.addDoubleProperty("roll", () -> getRoll(), null);
     }
 
     @Override

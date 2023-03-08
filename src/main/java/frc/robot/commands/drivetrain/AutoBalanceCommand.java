@@ -31,6 +31,6 @@ public class AutoBalanceCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         //TODO: assumes this is in degreese and +-180
-        return Math.abs(dt.getPitch() + dt.getRoll()) < 5;
+        return Math.abs(dt.getPitch() + dt.getRoll()) < 12;
     }
 }

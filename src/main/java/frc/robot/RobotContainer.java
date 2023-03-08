@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.auto.red.RedScoreBalanceAuto;
 import frc.robot.commands.auto.red.RedScorePickupBalanceAuto;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
@@ -59,7 +60,7 @@ public class RobotContainer {
     this.arm = new Arm();
 
     //Load the trajectories into the hashmap
-    loadPaths("test", "red-pickup-right");
+    loadPaths("test", "red-pickup-right", "red-dock-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
@@ -77,7 +78,9 @@ public class RobotContainer {
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
             TEST, new InstantCommand(),
-            RED_SCORE_PICKUP_BALANCE, new RedScorePickupBalanceAuto(this)
+            RED_SCORE_PICKUP_BALANCE, new RedScorePickupBalanceAuto(this),
+            RED_SCORE_BALANCE, new RedScoreBalanceAuto(this)
+
     ));
 
     SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
@@ -90,6 +93,8 @@ public class RobotContainer {
     rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
     leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+
+    leftStick.topBase().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.DOCKING)));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
@@ -171,6 +176,6 @@ public class RobotContainer {
   }
 
   public enum AutoRoutes {
-    TEST, RED_SCORE_PICKUP_BALANCE
+    TEST, RED_SCORE_PICKUP_BALANCE, RED_SCORE_BALANCE
   }
 }
