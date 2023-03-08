@@ -8,9 +8,9 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
-public class RedScorePickupBalanceAuto extends SequentialCommandGroup {
+public class RedScorePickupAuto extends SequentialCommandGroup {
 
-    public RedScorePickupBalanceAuto(RobotContainer rc) {
+    public RedScorePickupAuto(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 rc.arm().transitionCommand(Arm.ArmMode.HIGH_CUBE),

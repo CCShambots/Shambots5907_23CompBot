@@ -3,6 +3,9 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -11,8 +14,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.auto.red.RedScoreBalanceAuto;
-import frc.robot.commands.auto.red.RedScorePickupBalanceAuto;
+import frc.robot.commands.auto.red.RedScorePickupAuto;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
@@ -23,7 +27,10 @@ import frc.robot.subsytems.Lights;
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
+import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
 public class RobotContainer {
@@ -43,7 +50,7 @@ public class RobotContainer {
   
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Lights l = new Lights();
+  private final Lights l;
 
   public RobotContainer() {
 
@@ -58,17 +65,27 @@ public class RobotContainer {
     );
 
     this.arm = new Arm();
+    this.l = new Lights();
 
     //Load the trajectories into the hashmap
     loadPaths("test", "red-pickup-right", "red-dock-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
+    SubsystemManagerFactory.getInstance().registerSubsystem(l);
 
     autoLoader = instantiateAutoLoader();
 
-    SmartDashboard.putData(autoLoader.getSendableChooser());
+    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
+    driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
+    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
+    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
+    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
+    .withPosition(4, 2).withSize(2, 2);
 
+    SmartDashboard.putBoolean("override alliance", Constants.overrideAlliance);
+    
     configureBindings();
   }
 
@@ -77,15 +94,30 @@ public class RobotContainer {
 
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
-            TEST, new InstantCommand(),
-            RED_SCORE_PICKUP_BALANCE, new RedScorePickupBalanceAuto(this),
-            RED_SCORE_BALANCE, new RedScoreBalanceAuto(this)
-
+            RED_SCORE_BALANCE, new RedScoreBalanceAuto(this),
+            RED_SCORE_PICKUP, new RedScorePickupAuto(this),
+            NOTHING, new InstantCommand()
     ));
 
-    SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
-
     return autoLoader;
+  }
+
+  private InstantCommand switchAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              alliance = alliance == Red ? Blue : Red;
+              Constants.overrideAlliance = true;
+            }
+    );
+  }
+
+  private InstantCommand syncAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              Constants.pullAllianceFromFMS();
+              Constants.overrideAlliance = false;
+            }
+    );
   }
 
   private void configureBindings() {
@@ -176,6 +208,6 @@ public class RobotContainer {
   }
 
   public enum AutoRoutes {
-    TEST, RED_SCORE_PICKUP_BALANCE, RED_SCORE_BALANCE
+    NOTHING, RED_SCORE_PICKUP, RED_SCORE_BALANCE
   }
 }
