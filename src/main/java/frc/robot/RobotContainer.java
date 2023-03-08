@@ -3,6 +3,8 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,6 +19,7 @@ import frc.robot.commands.auto.blue.BlueScorePickupLeft;
 import frc.robot.commands.auto.red.RedScoreBalanceCenter;
 import frc.robot.commands.auto.red.RedScoreBalanceRight;
 import frc.robot.commands.auto.red.RedScorePickupRight;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
@@ -27,7 +30,10 @@ import frc.robot.subsytems.Lights;
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
+import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
 public class RobotContainer {
@@ -47,7 +53,7 @@ public class RobotContainer {
   
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Lights l = new Lights();
+  private final Lights l;
 
   public RobotContainer() {
 
@@ -62,17 +68,25 @@ public class RobotContainer {
     );
 
     this.arm = new Arm();
+    this.l = new Lights();
 
     //Load the trajectories into the hashmap
     loadPaths("test", "red-pickup-right", "red-dock-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
+    SubsystemManagerFactory.getInstance().registerSubsystem(l);
 
     autoLoader = instantiateAutoLoader();
 
-    SmartDashboard.putData(autoLoader.getSendableChooser());
-
+    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
+    driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
+    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
+    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
+    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
+    .withPosition(4, 2).withSize(2, 2);
+    
     configureBindings();
 
   }
@@ -91,9 +105,25 @@ public class RobotContainer {
             BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this)
     ));
 
-    SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
-
     return autoLoader;
+  }
+
+  private InstantCommand switchAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              alliance = alliance == Red ? Blue : Red;
+              Constants.overrideAlliance = true;
+            }
+    );
+  }
+
+  private InstantCommand syncAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              Constants.pullAllianceFromFMS();
+              Constants.overrideAlliance = false;
+            }
+    );
   }
 
   private void configureBindings() {

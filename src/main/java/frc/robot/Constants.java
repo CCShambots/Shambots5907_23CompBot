@@ -31,17 +31,10 @@ import static edu.wpi.first.math.util.Units.inchesToMeters;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
-/**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
- */
 public final class Constants {
 
   public static Alliance alliance = Alliance.Red;
+  public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
 
   public static final class Claw {
     public static final int COMPRESSOR_ID = 1;
@@ -291,7 +284,7 @@ public final class Constants {
 
   public static void pullAllianceFromFMS() {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
-    alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+    if(!overrideAlliance) alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
   }
   
 }
