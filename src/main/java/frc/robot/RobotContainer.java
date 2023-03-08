@@ -20,6 +20,7 @@ import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsytems.Lights;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +71,7 @@ public class RobotContainer {
     SmartDashboard.putData(autoLoader.getSendableChooser());
 
     configureBindings();
+
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
