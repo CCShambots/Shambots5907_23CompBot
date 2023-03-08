@@ -11,9 +11,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
+import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
+import frc.robot.commands.auto.blue.BlueScorePickupLeft;
 import frc.robot.commands.auto.red.RedScoreBalanceCenter;
 import frc.robot.commands.auto.red.RedScoreBalanceRight;
-import frc.robot.commands.auto.red.RedScorePickup;
+import frc.robot.commands.auto.red.RedScorePickupRight;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
@@ -80,9 +83,12 @@ public class RobotContainer {
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
             TEST, new InstantCommand(),
-            RED_SCORE_PICKUP, new RedScorePickup(this),
+            RED_SCORE_PICKUP, new RedScorePickupRight(this),
             RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
-            RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this)
+            RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
+            BLUE_SCORE_PICKUP, new BlueScorePickupLeft(this),
+            BLUE_SCORE_BALANCE_RIGHT, new BlueScoreBalanceLeft(this),
+            BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this)
     ));
 
     SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
@@ -182,6 +188,8 @@ public class RobotContainer {
   }
 
   public enum AutoRoutes {
-    TEST, RED_SCORE_PICKUP, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER
+    TEST,
+    RED_SCORE_PICKUP, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER,
+    BLUE_SCORE_PICKUP, BLUE_SCORE_BALANCE_RIGHT, BLUE_SCORE_BALANCE_CENTER
   }
 }
