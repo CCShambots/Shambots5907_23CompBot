@@ -5,20 +5,27 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
+import java.util.function.IntSupplier;
+
 public class DockChargingStationCommand extends CommandBase {
     private int direction;
+    private IntSupplier directionSupplier;
     private Drivetrain dt;
 
-    public DockChargingStationCommand(Drivetrain dt, int direction) {
+    public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
         addRequirements(dt);
 
-        this.direction = Math.max(Math.min(1, direction), -1);
+        this.directionSupplier = directionSupplier;
         this.dt = dt;
     }
 
     @Override
+    public void initialize() {
+        this.direction = Math.max(Math.min(1, directionSupplier.getAsInt()), -1);
+    }
+
+    @Override
     public void execute() {
-        //TODO: x is long ways right??
         ChassisSpeeds speeds = new ChassisSpeeds(Constants.SwerveDrivetrain.DOCK_SPEED * direction, 0, 0);
         dt.drive(speeds, false);
     }
@@ -30,7 +37,6 @@ public class DockChargingStationCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        //TODO: assumes this is in degreese and +-180
         return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > 20;
     }
 }

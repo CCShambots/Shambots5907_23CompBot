@@ -15,6 +15,7 @@
           "elevator": {
             "open": true
           },
+          "open": true,
           "shoulder": {
             "open": true
           },
@@ -35,9 +36,6 @@
             },
             "open": true
           }
-        },
-        "SendableChooser[0]": {
-          "open": true
         },
         "open": true
       }

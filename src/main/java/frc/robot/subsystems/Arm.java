@@ -51,7 +51,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         new TrapezoidProfile.Constraints(WRIST_MAX_VEL, WRIST_MAX_ACCEL));
     private double wristTarget = toRadians(-45);
 
-    private final PositionSpark rotator = new PositionSpark(ROTATOR_ID, kBrushless, ROTATOR_GAINS, ROTATOR_ENCODER_OFFSET, Math.toRadians(1));
+    // private final PositionSpark rotator = new PositionSpark(ROTATOR_ID, kBrushless, ROTATOR_GAINS, ROTATOR_ENCODER_OFFSET, Math.toRadians(1));
 
     private final ClawVision clawVision = new ClawVision();
     private final Claw claw = new Claw();
@@ -94,7 +94,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             elevator.set(0);
             shoulder.set(0);
             wrist.set(0);
-            rotator.set(0);
+            // rotator.set(0);
         });
 
         //Easy logics
@@ -293,7 +293,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
      * @param target target angle (in radians)
      */
     public void setRotatorTarget(double target) {
-        rotator.setTarget(target);
+        // rotator.setTarget(target);
     }
 
 
@@ -306,7 +306,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void update() {
-        rotator.update();
+        // rotator.update();
     }
 
     @Override
@@ -366,10 +366,12 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     public double getRotatorAngle() {
-        return rotator.getPosition();
+        // return rotator.getPosition();
+        return 0;
     }
     public double getRotatorTarget() {
-        return rotator.getTarget();
+        // return rotator.getTarget();
+        return 0;
     }
 
     private double getError(double num1, double num2) {
@@ -412,7 +414,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         // builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
         // builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
 
-        builder.addDoubleProperty("rotator/output", rotator::getAppliedOutput, null);
+        // builder.addDoubleProperty("rotator/output", rotator::getAppliedOutput, null);
         builder.addDoubleProperty("rotator/angle", () -> toDegrees(getRotatorAngle()), null);
         builder.addDoubleProperty("rotator/target", () -> toDegrees(getRotatorTarget()), null);
         builder.addDoubleProperty("rotator/error", () -> getError(toDegrees(getRotatorTarget()), toDegrees(getRotatorAngle())), null);
