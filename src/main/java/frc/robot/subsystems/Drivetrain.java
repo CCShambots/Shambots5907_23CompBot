@@ -251,7 +251,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
 
         drive.resetGyro(rotation);
-        drive.resetRotationOffset(rotation);
+        // drive.resetRotationOffset(rotation);
+        drive.drive(new ChassisSpeeds(0, 0, 1), true);
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }

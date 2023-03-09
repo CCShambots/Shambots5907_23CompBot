@@ -15,17 +15,20 @@ import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
-import frc.robot.commands.auto.blue.BlueScorePickupLeft;
+import frc.robot.commands.auto.blue.BlueScoreLeft;
+import frc.robot.commands.auto.blue.BlueScoreRight;
 import frc.robot.commands.auto.red.RedScoreBalanceCenter;
 import frc.robot.commands.auto.red.RedScoreBalanceRight;
-import frc.robot.commands.auto.red.RedScorePickupRight;
+import frc.robot.commands.auto.red.RedScoreLeft;
+import frc.robot.commands.auto.red.RedScoreRight;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
-import frc.robot.subsytems.Lights;
+import frc.robot.subsystems.Lights.LightState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +74,8 @@ public class RobotContainer {
     this.l = new Lights();
 
     //Load the trajectories into the hashmap
-    loadPaths("test", "red-pickup-right", "red-dock-right");
+    loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
+     "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
@@ -96,13 +100,15 @@ public class RobotContainer {
 
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
-            TEST, new InstantCommand(),
-            RED_SCORE_PICKUP, new RedScorePickupRight(this),
-            RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
-            RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
-            BLUE_SCORE_PICKUP, new BlueScorePickupLeft(this),
-            BLUE_SCORE_BALANCE_RIGHT, new BlueScoreBalanceLeft(this),
-            BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this)
+      RED_SCORE_RIGHT, new RedScoreRight(this),
+      RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
+      RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
+      RED_SCORE_LEFT, new RedScoreLeft(this),
+      BLUE_SCORE_LEFT, new BlueScoreLeft(this),
+      BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
+      BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
+      BLUE_SCORE_RIGHT, new BlueScoreRight(this),
+      NOTHING, new InstantCommand()
     ));
 
     return autoLoader;
@@ -148,6 +154,9 @@ public class RobotContainer {
     operatorCont.leftTrigger(0.8)
       .and(() -> operatorCont.rightTrigger(0.8)
       .getAsBoolean()).onTrue(arm.transitionCommand(ArmMode.SOFT_STOP));
+
+    operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
+    operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
 
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
@@ -218,8 +227,8 @@ public class RobotContainer {
   }
 
   public enum AutoRoutes {
-    TEST,
-    RED_SCORE_PICKUP, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER,
-    BLUE_SCORE_PICKUP, BLUE_SCORE_BALANCE_RIGHT, BLUE_SCORE_BALANCE_CENTER
+    NOTHING,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT,
+    BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

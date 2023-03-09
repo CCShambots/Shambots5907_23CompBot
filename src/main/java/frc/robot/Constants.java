@@ -202,7 +202,7 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 1000; //rot/sec 5000
+    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 5000
     public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2
 
     //Shoulder hardware details
@@ -216,7 +216,7 @@ public final class Constants {
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
-    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 49.0) * 2 * PI; //Ticks --> Radians
+    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 9;
     public static final double WRIST_ENCODER_OFFSET = 93.733337; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 0); //Degrees //TODO:
@@ -240,7 +240,7 @@ public final class Constants {
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
-    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(2);
+    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(16);
     public static final double SHOULDER_ELEVATOR_THRESHOLD = toRadians(75); // The point at which we can start moving the elevator whilst moving the shoulder
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     
@@ -257,13 +257,13 @@ public final class Constants {
   public static class Lights {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
-    public static final int NUM_LEDS = 20;
+    public static final int NUM_LEDS = 308;
 
-    public static final double BOUNCE_SPEED = 0.5;
+    public static final double BOUNCE_SPEED = 0.75;
     public static final double BLINK_SPEED = 0.5;
 
     public static final Animation DISABLED_ANIMATION =
-            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 5);
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 7);
 
     public static final RGB IDLE_RGB = new RGB(0, 0, 255);
 

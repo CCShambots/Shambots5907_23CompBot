@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-    // PathPlannerServer.startServer(5811); //TODO: enable when debugging again
+    PathPlannerServer.startServer(5811); //TODO: enable when debugging again
 
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
 

@@ -8,9 +8,9 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
-public class RedScorePickupRight extends SequentialCommandGroup {
+public class RedScoreRight extends SequentialCommandGroup {
 
-    public RedScorePickupRight(RobotContainer rc) {
+    public RedScoreRight(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 rc.arm().transitionCommand(Arm.ArmMode.HIGH_CUBE),
@@ -24,13 +24,7 @@ public class RedScorePickupRight extends SequentialCommandGroup {
                     )
                 ),
                 rc.dt().waitForState(DrivetrainState.IDLE),
-                rc.arm().waitForState(ArmMode.STOWED),
-                rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
-                rc.arm().waitForState(ArmMode.PICKUP_GROUND),
-                new WaitCommand(3),
-                rc.arm().closeClaw(),
-                new WaitCommand(0.5),
-                rc.arm().transitionCommand(ArmMode.SEEKING_STOWED)
+                rc.arm().waitForState(ArmMode.STOWED)
         );
     }
 }

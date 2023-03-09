@@ -1,4 +1,4 @@
-package frc.robot.subsytems;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.Animation;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -8,7 +8,7 @@ import frc.robot.ShamLib.SMF.StateMachine;
 
 import static frc.robot.Constants.Lights.*;
 import static frc.robot.Constants.Lights.UPRIGHT_CONE_RGB;
-import static frc.robot.subsytems.Lights.LightState.*;
+import static frc.robot.subsystems.Lights.LightState.*;
 
 public class Lights extends StateMachine<Lights.LightState> {
 
@@ -19,12 +19,14 @@ public class Lights extends StateMachine<Lights.LightState> {
         candle.animate(DISABLED.animation);
 
         addAnimationTransition(DISABLED);
+        addOmniTransition(IDLE, new InstantCommand(() -> candle.setLEDs(IDLE_RGB)));
         addOmniTransition(LightState.UPRIGHT_CONE, new InstantCommand(() -> candle.setLEDs(UPRIGHT_CONE_RGB)));
         addOmniTransition(CUBE, new InstantCommand(() -> candle.setLEDs(CUBE_RGB)));
     }
 
     public enum LightState {
         DISABLED(DISABLED_ANIMATION), //Where the state machine will start and immediately exit
+        IDLE(null),
         ARM_DEPLOYING(DEPLOYING_ANIMATION), //The arm is going to score a game element
         ARM_SCORING(null), //The arm has locked in and is scoring
         GAME_PIECE_GRABBED(null), //A game piece has been grabbed and is inside the bot
@@ -44,7 +46,7 @@ public class Lights extends StateMachine<Lights.LightState> {
 
     @Override
     protected void onEnable() {
-        requestTransition(UPRIGHT_CONE);
+        requestTransition(IDLE);
     }
 
     @Override
