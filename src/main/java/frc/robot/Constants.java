@@ -55,6 +55,7 @@ public final class Constants {
   public static final class SwerveDrivetrain {
     public static final double AUTO_BALANCE_SPEED = 0.35;
     public static final double DOCK_SPEED = 0.8;
+    public static final double MIN_BALANCE_TIME = 1.5;
 
 
     public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, toRadians(90)));
@@ -248,7 +249,7 @@ public final class Constants {
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(112), toRadians(-150), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(16), toRadians(-81), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(19.9), toRadians(30.6), toRadians(-26.7), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(22), toRadians(17), toRadians(4), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(49), toRadians(-32), 0);
