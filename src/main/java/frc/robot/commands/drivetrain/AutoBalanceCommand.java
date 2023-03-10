@@ -38,6 +38,6 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(dt.getPitch() + dt.getRoll()) < 12;
+        return Math.abs(dt.getPitch() + dt.getRoll()) < 9;
     }
 }
