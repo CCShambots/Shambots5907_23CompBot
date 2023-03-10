@@ -41,6 +41,7 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        startTime = 0;
         dt.stopModules();
     }
 
