@@ -39,6 +39,10 @@ public class AutoBalanceCommand extends CommandBase {
         return Timer.getFPGATimestamp() - startTime;
     }
 
+    private boolean hasMetMinTime() {
+        return getRuntime() > Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED;
+    }
+
     @Override
     public void end(boolean interrupted) {
         startTime = 0;
@@ -47,6 +51,6 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override   
     public boolean isFinished() {
-        return Math.abs(dt.getPitch() + dt.getRoll()) < 9 && getRuntime() > Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED;
+        return Math.abs(dt.getPitch() + dt.getRoll()) < 9 && hasMetMinTime();
     }
 }
