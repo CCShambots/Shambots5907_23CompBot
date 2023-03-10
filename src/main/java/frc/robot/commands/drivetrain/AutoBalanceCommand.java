@@ -36,7 +36,7 @@ public class AutoBalanceCommand extends CommandBase {
         dt.stopModules();
     }
 
-    @Override
+    @Override   
     public boolean isFinished() {
         return Math.abs(dt.getPitch() + dt.getRoll()) < 9;
     }

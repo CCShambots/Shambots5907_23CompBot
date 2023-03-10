@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -255,6 +256,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.drive(new ChassisSpeeds(0, 0, 1), true);
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+
+        new WaitCommand(134).andThen(transitionCommand(DrivetrainState.X_SHAPE)).schedule();
     }
 
     @Override
