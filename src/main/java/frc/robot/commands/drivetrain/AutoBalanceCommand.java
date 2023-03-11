@@ -51,6 +51,6 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override   
     public boolean isFinished() {
-        return Math.abs(dt.getPitch() + dt.getRoll()) < 9 && hasMetMinTime();
+        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) < 14 && hasMetMinTime();
     }
 }
