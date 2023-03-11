@@ -40,7 +40,7 @@ public class AutoBalanceCommand extends CommandBase {
     }
 
     private boolean hasMetMinTime() {
-        return getRuntime() > Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED;
+        return getRuntime() > Constants.SwerveDrivetrain.MIN_BALANCE_TIME;
     }
 
     @Override
