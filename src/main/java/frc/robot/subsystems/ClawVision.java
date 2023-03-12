@@ -11,18 +11,18 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     private final Limelight ll = new Limelight("limelight-arm");
 
     public ClawVision() {
-        super("Vision", Undetermined, VisionState.class);
+        super("Vision", UNDETERMINED, VisionState.class);
 
-        addOmniTransition(ConeDetector, () -> setPipeline(ConeDetector));
-        addOmniTransition(CubeDetector, () -> setPipeline(CubeDetector));
-        addOmniTransition(ConeAngle, () -> setPipeline(ConeAngle));
+        addOmniTransition(CONE_DETECTOR, () -> setPipeline(CONE_DETECTOR));
+        addOmniTransition(CUBE_DETECTOR, () -> setPipeline(CUBE_DETECTOR));
+        addOmniTransition(CONE_ANGLE, () -> setPipeline(CONE_ANGLE));
     }
 
     public enum VisionState {
-        Undetermined(CONE_DETECTOR_PIPELINE),
-        ConeDetector(CONE_DETECTOR_PIPELINE),
-        CubeDetector(CUBE_DETECTOR_PIPELINE),
-        ConeAngle(CONE_ORIENTATION_PIPELINE);
+        UNDETERMINED(CONE_DETECTOR_PIPELINE),
+        CONE_DETECTOR(CONE_DETECTOR_PIPELINE),
+        CUBE_DETECTOR(CUBE_DETECTOR_PIPELINE),
+        CONE_ANGLE(CONE_ORIENTATION_PIPELINE);
 
         public final int pipelineID;
         VisionState(int pipelineID) {
@@ -57,14 +57,14 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
 
     @Override
     protected void onDisable() {
-        setState(Undetermined);
+        setState(UNDETERMINED);
     }
 
 
     @Override
     protected void determineSelf() {
-        ll.setPipeline(Undetermined.pipelineID);
-        setState(ConeDetector);
+        ll.setPipeline(UNDETERMINED.pipelineID);
+        setState(CONE_DETECTOR);
     }
 
 }
