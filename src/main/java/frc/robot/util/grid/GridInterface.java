@@ -21,6 +21,7 @@ public class GridInterface {
 
     /**
      * Updates the grid interface by checking to see if the robot has placed elements and sending them to the dashboard
+     * Must be called periodically
      */
     public void update() {
         if(dashboardAcceptingPlacedElements() && elementsToSend.size() > 0) {
