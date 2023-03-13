@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
@@ -41,7 +42,7 @@ public final class Constants {
     public static final int SOLENOID_ID_1 = 2;
     public static final int SOLENOID_ID_2 = 3;
 
-    public static final boolean SOLENOID_CLAW_OPEN_STATE = true;
+    public static final DoubleSolenoid.Value SOLENOID_CLAW_OPEN_VALUE = DoubleSolenoid.Value.kForward;
   }
 
 
