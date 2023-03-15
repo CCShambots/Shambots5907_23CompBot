@@ -33,6 +33,7 @@ import static java.lang.Math.toRadians;
 
 public final class Constants {
 
+  public static final double VOLTAGE_WARNING = 9.5;
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
 

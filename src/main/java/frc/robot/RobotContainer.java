@@ -3,6 +3,8 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
@@ -57,6 +60,7 @@ public class RobotContainer {
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
   private final Lights l;
+  private final PowerDistribution pd = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
   public RobotContainer() {
 
@@ -158,6 +162,10 @@ public class RobotContainer {
     operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
 
+    new Trigger(this::lowVoltage)
+            .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1)))
+            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
@@ -169,6 +177,9 @@ public class RobotContainer {
     return arm.runControlLoops();
   }
 
+  public boolean lowVoltage() {
+    return pd.getVoltage() <= Constants.VOLTAGE_WARNING;
+  }
 
   /**
    * Load a sequence of paths directly into the map of trajectories.
