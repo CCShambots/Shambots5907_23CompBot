@@ -126,7 +126,7 @@ public class RobotContainer {
   private InstantCommand syncAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
-              Constants.pullAllianceFromFMS();
+              Constants.pullAllianceFromFMS(this);
               Constants.overrideAlliance = false;
             }
     );
@@ -158,7 +158,10 @@ public class RobotContainer {
     operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
 
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
+    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
+
+    leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
+    leftStick.button(111).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));
   }
 
   public Command getAutonomousCommand() {

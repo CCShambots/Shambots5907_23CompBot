@@ -2,6 +2,7 @@ package frc.robot.util.grid;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import static frc.robot.util.grid.GridJsonReader.*;
 
 public class GridInterface {
 
-    //TODO: Write JSONs
     private Grid grid;
     private NetworkTable table = NetworkTableInstance.getDefault().getTable("grid-ui");
     private List<GridElement> elementsToSend = new ArrayList<>(); //list of elements that have been placed to send to the ds
@@ -100,12 +100,4 @@ public class GridInterface {
 
         table.getEntry("placed/just-placed").setBoolean(true);
     }
-
-    //TODO: This should be in a constants file or smth
-    public enum Alliance {
-        Red,
-        Blue
-    }
-
-    
 }
