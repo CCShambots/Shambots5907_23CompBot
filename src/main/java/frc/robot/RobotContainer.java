@@ -164,7 +164,8 @@ public class RobotContainer {
 
     new Trigger(this::lowVoltage)
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1)))
-            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0)));
+            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0)))
+            .debounce(2);
 
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
