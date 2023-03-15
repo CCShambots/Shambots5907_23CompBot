@@ -3,11 +3,9 @@ package frc.robot.util.grid;
 import java.util.List;
 
 public class Grid {
-    private String alliance;
     private GridElement[][] elements;
 
-    Grid(String alliance, List<GridElement> elementsArray) {
-        this.alliance = alliance;
+    Grid(List<GridElement> elementsArray) {
         this.elements = parseElementsToArray(elementsArray);
     }
 

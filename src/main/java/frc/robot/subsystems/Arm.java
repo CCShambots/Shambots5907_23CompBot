@@ -330,6 +330,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         gridInterface.removeForceElement();
     }
 
+    public GridInterface getGridInterface() { return gridInterface;}
+
     @Override
     protected void onEnable() {
     }

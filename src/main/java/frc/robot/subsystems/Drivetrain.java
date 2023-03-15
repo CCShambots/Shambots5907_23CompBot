@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -187,6 +188,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
         drive.drive(speeds, allowHoldAngleChange);
     }
+
+    //TODO: remove
+    public Field2d getField() {return drive.getField();}
 
     /**
      *

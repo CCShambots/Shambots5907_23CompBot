@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -220,6 +222,11 @@ public class RobotContainer {
 
   public Drivetrain dt() {
     return dt;
+  }
+
+  //TODO: Remove
+  public void updateTarget() {
+    dt.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {
