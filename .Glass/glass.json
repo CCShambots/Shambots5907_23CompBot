@@ -42,6 +42,9 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drive/Auto Route": "String Chooser",
+      "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
+      "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard//Drivetrain/field": "Field2d",
       "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
@@ -75,10 +78,18 @@
           "length": 0.6100000143051147,
           "width": 0.6100000143051147
         },
+        "height": 8.229599952697754,
+        "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_23CompBot\\Glass Configuration\\field23.png",
         "ll": {
           "length": 0.25,
           "width": 0.25
         },
+        "target": {
+          "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_23CompBot\\Glass Configuration\\circle.png",
+          "length": 0.25,
+          "width": 0.25
+        },
+        "width": 16.459199905395508,
         "window": {
           "name": "Field drawing",
           "visible": true
@@ -460,7 +471,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

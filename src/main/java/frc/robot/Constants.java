@@ -283,9 +283,11 @@ public final class Constants {
     public static final RGB CUBE_RGB = new RGB(144,22,153);
   }
 
-  public static void pullAllianceFromFMS() {
+  public static void pullAllianceFromFMS(RobotContainer rc) {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
     if(!overrideAlliance) alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+
+    rc.arm().reInstantiateGridUI(alliance);
   }
   
 }

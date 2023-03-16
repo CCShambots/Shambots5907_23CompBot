@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -161,7 +163,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private InstantCommand syncAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
-              Constants.pullAllianceFromFMS();
+              Constants.pullAllianceFromFMS(this);
               Constants.overrideAlliance = false;
             }
     );
@@ -193,7 +195,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
 
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
+    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
+
+    leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
+    leftStick.button(111).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));
   }
 
   public Command getAutonomousCommand() {
@@ -252,6 +257,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public Drivetrain dt() {
     return dt;
+  }
+
+  //TODO: Remove
+  public void updateTarget() {
+    dt.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {
