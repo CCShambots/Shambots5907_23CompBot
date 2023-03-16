@@ -175,10 +175,10 @@ public final class Constants {
 
   public static class Arm {
     //Physial constants for arm dimensions
-    public static final double baseToTurret = inchesToMeters(5.5 + 1.44);//Distance from the floor to the top of the turret plate
-    public static final double turretToArm = inchesToMeters(14.5); //Distance from the turret to the arm (when the elevator is at 0)
-    public static final double armToWrist = inchesToMeters(28.765564);
-    public static final double wristToEndEffector = inchesToMeters(12.9016);
+    public static final double baseToTurret = inchesToMeters(7.5);//Distance from the floor to the top of the turret plate
+    public static final double turretToShoulder = inchesToMeters(14); //Distance from the turret to the arm (when the elevator is at 0)
+    public static final double shoulderToWrist = inchesToMeters(28.75);
+    public static final double wristToEndEffector = inchesToMeters(25.5);
 
     //Turret hardawre details
     public static final int TURRET_ID = 21;
@@ -190,8 +190,8 @@ public final class Constants {
     public static final int TURRET_POT_PORT = 0; //Analog port
     public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
-    public static final double TURRET_MAX_VEL = 1000;
-    public static final double TURRET_MAX_ACCEL = 1000;
+    public static final double TURRET_MAX_VEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 400; //1000
     public static final Range turretRange = Range.fromDegrees(-90, 90);
 
     //Elevator hardware details
@@ -203,8 +203,8 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 5000
-    public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2
+    public static final double ELEVATOR_MAX_VEL = 50; //rot/sec 3000
+    public static final double ELEVATOR_MAX_ACCEL = 50; //rot/sec^2 5000
 
     //Shoulder hardware details
     public static final int SHOULDER_ID = 23;

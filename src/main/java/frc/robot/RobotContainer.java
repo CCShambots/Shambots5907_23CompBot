@@ -2,7 +2,10 @@ package frc.robot;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +36,7 @@ import frc.robot.subsystems.Lights.LightState;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
@@ -60,18 +64,19 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
+    this.arm = new Arm();
+    this.l = new Lights();
+
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(arm.getTurretAngle()));
 
     dt = new Drivetrain(
           () -> -leftStick.getY(),
           () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
-          baseVision.getLLPoseSupplier(),
+          baseVision.getPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
 
-    this.arm = new Arm();
-    this.l = new Lights();
 
     //Load the trajectories into the hashmap
     loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
@@ -157,6 +162,12 @@ public class RobotContainer {
 
     operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
+
+    // rightStick.topRight().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(-90))));
+    // rightStick.topBase().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(0))));
+    // rightStick.topLeft().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(90))));
+
+    rightStick.topRight().onTrue(new InstantCommand(() -> arm.goToPose(new Pose3d(Constants.Arm.shoulderToWrist, 0, Constants.Arm.baseToTurret + Constants.Arm.turretToShoulder + Constants.Arm.shoulderToWrist, new Rotation3d(0, 0, 0)))));
 
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }

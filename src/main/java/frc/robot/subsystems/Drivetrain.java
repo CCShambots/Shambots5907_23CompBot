@@ -65,7 +65,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                false,
+                true, //TODO: Disable before comp
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
@@ -180,6 +180,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         //Only integrate vision measurement if the limelight has a target
         if(llHasPose.getAsBoolean()) {
+            // System.out.println(llPose.get());
             drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }

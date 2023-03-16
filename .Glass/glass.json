@@ -1,86 +1,60 @@
 {
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
       "SmartDashboard": {
         "Arm": {
           "armpose": {
-            "open": true
-          },
-          "elevator": {
-            "open": true
-          },
-          "open": true,
-          "shoulder": {
-            "open": true
-          },
-          "turret": {
-            "open": true
-          },
-          "wrist": {
-            "open": true
+            "open": false
           }
         },
         "Drivetrain": {
           "field": {
-            "open": true
+            "open": false
           },
           "modules": {
             "module-1": {
-              "open": true
+              "open": false
             },
-            "open": true
+            "open": false
           }
-        },
-        "open": true
+        }
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Drive/Auto Route": "String Chooser",
+      "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
+      "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard//Drivetrain/field": "Field2d",
-      "/SmartDashboard/Drivetrain": "Subsystem",
-      "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/InstantCommand": "Command",
-      "/SmartDashboard/SendableChooser[0]": "String Chooser",
-      "/SmartDashboard/auto-route": "String Chooser"
+      "/SmartDashboard/InstantCommand": "Command"
     },
     "windows": {
       "/SmartDashboard//Drivetrain/field": {
         "Module-1": {
-          "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_22O\\Glass Configuration\\circle.png",
-          "length": 0.25,
-          "width": 0.25
+          "image": "",
+          "length": 0.0,
+          "width": 0.0
         },
         "Module-2": {
-          "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_22O\\Glass Configuration\\circle.png",
-          "length": 0.25,
-          "width": 0.25
+          "image": "",
+          "length": 0.0,
+          "width": 0.0
         },
         "Module-3": {
-          "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_22O\\Glass Configuration\\circle.png",
-          "length": 0.25,
-          "width": 0.25
+          "image": "",
+          "length": 0.0,
+          "width": 0.0
         },
         "Module-4": {
-          "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_22O\\Glass Configuration\\circle.png",
-          "length": 0.25,
-          "width": 0.25
-        },
-        "Robot": {
-          "length": 0.6100000143051147,
-          "width": 0.6100000143051147
+          "image": "",
+          "length": 0.0,
+          "width": 0.0
         },
         "ll": {
-          "length": 0.25,
-          "width": 0.25
+          "length": 0.0,
+          "width": 0.0
         },
         "window": {
-          "name": "Field drawing",
           "visible": true
         }
       }
@@ -89,378 +63,5 @@
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
     "serverTeam": "5907"
-  },
-  "Plots": {
-    "Plot <0>": {
-      "plots": [
-        {
-          "height": 1270,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Velocity"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Velo error"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Target Velocity"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <1>": {
-      "plots": [
-        {
-          "height": 0,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Velo error"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Velocity"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/modules/module-1/Target Velocity"
-            }
-          ]
-        }
-      ]
-    },
-    "Plot <2>": {
-      "plots": [
-        {
-          "height": -55,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/Angle"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/Target Angle"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/erorr"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <3>": {
-      "plots": [
-        {
-          "height": 1247,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/Velocity"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/Velo error"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard//Drivetrain/module-1/Target Velocity"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <4>": {
-      "plots": [
-        {
-          "height": 1401,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/elevator/error"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/elevator/height"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/elevator/target"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <5>": {
-      "plots": [
-        {
-          "height": 1280,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/absolute"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/angle"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/error"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/target"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <6>": {
-      "plots": [
-        {
-          "height": 1608,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/wrist/absolute"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/wrist/angle"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/wrist/error"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/wrist/target",
-              "name": "target"
-            },
-            {
-              "color": [
-                0.5058823823928833,
-                0.44705885648727417,
-                0.7019608020782471,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/wrist/velo",
-              "name": "velo"
-            },
-            {
-              "color": [
-                0.5764706134796143,
-                0.4705882668495178,
-                0.3764706254005432,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/lmao"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "visible": false
-      }
-    },
-    "Plot <7>": {
-      "plots": [
-        {
-          "height": 1516,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/absolute"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/angle"
-            },
-            {
-              "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/shoulder-target-pos"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/shoulder-target-velo"
-            },
-            {
-              "color": [
-                0.5058823823928833,
-                0.44705885648727417,
-                0.7019608020782471,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/target"
-            },
-            {
-              "color": [
-                0.5764706134796143,
-                0.4705882668495178,
-                0.3764706254005432,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm/shoulder/error"
-            }
-          ]
-        }
-      ]
-    }
   }
 }
