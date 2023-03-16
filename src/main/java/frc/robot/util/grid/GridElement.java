@@ -51,6 +51,10 @@ public class GridElement {
         return Cone; //The element can only be a cone if it's anywhere else
     }
 
+    public boolean isCube() {
+        return type == Cube;
+    }
+
     public enum Type {
         Cone,
         Cube,
