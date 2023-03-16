@@ -3,101 +3,96 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
-import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
+import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
+import frc.robot.commands.auto.blue.BlueScoreLeft;
+import frc.robot.commands.auto.blue.BlueScoreRight;
+import frc.robot.commands.auto.red.RedScoreBalanceCenter;
+import frc.robot.commands.auto.red.RedScoreBalanceRight;
+import frc.robot.commands.auto.red.RedScoreLeft;
+import frc.robot.commands.auto.red.RedScoreRight;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.BaseVision;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
+import frc.robot.subsystems.Lights.LightState;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
+import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
-public class RobotContainer extends StateMachine<RobotContainer.State> {
+public class RobotContainer {
 
   //Declare HIDs
   private final CommandFlightStick leftStick = new CommandFlightStick(0);
   private final CommandFlightStick rightStick = new CommandFlightStick(1);
+  private final CommandXboxController operatorCont = new CommandXboxController(2);
 
   //Declare subsystems
   private final BaseVision baseVision;
-
+  private final Drivetrain dt;
   private final Arm arm;
-  private final Drivetrain drivetrain;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
+  
+  private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Map<String, PathPlannerTrajectory> trajectories = new HashMap<>();
+  private final Lights l;
 
   public RobotContainer() {
-    super("Robot", State.UNDETERMINED, State.class);
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, Rotation2d::new); //TODO: Give turret information to the vision subsystem
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
-    arm = new Arm();
-
-    drivetrain = new Drivetrain(
-          () -> -leftStick.getX(),
+    dt = new Drivetrain(
           () -> -leftStick.getY(),
+          () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
           baseVision.getLLPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
 
-    //Load the trajectories into the hashmap
-    loadPaths("test");
+    this.arm = new Arm();
+    this.l = new Lights();
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(drivetrain);
+    //Load the trajectories into the hashmap
+    loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
+     "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
+
+    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
+    SubsystemManagerFactory.getInstance().registerSubsystem(l);
 
     autoLoader = instantiateAutoLoader();
 
-
+    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
+    driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
+    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
+    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
+    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
+    .withPosition(4, 2).withSize(2, 2);
+    
     configureBindings();
-    registerSubsystems();
 
-    registerTransitions();
-  }
-
-  private void registerTransitions() {
-    addOmniTransition(State.DISABLED, new SequentialCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.IDLE),
-            arm.transitionCommand(ArmMode.IDLE)
-    ));
-
-    addOmniTransition(State.TELEOP, new SequentialCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
-            arm.transitionCommand(ArmMode.SEEKING_POSITION) //TODO: make state SEEKING_STOW
-    ));
-
-    addOmniTransition(State.AUTONOMOUS, new SequentialCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.TRAJECTORY) //TODO: change to dt.runTrajectoryCommand or whatever
-    ));
-  }
-
-  private void registerSubsystems() {
-    addChildSubsystem(drivetrain);
-    addChildSubsystem(arm);
-  }
-
-  @Override
-  protected void onTeleopStart() {
-    requestTransition(State.TELEOP);
-  }
-
-  @Override
-  protected void onAutonomousStart() {
-    requestTransition(State.AUTONOMOUS);
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
@@ -105,24 +100,75 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Put new auto routes here
     autoLoader = new AutonomousLoader<>(Map.of(
-            TEST, new InstantCommand()
+      RED_SCORE_RIGHT, new RedScoreRight(this),
+      RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
+      RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
+      RED_SCORE_LEFT, new RedScoreLeft(this),
+      BLUE_SCORE_LEFT, new BlueScoreLeft(this),
+      BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
+      BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
+      BLUE_SCORE_RIGHT, new BlueScoreRight(this),
+      NOTHING, new InstantCommand()
     ));
-
-    SmartDashboard.putData("auto-route", autoLoader.getSendableChooser());
 
     return autoLoader;
   }
 
-  private void configureBindings() {
-    rightStick.trigger().onTrue(new InstantCommand(() -> drivetrain.requestTransition(DrivetrainState.X_SHAPE)));
-    rightStick.trigger().onFalse(new InstantCommand(() -> drivetrain.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+  private InstantCommand switchAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              alliance = alliance == Red ? Blue : Red;
+              Constants.overrideAlliance = true;
+            }
+    );
+  }
 
-    leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
+  private InstantCommand syncAlliance() {
+    return new WhileDisabledInstantCommand(
+            () -> {
+              Constants.pullAllianceFromFMS();
+              Constants.overrideAlliance = false;
+            }
+    );
+  }
+
+  private void configureBindings() {
+    rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
+    rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+
+    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+
+    leftStick.topBase().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.DOCKING)));
+
+    operatorCont.leftBumper().onTrue(arm.openClaw());
+    operatorCont.rightBumper().onTrue(arm.closeClaw());
+
+    operatorCont.a().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_STOWED)));
+    operatorCont.b().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.PICKUP_DOUBLE)));
+
+    operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
+    operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
+    operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
+    operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
+
+    operatorCont.leftTrigger(0.8)
+      .and(() -> operatorCont.rightTrigger(0.8)
+      .getAsBoolean()).onTrue(arm.transitionCommand(ArmMode.SOFT_STOP));
+
+    operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
+    operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
+
+    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
   public Command getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
+
+  public Runnable runArmControlLoops() {
+    return arm.runControlLoops();
+  }
+
 
   /**
    * Load a sequence of paths directly into the map of trajectories.
@@ -132,8 +178,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
    */
   public void loadPaths(boolean reversed, String... names) {
     for (String n : names) {
-      trajectories.put(n, PathPlanner.loadPath(n, Constants.SwerveDrivetrain.MAX_LINEAR_SPEED,
-              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION, reversed));
+      trajectories.put(n, PathPlanner.loadPath(n, Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
+              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, reversed));
     }
   }
 
@@ -145,16 +191,44 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(false, names);
   }
 
-  @Override
-  protected void determineSelf() {
-    setState(State.DISABLED);
+  public Map<String, PathPlannerTrajectory> paths() {
+    return trajectories;
   }
 
-  public enum State {
-    UNDETERMINED, DISABLED, AUTONOMOUS, TELEOP
+  public Command runTraj(PathPlannerTrajectory traj) {
+    return dt.runTrajectory(traj, DrivetrainState.IDLE);
+  }
+
+  public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
+    return dt.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
+  }
+
+  public Command runTraj(String traj) {
+    return runTraj(paths().get(traj));
+  }
+
+  public Command runTraj(String traj, boolean resetPose) {
+    return runTraj(paths().get(traj), resetPose);
+  }
+
+  public Arm arm() {
+    return arm;
+  }
+
+  public Drivetrain dt() {
+    return dt;
+  }
+
+  public Command waitForReady() {
+    return new WaitUntilCommand(() ->
+            dt.getState() == DrivetrainState.IDLE &&
+            arm.getState() == ArmMode.STOWED
+    );
   }
 
   public enum AutoRoutes {
-    TEST
+    NOTHING,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT,
+    BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

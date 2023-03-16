@@ -1,12 +1,19 @@
 {
   "NetworkTables Settings": {
-    "mode": "Client (NT4)"
+    "mode": "Client (NT4)",
+    "serverTeam": "5907"
   },
   "Retained Values": {
     "open": false
   },
   "transitory": {
     "SmartDashboard": {
+      "Arm": {
+        "open": true,
+        "shoulder": {
+          "open": true
+        }
+      },
       "open": true
     }
   }
