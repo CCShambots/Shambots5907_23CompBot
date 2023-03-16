@@ -21,6 +21,10 @@ public class GridElement {
         this.location = location;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     /**
      * Get the location (in field space) of this element of the grid
      * @return the pose of the element

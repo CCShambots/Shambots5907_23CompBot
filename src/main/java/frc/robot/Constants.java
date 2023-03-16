@@ -24,6 +24,7 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
+import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
@@ -35,6 +36,8 @@ public final class Constants {
 
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
+  public static GridInterface gridInterface = new GridInterface(alliance);
+  public static boolean gridReinstantiated = true;
 
   public static final class Claw {
     public static final int COMPRESSOR_ID = 1;
@@ -162,7 +165,7 @@ public final class Constants {
   }
 
   public static final class Vision {
-    public static Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-5), 0, inchesToMeters(31), new Rotation3d());
+    public static Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-7.549165), 0, inchesToMeters(8.585326+1.44), new Rotation3d());
 
     //Base
     public static final int APRIL_TAG_PIPELINE = 0;
@@ -179,20 +182,6 @@ public final class Constants {
     public static final double turretToShoulder = inchesToMeters(14); //Distance from the turret to the arm (when the elevator is at 0)
     public static final double shoulderToWrist = inchesToMeters(28.75);
     public static final double wristToEndEffector = inchesToMeters(25.5);
-
-    //Turret hardawre details
-    public static final int TURRET_ID = 21;
-    public static final double TURRET_INPUT_TO_OUTPUT =
-            (1.0/ 25.0) * //TODO: Gear ratio on motor
-            (10.0 / 140.0) *
-            2 * PI //To radians
-    ; //Rotations --> Radians
-    public static final int TURRET_POT_PORT = 0; //Analog port
-    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
-    public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 400; //1000
-    public static final Range turretRange = Range.fromDegrees(-90, 90);
 
     //Elevator hardware details
     public static final int ELEVATOR_ID = 22;
@@ -230,7 +219,6 @@ public final class Constants {
     public static final Range rotatorRange = Range.fromDegrees(-180, 180);
 
     //PID gains
-    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
     public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
@@ -253,6 +241,27 @@ public final class Constants {
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(49), toRadians(-32), 0);
+  }
+
+  public static class Turret {
+    //Turret hardawre details
+    public static final int TURRET_ID = 21;
+    public static final double TURRET_INPUT_TO_OUTPUT =
+            (1.0/ 25.0) * //TODO: Gear ratio on motor
+                    (10.0 / 140.0) *
+                    2 * PI //To radians
+            ; //Rotations --> Radians
+    public static final int TURRET_POT_PORT = 0; //Analog port
+    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
+    public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
+    public static final double TURRET_MAX_VEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
+
+    public static final double TURRET_START_ANGLE  = 0;
+
+    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+
   }
 
   public static class Lights {
@@ -287,7 +296,13 @@ public final class Constants {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
     if(!overrideAlliance) alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
 
-    rc.arm().reInstantiateGridUI(alliance);
+    reInstantiateGridUI(alliance);
   }
-  
+
+  public static void reInstantiateGridUI(Alliance alliance) {
+    gridInterface = new GridInterface(alliance);
+    Constants.gridReinstantiated = true;
+  }
+
+
 }

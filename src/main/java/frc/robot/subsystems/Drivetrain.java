@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -54,6 +56,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         this.theta = theta;
         this.llPose = llPoseSupplier;
         this.llHasPose = llHasPose;
+
+        getOdoPose = this::getPose;
 
         drive = new SwerveDrive(
                 PIGEON_ID,
@@ -292,6 +296,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
+
+    public Pose2d getPose() {
+        return drive.getPose();
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
@@ -305,11 +314,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            "field", drive.getField(),
-            "module-1", drive.getModules().get(0),
-            "module-2", drive.getModules().get(1),
-            "module-3", drive.getModules().get(2),
-            "module-4", drive.getModules().get(3)
+            "field", drive.getField()
+            // "module-1", drive.getModules().get(0),
+            // "module-2", drive.getModules().get(1),
+            // "module-3", drive.getModules().get(2),
+            // "module-4", drive.getModules().get(3)
         );
     }
 

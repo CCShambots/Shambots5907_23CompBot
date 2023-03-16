@@ -89,6 +89,7 @@ public class GridInterface {
         indicateElementPlaced(grid.accessElement(row, col));
     }
 
+
     /**
      * Notifies the dashboard that an element has been placed
      * @param element

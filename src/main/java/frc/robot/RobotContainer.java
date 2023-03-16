@@ -4,15 +4,16 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
@@ -25,10 +26,7 @@ import frc.robot.commands.auto.red.RedScoreBalanceRight;
 import frc.robot.commands.auto.red.RedScoreLeft;
 import frc.robot.commands.auto.red.RedScoreRight;
 import frc.robot.commands.WhileDisabledInstantCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.BaseVision;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
@@ -41,6 +39,7 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
+import static frc.robot.Constants.gridReinstantiated;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
 public class RobotContainer {
@@ -52,22 +51,32 @@ public class RobotContainer {
 
   //Declare subsystems
   private final BaseVision baseVision;
+  private final ClawVision clawVision;
   private final Drivetrain dt;
   private final Arm arm;
+  private final Lights l;
+  private final Turret t;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
-  
+
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Lights l;
 
   public RobotContainer() {
 
     this.arm = new Arm();
     this.l = new Lights();
+    this.clawVision = new ClawVision();
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(arm.getTurretAngle()));
+
+    this.t = new Turret(
+            () -> operatorCont.pov(0).getAsBoolean(),
+            () -> operatorCont.pov(180).getAsBoolean(),
+            () -> clawVision.hasTarget(),
+            () -> clawVision.getGameElementOffset().getRadians());
+
+    this.baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(t.getTurretAngle()));
 
     dt = new Drivetrain(
           () -> -leftStick.getY(),
@@ -151,10 +160,10 @@ public class RobotContainer {
     operatorCont.a().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_STOWED)));
     operatorCont.b().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.PICKUP_DOUBLE)));
 
-    operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
-    operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
-    operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
-    operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
+//    operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
+//    operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
+//    operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
+//    operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
 
     operatorCont.leftTrigger(0.8)
       .and(() -> operatorCont.rightTrigger(0.8)
@@ -162,13 +171,6 @@ public class RobotContainer {
 
     operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
-
-    // rightStick.topRight().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(-90))));
-    // rightStick.topBase().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(0))));
-    // rightStick.topLeft().onTrue(new InstantCommand(() -> arm.setTurretTarget(Math.toRadians(90))));
-
-    rightStick.topRight().onTrue(new InstantCommand(() -> arm.goToPose(new Pose3d(Constants.Arm.shoulderToWrist, 0, Constants.Arm.baseToTurret + Constants.Arm.turretToShoulder + Constants.Arm.shoulderToWrist, new Rotation3d(0, 0, 0)))));
-
   }
 
   public Command getAutonomousCommand() {
