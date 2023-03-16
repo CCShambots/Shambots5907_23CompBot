@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
+import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
@@ -39,7 +40,7 @@ import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
-public class RobotContainer {
+public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   //Declare HIDs
   private final CommandFlightStick leftStick = new CommandFlightStick(0);
@@ -51,6 +52,8 @@ public class RobotContainer {
   private final Drivetrain dt;
   private final Arm arm;
 
+  //private final Turret t;
+
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
   
@@ -59,6 +62,8 @@ public class RobotContainer {
   private final Lights l;
 
   public RobotContainer() {
+    super("Robot", State.UNDETERMINED, State.class);
+
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
@@ -77,10 +82,6 @@ public class RobotContainer {
     loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
      "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
-    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
-    SubsystemManagerFactory.getInstance().registerSubsystem(l);
-
     autoLoader = instantiateAutoLoader();
 
     ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
@@ -90,8 +91,22 @@ public class RobotContainer {
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
     .withPosition(4, 2).withSize(2, 2);
-    
+
+    addChildSubsystem(dt);
+    addChildSubsystem(arm);
+    addChildSubsystem(l);
+
+    defineTransitions();
+    defineStateCommands();
+
     configureBindings();
+  }
+
+  private void defineTransitions() {
+
+  }
+
+  private void defineStateCommands() {
 
   }
 
@@ -224,6 +239,17 @@ public class RobotContainer {
             dt.getState() == DrivetrainState.IDLE &&
             arm.getState() == ArmMode.STOWED
     );
+  }
+
+  @Override
+  protected void determineSelf() {
+
+  }
+
+  public enum State {
+    SOFT_E_STOP, INTAKING, TRAVELING_TO_INTAKE, SCORING, TRAVELING_TO_SCORE, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED
+
+
   }
 
   public enum AutoRoutes {

@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
     PathPlannerServer.startServer(5811); //TODO: enable when debugging again
