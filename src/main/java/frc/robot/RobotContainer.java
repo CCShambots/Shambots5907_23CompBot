@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
@@ -54,6 +55,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   //private final Turret t;
 
+
+
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
   
@@ -63,7 +66,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public RobotContainer() {
     super("Robot", State.UNDETERMINED, State.class);
-
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
@@ -75,8 +77,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
           baseVision.getLLHasTargetSupplier()
     );
 
-    this.arm = new Arm();
-    this.l = new Lights();
+    arm = new Arm();
+    l = new Lights();
 
     //Load the trajectories into the hashmap
     loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
@@ -84,13 +86,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     autoLoader = instantiateAutoLoader();
 
-    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
-    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
-    driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
-    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
-    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
-    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
-    .withPosition(4, 2).withSize(2, 2);
+    initializeDriveTab();
 
     addChildSubsystem(dt);
     addChildSubsystem(arm);
@@ -103,11 +99,35 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void defineTransitions() {
+    addOmniTransition(State.SOFT_E_STOP, new ParallelCommandGroup(
+            dt.transitionCommand(DrivetrainState.X_SHAPE),
+            arm.transitionCommand(ArmMode.SOFT_STOP)
+            //turret estop
+            //light transition to estop pattern
+    ));
 
+    addTransition(State.DISABLED, State.AUTONOMOUS);
+
+    addOmniTransition(State.TRAVELING, new InstantCommand()/*set lights to traveling*/);
+
+    addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
+            //set lights,
+            arm.transitionCommand(ArmMode.SEEKING_STOWED /*gridinterface requested*/)
+    ));
   }
 
   private void defineStateCommands() {
 
+  }
+
+  private void initializeDriveTab() {
+    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
+    driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
+    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
+    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
+    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
+            .withPosition(4, 2).withSize(2, 2);
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
@@ -243,11 +263,26 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   @Override
   protected void determineSelf() {
+    setState(State.TRAVELING);
+  }
 
+  @Override
+  protected void onDisable() {
+    setState(State.DISABLED);
+  }
+
+  @Override
+  protected void onTeleopStart() {
+    requestTransition(State.TRAVELING);
+  }
+
+  @Override
+  protected void onAutonomousStart() {
+    requestTransition(State.AUTONOMOUS);
   }
 
   public enum State {
-    SOFT_E_STOP, INTAKING, TRAVELING_TO_INTAKE, SCORING, TRAVELING_TO_SCORE, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED
+    SOFT_E_STOP, INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING
 
 
   }
