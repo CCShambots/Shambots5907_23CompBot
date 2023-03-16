@@ -3,7 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -131,7 +131,7 @@ public class RobotContainer {
   private InstantCommand syncAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
-              Constants.pullAllianceFromFMS();
+              Constants.pullAllianceFromFMS(this);
               Constants.overrideAlliance = false;
             }
     );
@@ -169,7 +169,6 @@ public class RobotContainer {
 
     rightStick.topRight().onTrue(new InstantCommand(() -> arm.goToPose(new Pose3d(Constants.Arm.shoulderToWrist, 0, Constants.Arm.baseToTurret + Constants.Arm.turretToShoulder + Constants.Arm.shoulderToWrist, new Rotation3d(0, 0, 0)))));
 
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
   public Command getAutonomousCommand() {
@@ -228,6 +227,11 @@ public class RobotContainer {
 
   public Drivetrain dt() {
     return dt;
+  }
+
+  //TODO: Remove
+  public void updateTarget() {
+    dt.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {

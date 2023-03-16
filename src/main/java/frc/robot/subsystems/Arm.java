@@ -6,15 +6,18 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.subsystems.Claw.State;
+import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
@@ -56,6 +59,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private ArmState currentArmState = STOWED_POS;
 
+    private GridInterface gridInterface;
 
     public Arm() {
         super("Arm", UNDETERMINED, ArmMode.class);
@@ -69,6 +73,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         registerStateCommands();
 
         goToArmState(STOWED_POS);
+
+        gridInterface = new GridInterface(Constants.alliance);
 
         //TODO: check if abs encoders are zero and disable joint on startup if so
     }
@@ -219,6 +225,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             shoulderPID.reset(getShoulderAngle());
         });
     }
+
     public Runnable runControlLoops() {
         return () -> {
             //Wrist code
@@ -331,17 +338,33 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void update() {
-        // rotator.update();
+        gridInterface.update();
     }
+
+    public void reInstantiateGridUI(Alliance alliance) {
+        gridInterface = new GridInterface(alliance);
+    }
+
+    public void forceCone() {
+        gridInterface.forceCone();
+    }
+
+    public void forceCube() {
+        gridInterface.forceCube();
+    }
+
+    public void forceNone() {
+        gridInterface.removeForceElement();
+    }
+
+    public GridInterface getGridInterface() { return gridInterface;}
 
     @Override
     protected void onEnable() {
-
     }
 
     @Override
     protected void onDisable() {
-
     }
 
     public Pose3d getArmPose() {
