@@ -75,8 +75,8 @@ public final class Constants {
     public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
 
     //Max speeds (turbo button)
-    public static final double MAX_LINEAR_SPEED = 3;
-    public static final double MAX_LINEAR_ACCELERATION = 6;
+    public static final double MAX_LINEAR_SPEED = 4;
+    public static final double MAX_LINEAR_ACCELERATION = 8;
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
