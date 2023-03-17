@@ -356,9 +356,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public enum State {
-    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
-
-    DT_DONE, ARM_DONE, TURRET_DONE, LIGHTS_DONE
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE
   }
 
   public enum AutoRoutes {
