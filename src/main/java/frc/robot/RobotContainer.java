@@ -138,13 +138,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            //arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
             turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            //arm.transitionCommand(getNextScoringMode()),
+            arm.transitionCommand(getNextScoringMode()),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
