@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -55,6 +57,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         this.llPose = llPoseSupplier;
         this.llHasPose = llHasPose;
 
+        getOdoPose = this::getPose;
+
         drive = new SwerveDrive(
                 PIGEON_ID,
                 DRIVE_GAINS,
@@ -66,7 +70,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                false,
+                true, //TODO: Disable before comp
                 "drivetrain",
                 "",
                 Constants.CURRENT_LIMIT,
@@ -181,6 +185,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         //Only integrate vision measurement if the limelight has a target
         if(llHasPose.getAsBoolean()) {
+            // System.out.println(llPose.get());
             drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }
@@ -291,6 +296,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
+
+    public Pose2d getPose() {
+        return drive.getPose();
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
@@ -304,11 +314,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            "field", drive.getField(),
-            "module-1", drive.getModules().get(0),
-            "module-2", drive.getModules().get(1),
-            "module-3", drive.getModules().get(2),
-            "module-4", drive.getModules().get(3)
+            "field", drive.getField()
+            // "module-1", drive.getModules().get(0),
+            // "module-2", drive.getModules().get(1),
+            // "module-3", drive.getModules().get(2),
+            // "module-4", drive.getModules().get(3)
         );
     }
 

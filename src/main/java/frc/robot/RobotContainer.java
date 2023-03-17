@@ -4,7 +4,9 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -26,10 +29,7 @@ import frc.robot.commands.auto.red.RedScoreBalanceRight;
 import frc.robot.commands.auto.red.RedScoreLeft;
 import frc.robot.commands.auto.red.RedScoreRight;
 import frc.robot.commands.WhileDisabledInstantCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.BaseVision;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
@@ -43,6 +43,7 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
+import static frc.robot.Constants.gridReinstantiated;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
 public class RobotContainer extends StateMachine<RobotContainer.State> {
@@ -54,37 +55,41 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   //Declare subsystems
   private final BaseVision baseVision;
+  private final ClawVision clawVision;
   private final Drivetrain dt;
   private final Arm arm;
-
-  //private final Turret t;
-
-  GridInterface gridInterface;
+  private final Lights l;
+  private final Turret t;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
-  
+
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
-  private final Lights l;
 
   public RobotContainer() {
     super("Robot", State.UNDETERMINED, State.class);
 
-    gridInterface = new GridInterface(alliance);
+    this.arm = new Arm();
+    this.l = new Lights();
+    this.clawVision = new ClawVision();
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
+
+    this.t = new Turret(
+            () -> operatorCont.pov(0).getAsBoolean(),
+            () -> operatorCont.pov(180).getAsBoolean(),
+            () -> clawVision.hasTarget(),
+            () -> clawVision.getGameElementOffset().getRadians());
+
+    this.baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(t.getTurretAngle()));
 
     dt = new Drivetrain(
           () -> -leftStick.getY(),
           () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
-          baseVision.getLLPoseSupplier(),
+          baseVision.getPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
-
-    arm = new Arm();
-    l = new Lights();
 
     //Load the trajectories into the hashmap
     loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
@@ -196,7 +201,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             () -> {
               alliance = alliance == Red ? Blue : Red;
               Constants.overrideAlliance = true;
-              gridInterface = new GridInterface(alliance);
             }
     );
   }
@@ -206,7 +210,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             () -> {
               Constants.pullAllianceFromFMS(this);
               Constants.overrideAlliance = false;
-              gridInterface = new GridInterface(alliance);
             }
     );
   }
