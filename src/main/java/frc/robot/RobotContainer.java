@@ -4,19 +4,14 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
 import frc.robot.commands.auto.blue.BlueScoreLeft;
@@ -31,7 +26,6 @@ import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.util.grid.GridElement;
-import frc.robot.util.grid.GridInterface;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +34,6 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
-import static frc.robot.Constants.gridReinstantiated;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 
 public class RobotContainer extends StateMachine<RobotContainer.State> {
@@ -53,10 +46,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   //Declare subsystems
   private final BaseVision baseVision;
   private final ClawVision clawVision;
-  private final Drivetrain dt;
+  private final Drivetrain drivetrain;
   private final Arm arm;
-  private final Lights l;
-  private final Turret t;
+  private final Lights lights;
+  private final Turret turret;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
@@ -68,19 +61,19 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     super("Robot", State.UNDETERMINED, State.class);
 
     arm = new Arm();
-    l = new Lights();
+    lights = new Lights();
     clawVision = new ClawVision();
 
 
-    t = new Turret(
+    turret = new Turret(
             () -> operatorCont.pov(0).getAsBoolean(),
             () -> operatorCont.pov(180).getAsBoolean(),
             clawVision::hasTarget,
             () -> clawVision.getGameElementOffset().getRadians());
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(t.getTurretAngle()));
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getTurretAngle()));
 
-    dt = new Drivetrain(
+    drivetrain = new Drivetrain(
           () -> -leftStick.getY(),
           () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
@@ -104,11 +97,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     initializeDriveTab();
 
-    addChildSubsystem(dt);
+    addChildSubsystem(drivetrain);
     addChildSubsystem(arm);
-    addChildSubsystem(l);
+    addChildSubsystem(lights);
     addChildSubsystem(clawVision);
-    addChildSubsystem(t);
+    addChildSubsystem(turret);
 
     defineTransitions();
     defineStateCommands();
@@ -118,36 +111,36 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
-            dt.transitionCommand(DrivetrainState.X_SHAPE),
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
-            t.transitionCommand(Turret.TurretState.SOFT_STOP)
+            turret.transitionCommand(Turret.TurretState.SOFT_STOP)
             //l.transitionCommand(LightMode.SOFT_STOP)
     ));
 
     addOmniTransition(State.BRAKE, new ParallelCommandGroup(
-            dt.transitionCommand(DrivetrainState.X_SHAPE),
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SEEKING_STOWED),
-            l.transitionCommand(LightState.IDLE),
-            t.transitionCommand(Turret.TurretState.IDLE)
+            lights.transitionCommand(LightState.IDLE),
+            turret.transitionCommand(Turret.TurretState.IDLE)
     ));
 
     addTransition(State.DISABLED, State.AUTONOMOUS);
 
     addOmniTransition(State.TRAVELING, new ParallelCommandGroup(
             arm.transitionCommand(ArmMode.SEEKING_STOWED),
-            dt.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
-            t.transitionCommand(Turret.TurretState.CARDINALS)
+            drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
+            turret.transitionCommand(Turret.TurretState.CARDINALS)
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
             arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
-            t.transitionCommand(Turret.TurretState.INTAKING)
+            turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
-            l.transitionCommand(LightState.ARM_SCORING),
+            lights.transitionCommand(LightState.ARM_SCORING),
             arm.transitionCommand(getNextScoringMode()),
-            t.transitionCommand(Turret.TurretState.SCORING)
+            turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
 
@@ -157,8 +150,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
       LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.UPRIGHT_CONE;
 
-      if (l.getState() != based) {
-        l.requestTransition(based);
+      if (lights.getState() != based) {
+        lights.requestTransition(based);
       }
     }));
 
@@ -231,7 +224,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
-    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+    leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(transitionCommand(State.INTAKING));
@@ -240,25 +233,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    /* TODO: change these to cardinal directions of turret
-    * operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
-    * operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
-    * operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
-    * operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
-    */
-
     operatorCont.leftTrigger(0.8)
             .and(operatorCont.rightTrigger(0.8))
             .onTrue(transitionCommand(State.DISABLED));
 
-    //operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
-    //operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
-
     /*
-
-    operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
-    operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
-
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
 
     leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
@@ -300,11 +279,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public Command runTraj(PathPlannerTrajectory traj) {
-    return dt.runTrajectory(traj, DrivetrainState.IDLE);
+    return drivetrain.runTrajectory(traj, DrivetrainState.IDLE);
   }
 
   public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
-    return dt.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
+    return drivetrain.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
   }
 
   public Command runTraj(String traj) {
@@ -320,17 +299,17 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public Drivetrain dt() {
-    return dt;
+    return drivetrain;
   }
 
   //TODO: Remove
   public void updateTarget() {
-    dt.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
+    drivetrain.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {
     return new WaitUntilCommand(() ->
-            dt.getState() == DrivetrainState.IDLE &&
+            drivetrain.getState() == DrivetrainState.IDLE &&
             arm.getState() == ArmMode.STOWED
     );
   }
