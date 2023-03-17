@@ -56,7 +56,7 @@ public class GridElement {
     }
 
     public boolean isCube() {
-        return type == Cube;
+        return type == Cube || type == Both;
     }
 
     public enum Type {
