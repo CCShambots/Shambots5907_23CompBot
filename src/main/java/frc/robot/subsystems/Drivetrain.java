@@ -265,8 +265,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.drive(new ChassisSpeeds(0, 0, 1), true);
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
-
-        new WaitCommand(134).andThen(transitionCommand(DrivetrainState.X_SHAPE)).schedule();
     }
 
     @Override

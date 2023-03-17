@@ -327,6 +327,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
+    new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 
   @Override
