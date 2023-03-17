@@ -116,7 +116,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
-            //drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)
