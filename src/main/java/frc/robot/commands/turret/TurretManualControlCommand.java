@@ -22,8 +22,8 @@ public class TurretManualControlCommand extends CommandBase {
     @Override
     public void execute() {
         //get left and right rotation request in radians per second
-        double l = ((left.getAsBoolean() ? -1 : 0) * Constants.Turret.MANUAL_CONTROL_VELOCITY) * Constants.Turret.TURRET_INPUT_TO_OUTPUT;
-        double r = ((right.getAsBoolean() ? 1 : 0) * Constants.Turret.MANUAL_CONTROL_VELOCITY) * Constants.Turret.TURRET_INPUT_TO_OUTPUT;
+        double l = ((left.getAsBoolean() ? 1 : 0) * Constants.Turret.MANUAL_CONTROL_VELOCITY) * Constants.Turret.TURRET_INPUT_TO_OUTPUT;
+        double r = ((right.getAsBoolean() ? -1 : 0) * Constants.Turret.MANUAL_CONTROL_VELOCITY) * Constants.Turret.TURRET_INPUT_TO_OUTPUT;
 
         turret.setTarget(turret.getTurretTarget() + (l / 50) + (r / 50)); //divide by 50 to account for 20ms loop
     }
