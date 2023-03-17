@@ -64,7 +64,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     lights = new Lights();
     clawVision = new ClawVision();
 
-
     turret = new Turret(
             () -> operatorCont.pov(0).getAsBoolean(),
             () -> operatorCont.pov(180).getAsBoolean(),
@@ -113,8 +112,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
-            turret.transitionCommand(Turret.TurretState.SOFT_STOP)
-            //l.transitionCommand(LightMode.SOFT_STOP)
+            turret.transitionCommand(Turret.TurretState.SOFT_STOP),
+            lights.transitionCommand(LightState.SOFT_STOP)
     ));
 
     addOmniTransition(State.BRAKE, new ParallelCommandGroup(
@@ -138,7 +137,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
-            lights.transitionCommand(LightState.ARM_SCORING),
+            lights.transitionCommand(LightState.SCORING),
             arm.transitionCommand(getNextScoringMode()),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
@@ -148,7 +147,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.UPRIGHT_CONE;
+      LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
 
       if (lights.getState() != based) {
         lights.requestTransition(based);

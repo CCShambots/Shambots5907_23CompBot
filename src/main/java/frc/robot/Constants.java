@@ -278,18 +278,23 @@ public final class Constants {
     public static final RGB IDLE_RGB = new RGB(0, 0, 255);
 
     public static final RGB ELEMENT_GRABBED_RGB = new RGB(0, 255, 0);
-    public static final Animation DEPLOYING_ANIMATION =
+    public static final Animation SCORING_ANIMATION =
             new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LEDS);
 
     public static final RGB SCORING_RGB = new RGB(0, 255, 0);
 
+    public static final RGB CONE_RGB = new RGB(255, 255, 0);
 
-    public static final RGB UPRIGHT_CONE_RGB = new RGB(255, 255, 0);
-
-    public static final Animation DOWNED_CONE_ANIMATION =
+    public static final Animation INTAKE_CONE_ANIMATION =
             new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
 
     public static final RGB CUBE_RGB = new RGB(144,22,153);
+
+    public static final Animation INTAKE_CUBE_ANIMATION =
+            new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LEDS);
+
+    public static final Animation SOFT_STOP_ANIMATION =
+            new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LEDS);
   }
 
   public static void pullAllianceFromFMS(RobotContainer rc) {
