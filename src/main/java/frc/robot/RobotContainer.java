@@ -70,7 +70,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             () -> operatorCont.pov(0).getAsBoolean(),
             () -> operatorCont.pov(180).getAsBoolean(),
             clawVision::hasTarget,
-            () -> clawVision.getGameElementOffset().getRadians());
+            () -> clawVision.getGameElementOffset().getRadians(),
+            operatorCont.pov(270),
+            operatorCont.pov(90)
+
+    );
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getTurretAngle()));
 
@@ -231,8 +235,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    operatorCont.b().onTrue(transitionCommand(State.INTAKING));
-    operatorCont.x().onTrue(transitionCommand(State.SCORING));
+    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
+    operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
 
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
@@ -247,6 +251,22 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
     leftStick.button(11).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));*/
+  }
+
+  private void handleManualRequest(State s, Turret.TurretState ts) {
+    if (getState() == s) {
+      if (isFlag(State.MANUAL_CONTROL)) {
+        clearFlag(State.MANUAL_CONTROL);
+        turret.requestTransition(ts);
+      }
+      else {
+        setFlag(State.MANUAL_CONTROL);
+        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+      }
+    }
+    else {
+      requestTransition(s);
+    }
   }
 
   public Command getAutonomousCommand() {
@@ -341,7 +361,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public enum State {
-    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
+
+    MANUAL_CONTROL
   }
 
   public enum AutoRoutes {

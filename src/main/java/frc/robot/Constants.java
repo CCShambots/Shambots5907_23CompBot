@@ -253,7 +253,7 @@ public final class Constants {
     //Turret hardawre details
     public static final int TURRET_ID = 21;
     public static final double TURRET_INPUT_TO_OUTPUT =
-            (1.0/ 25.0) * //TODO: Gear ratio on motor
+            (1.0/ 25.0) *
                     (10.0 / 140.0) *
                     2 * PI //To radians
             ; //Rotations --> Radians
@@ -268,6 +268,8 @@ public final class Constants {
 
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
 
+
+    public static double MANUAL_CONTROL_VELOCITY = 30;
   }
 
   public static class Lights {

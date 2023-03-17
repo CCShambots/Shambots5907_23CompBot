@@ -11,6 +11,7 @@ import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.commands.turret.TurretCardinalsCommand;
+import frc.robot.commands.turret.TurretManualControlCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -29,10 +30,12 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
     private final BooleanSupplier towardSupplier;
     private final BooleanSupplier awaySupplier;
+    private final BooleanSupplier leftSupplier;
+    private final BooleanSupplier rightSupplier;
     private final BooleanSupplier clawHasTarget;
     private final DoubleSupplier clawVisionOffset;
 
-    public Turret(BooleanSupplier towardSupplier, BooleanSupplier awaySupplier, BooleanSupplier clawHasTarget, DoubleSupplier clawVisionOffset) {
+    public Turret(BooleanSupplier towardSupplier, BooleanSupplier awaySupplier, BooleanSupplier clawHasTarget, DoubleSupplier clawVisionOffset, BooleanSupplier leftSupplier, BooleanSupplier rightSupplier) {
         super("turret", UNDETERMINED, TurretState.class);
 
         this.towardSupplier = towardSupplier;
@@ -40,6 +43,9 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
         this.clawHasTarget = clawHasTarget;
         this.clawVisionOffset = clawVisionOffset;
+
+        this.leftSupplier = leftSupplier;
+        this.rightSupplier = rightSupplier;
 
         defineTransitions();
         registerStateCommands();
@@ -53,22 +59,25 @@ public class Turret extends StateMachine<Turret.TurretState> {
         addOmniTransition(SCORING);
         addOmniTransition(INTAKING);
         addOmniTransition(CARDINALS);
+        addOmniTransition(MANUAL_CONTROL);
 
         addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
     }
 
     private void registerStateCommands() {
-        registerStateCommand(CARDINALS, new TurretCardinalsCommand(this, towardSupplier, awaySupplier));
+        registerStateCommand(CARDINALS, new InstantCommand(() -> turret.set(0)).andThen(new TurretCardinalsCommand(this, towardSupplier, awaySupplier)));
 
         registerStateCommand(SCORING, new RunCommand(() -> {
             setTargetToPoint(Constants.gridInterface.getNextElement().getLocation().toTranslation2d());
         }));
 
-        registerStateCommand(INTAKING, new RunCommand(() -> {
+        registerStateCommand(INTAKING, new InstantCommand(() -> turret.set(0)).andThen(new RunCommand(() -> {
                 if(clawHasTarget.getAsBoolean()) {
                     setTarget(getTurretTarget() + clawVisionOffset.getAsDouble());
                 }
-        }));
+        })));
+
+        registerStateCommand(MANUAL_CONTROL, new TurretManualControlCommand(this, leftSupplier, rightSupplier));
     }
 
     public enum TurretState {
@@ -77,7 +86,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
         CARDINALS,
         SCORING,
         INTAKING,
-        SOFT_STOP
+        SOFT_STOP,
+        MANUAL_CONTROL
     }
 
     @Override
