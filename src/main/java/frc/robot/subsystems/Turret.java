@@ -52,6 +52,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
         addOmniTransition(IDLE);
         addOmniTransition(SCORING);
         addOmniTransition(INTAKING);
+        addOmniTransition(CARDINALS);
 
         addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
     }

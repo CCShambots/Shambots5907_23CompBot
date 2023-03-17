@@ -75,7 +75,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     t = new Turret(
             () -> operatorCont.pov(0).getAsBoolean(),
             () -> operatorCont.pov(180).getAsBoolean(),
-            () -> clawVision.hasTarget(),
+            clawVision::hasTarget,
             () -> clawVision.getGameElementOffset().getRadians());
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(t.getTurretAngle()));
@@ -356,7 +356,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public enum State {
-    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
+
+    DT_DONE, ARM_DONE, TURRET_DONE, LIGHTS_DONE
   }
 
   public enum AutoRoutes {
