@@ -116,7 +116,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            //drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)
@@ -138,13 +138,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            //arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
             turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            arm.transitionCommand(getNextScoringMode()),
+            //arm.transitionCommand(getNextScoringMode()),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
@@ -246,6 +246,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .and(operatorCont.rightTrigger(0.8))
             .onTrue(transitionCommand(State.DISABLED));
 
+    operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
+
     /*
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
 
@@ -253,7 +256,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     leftStick.button(11).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));*/
   }
 
+  private void handleManualTurretRequest() {
+    if (isFlag(State.MANUAL_CONTROL)) return;
+
+    if (getState() == State.INTAKING) handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING);
+    else if (getState() == State.SCORING) handleManualRequest(State.SCORING, Turret.TurretState.SCORING);
+  }
+
   private void handleManualRequest(State s, Turret.TurretState ts) {
+    if (!(s == State.SCORING || s == State.INTAKING)) return;
+
     if (getState() == s) {
       if (isFlag(State.MANUAL_CONTROL)) {
         clearFlag(State.MANUAL_CONTROL);

@@ -1,4 +1,11 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -27,13 +34,31 @@
       "/Shuffleboard/Drive/Auto Route": "String Chooser",
       "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
+      "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
       "/SmartDashboard//Drivetrain/field": "Field2d",
       "/SmartDashboard/Arm": "Subsystem",
       "/SmartDashboard/Claw": "Subsystem",
       "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/InstantCommand": "Command",
       "/SmartDashboard/Lights": "Subsystem",
+      "/SmartDashboard/Robot": "Subsystem",
       "/SmartDashboard/Vision": "Subsystem"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "Robot": {
+          "open": true
+        },
+        "open": true,
+        "turret": {
+          "open": true,
+          "turret": {
+            "open": true
+          }
+        }
+      }
     }
   }
 }

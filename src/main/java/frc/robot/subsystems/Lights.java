@@ -26,6 +26,7 @@ public class Lights extends StateMachine<Lights.LightState> {
         addAnimationTransition(INTAKE_CONE);
         addAnimationTransition(INTAKE_CUBE);
         addAnimationTransition(SOFT_STOP);
+        addAnimationTransition(SCORING);
     }
 
     public enum LightState {
