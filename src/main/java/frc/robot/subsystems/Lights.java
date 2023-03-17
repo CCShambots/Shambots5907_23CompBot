@@ -20,7 +20,7 @@ public class Lights extends StateMachine<Lights.LightState> {
 
         addAnimationTransition(DISABLED);
         addOmniTransition(IDLE, new InstantCommand(() -> candle.setLEDs(IDLE_RGB)));
-        addOmniTransition(LightState.CONE, new InstantCommand(() -> candle.setLEDs(CONE_RGB)));
+        addOmniTransition(CONE, new InstantCommand(() -> candle.setLEDs(CONE_RGB)));
         addOmniTransition(CUBE, new InstantCommand(() -> candle.setLEDs(CUBE_RGB)));
         addOmniTransition(GAME_PIECE_GRABBED, new InstantCommand(() -> candle.setLEDs(ELEMENT_GRABBED_RGB)));
         addAnimationTransition(INTAKE_CONE);
