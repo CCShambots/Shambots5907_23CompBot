@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
 import frc.robot.util.grid.GridInterface;
+import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
@@ -68,17 +69,22 @@ public final class Constants {
     // Distance between front and back wheels on robot in meters
     public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
 
-    // Maximum linear chassis speed in meters per second (MK4 standard modules capable of 4.1)
-    public static final double MAX_LINEAR_SPEED = 3;
-    public static final double MAX_LINEAR_ACCELERATION = 6;
+    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
+
+    // Standard speeds (MK4 standard modules capable of 4.1)
+    public static final double STANDARD_LINEAR_SPEED = 3;
+    public static final double STANDARD_LINEAR_ACCELERATION = 6;
+    public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
+    public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
+
+    //Max speeds (turbo button)
+    public static final double MAX_LINEAR_SPEED = 4;
+    public static final double MAX_LINEAR_ACCELERATION = 8;
+    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
+    public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
     public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
     public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
-
-    // Maximum chassis rotational speed in radians per second
-    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
-    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
-    public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left

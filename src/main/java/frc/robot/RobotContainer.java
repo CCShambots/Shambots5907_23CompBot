@@ -35,6 +35,8 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
@@ -225,9 +227,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
 
+    leftStick.topBase().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
+                    .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(transitionCommand(State.INTAKING));
     operatorCont.x().onTrue(transitionCommand(State.SCORING));
+
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
