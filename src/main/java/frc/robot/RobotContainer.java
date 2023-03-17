@@ -35,6 +35,8 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
@@ -63,7 +65,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     arm = new Arm();
     lights = new Lights();
     clawVision = new ClawVision();
-
 
     turret = new Turret(
             () -> operatorCont.pov(0).getAsBoolean(),
@@ -117,8 +118,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
-            turret.transitionCommand(Turret.TurretState.SOFT_STOP)
-            //l.transitionCommand(LightMode.SOFT_STOP)
+            turret.transitionCommand(Turret.TurretState.SOFT_STOP),
+            lights.transitionCommand(LightState.SOFT_STOP)
     ));
 
     addOmniTransition(State.BRAKE, new ParallelCommandGroup(
@@ -142,7 +143,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
-            lights.transitionCommand(LightState.ARM_SCORING),
+            lights.transitionCommand(LightState.SCORING),
             arm.transitionCommand(getNextScoringMode()),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
@@ -152,7 +153,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.UPRIGHT_CONE;
+      LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
 
       if (lights.getState() != based) {
         lights.requestTransition(based);
@@ -230,9 +231,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
 
+    leftStick.topBase().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
+                    .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
     operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
+
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
