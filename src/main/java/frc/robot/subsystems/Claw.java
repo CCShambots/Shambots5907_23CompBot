@@ -14,6 +14,8 @@ public class Claw extends StateMachine<Claw.State> {
 
     Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
 
+    private State prevState = State.UNDETERMINED;
+
     public Claw() {
         super("Claw", State.UNDETERMINED, State.class);
 
@@ -23,21 +25,32 @@ public class Claw extends StateMachine<Claw.State> {
     }
 
     private void defineTransitions() {
-        addOmniTransition(State.CLOSED, () -> solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE)));
-        addOmniTransition(State.OPENED, () -> solenoid.set(SOLENOID_CLAW_OPEN_VALUE));
+        addOmniTransition(State.CLOSED, () -> {
+            solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
+            prevState = State.CLOSED;
+        });
+        addOmniTransition(State.OPENED, () -> {
+            solenoid.set(SOLENOID_CLAW_OPEN_VALUE);
+            prevState = State.OPENED;
+        });
     }
 
     @Override
     protected void determineSelf() {
-        DoubleSolenoid.Value solenoidValue = solenoid.get();
-        if(solenoidValue == kOff) {
-            solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
-            setState(State.CLOSED);
-        } else if(solenoidValue == SOLENOID_CLAW_OPEN_VALUE) {
-            setState(State.OPENED);
+        if(prevState == State.UNDETERMINED) {
+            DoubleSolenoid.Value solenoidValue = solenoid.get();
+            if(solenoidValue == kOff) {
+                solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
+                setState(State.CLOSED);
+            } else if(solenoidValue == SOLENOID_CLAW_OPEN_VALUE) {
+                setState(State.OPENED);
+            } else {
+                setState(State.CLOSED);
+            }
         } else {
-            setState(State.CLOSED);
+            setState(prevState);
         }
+        
     }
 
     @Override
