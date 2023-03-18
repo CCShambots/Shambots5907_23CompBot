@@ -116,7 +116,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
-            //drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)
@@ -138,13 +138,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            //arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
             turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            //arm.transitionCommand(getNextScoringMode()),
+            new InstantCommand(() -> arm.requestTransition(getNextScoringMode())),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
@@ -153,10 +153,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState based = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
+      LightState correctState = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
 
-      if (lights.getState() != based) {
-        lights.requestTransition(based);
+      if (lights.getState() != correctState) {
+        lights.requestTransition(correctState);
       }
     }));
 

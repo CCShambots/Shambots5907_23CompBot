@@ -25,7 +25,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
 import frc.robot.util.grid.GridInterface;
-import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
@@ -198,8 +197,8 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 50; //rot/sec 3000
-    public static final double ELEVATOR_MAX_ACCEL = 50; //rot/sec^2 5000
+    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 3000
+    public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2 5000
 
     //Shoulder hardware details
     public static final int SHOULDER_ID = 23;
@@ -278,7 +277,7 @@ public final class Constants {
     public static final int NUM_LEDS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
-    public static final double BLINK_SPEED = 0.5;
+    public static final double BLINK_SPEED = 1;
 
     public static final Animation DISABLED_ANIMATION =
             new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 7);

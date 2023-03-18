@@ -50,7 +50,7 @@ public class GridElement {
     }
 
     private Type determineType() {
-        if(row == 2) return Both; //The element can be either if it's on the bottom row
+        if(row == 0) return Both; //The element can be either if it's on the bottom row
         if(col == 1 || col==4 || col==7) return Cube; //The element can only be a cube in the 2nd, 5th, and 8th columns
         return Cone; //The element can only be a cone if it's anywhere else
     }

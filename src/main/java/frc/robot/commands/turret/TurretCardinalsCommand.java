@@ -41,6 +41,8 @@ public class TurretCardinalsCommand extends CommandBase {
         if(currentToward && !prevToward) {
             Rotation2d base = getCurrentCardinal();
 
+            System.out.println("base: " + base.getDegrees()); 
+
             //Flip on blue alliance
             if(alliance == Blue) {
                 base = base.plus(new Rotation2d(PI));
@@ -70,7 +72,7 @@ public class TurretCardinalsCommand extends CommandBase {
     }
 
     private Rotation2d getCurrentCardinal() {
-        return new Rotation2d(Math.round(Constants.SwerveDrivetrain.getOdoPose.get().getRotation().getRadians() / (PI /2)) * PI / 2);
+        return new Rotation2d(Math.round(Constants.SwerveDrivetrain.getOdoPose.get().getRotation().getRadians() / (PI /2)) * (PI / 2));
     }
 
 }
