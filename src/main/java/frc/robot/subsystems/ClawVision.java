@@ -10,7 +10,7 @@ import static frc.robot.Constants.Vision.*;
 import static frc.robot.subsystems.ClawVision.VisionState.*;
 
 public class ClawVision extends StateMachine<ClawVision.VisionState> {
-    private final Limelight ll = new Limelight("limelight-arm");
+    private final Limelight ll = new Limelight("limelight-claw");
 
     public ClawVision() {
         super("Vision", UNDETERMINED, VisionState.class);
