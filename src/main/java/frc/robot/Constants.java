@@ -61,9 +61,6 @@ public final class Constants {
     public static final double DOCK_SPEED = 0.8;
     public static final double MIN_BALANCE_TIME = 2;
 
-
-    public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, toRadians(90)));
-
     // Distance between centers of right and left wheels on robot in meters
     public static final double TRACK_WIDTH = Units.inchesToMeters(18.75);
     // Distance between front and back wheels on robot in meters
@@ -219,10 +216,6 @@ public final class Constants {
     public static final double WRIST_MAX_VEL = toRadians(180); //Radians/sec
     public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
 
-    //Rotator hardware details
-    public static final int ROTATOR_ID = 25;
-    public static final double ROTATOR_ENCODER_OFFSET = toRadians(48.112586); //Radians //TODO
-    public static final Range rotatorRange = Range.fromDegrees(-180, 180);
 
     //PID gains
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
@@ -280,7 +273,7 @@ public final class Constants {
     public static final int NUM_LEDS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
-    public static final double BLINK_SPEED = 1;
+    public static final double BLINK_SPEED = .6;
 
     public static final Animation DISABLED_ANIMATION =
             new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 7);
