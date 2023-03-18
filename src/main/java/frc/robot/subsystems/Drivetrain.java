@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
@@ -17,17 +16,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.swerve.DriveCommand;
-import frc.robot.ShamLib.swerve.ModuleInfo;
-import frc.robot.ShamLib.swerve.SwerveDrive;
+import frc.robot.ShamLib.swerve.*;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.PathPlanner;
-import frc.robot.ShamLib.swerve.TrajectoryBuilder;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 
@@ -58,8 +53,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 PIGEON_ID,
                 DRIVE_GAINS,
                 TURN_GAINS,
-                MAX_LINEAR_SPEED,
-                MAX_LINEAR_ACCELERATION,
+                STANDARD_LINEAR_SPEED,
+                STANDARD_LINEAR_ACCELERATION,
                 MAX_TURN_SPEED,
                 MAX_TURN_ACCEL,
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
@@ -138,14 +133,23 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 x,
                 y,
                 theta,
-                MAX_LINEAR_SPEED,
-                MAX_LINEAR_ACCELERATION,
-                MAX_ROTATION,
-                MAX_ROT_ACCEL,
                 Constants.ControllerConversions.DEADBAND,
                 Constants.ControllerConversions.conversionFunction,
                 true,
-                this
+                this,
+                new SwerveSpeedLimits(
+                        STANDARD_LINEAR_SPEED,
+                        STANDARD_LINEAR_ACCELERATION,
+                        STANDARD_ROTATION,
+                        STANDARD_ROT_ACCEL
+                ),
+                new SwerveSpeedLimits(
+                        MAX_LINEAR_SPEED,
+                        MAX_LINEAR_ACCELERATION,
+                        MAX_ROTATION,
+                        MAX_ROT_ACCEL
+                )
+
         );
     }
 
@@ -287,6 +291,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
+    public void setSpeedMode(SpeedMode mode) {
+        drive.setSpeedMode(mode.ordinal());
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
@@ -310,5 +318,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public enum DrivetrainState {
         UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE, DOCKING, BALANCING
+    }
+
+    public enum SpeedMode {
+        NORMAL,
+        TURBO
     }
 }
