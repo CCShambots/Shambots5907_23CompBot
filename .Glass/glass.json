@@ -3,16 +3,21 @@
     "transitory": {
       "SmartDashboard": {
         "Drivetrain": {
-          "field": {
-            "open": false
+          "module-1": {
+            "open": true
+          },
+          "module-4": {
+            "open": true
           },
           "modules": {
             "module-1": {
               "open": false
             },
             "open": false
-          }
-        }
+          },
+          "open": true
+        },
+        "open": true
       }
     },
     "types": {
@@ -22,16 +27,13 @@
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
       "/SmartDashboard//Drivetrain/field": "Field2d",
+      "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/InstantCommand": "Command"
     },
     "windows": {
       "/SmartDashboard///Robot/Drivetrain/field": {
         "height": 8.229599952697754,
-        "image": "C:\\Users\\barta\\Documents\\Github\\Shambots5907_23CompBot\\Glass Configuration\\field23.png",
-        "width": 16.459199905395508,
-        "window": {
-          "visible": true
-        }
+        "width": 16.459199905395508
       },
       "/SmartDashboard//Drivetrain/field": {
         "Module-1": {
@@ -62,12 +64,53 @@
           "image": "",
           "length": 0.0,
           "width": 0.0
+        },
+        "window": {
+          "visible": true
         }
       }
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT4)",
+    "mode": "Client (NT3)",
     "serverTeam": "5907"
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "height": 1396,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard//Drivetrain/module-1/Velo error"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard//Drivetrain/module-1/Target Velocity"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard//Drivetrain/module-1/Velocity"
+            }
+          ]
+        }
+      ]
+    }
   }
 }

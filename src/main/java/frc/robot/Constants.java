@@ -25,7 +25,6 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
-import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
@@ -70,14 +69,14 @@ public final class Constants {
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
 
     // Standard speeds (MK4 standard modules capable of 4.1)
-    public static final double STANDARD_LINEAR_SPEED = 3;
-    public static final double STANDARD_LINEAR_ACCELERATION = 6;
+    public static final double STANDARD_LINEAR_SPEED = 5; //3
+    public static final double STANDARD_LINEAR_ACCELERATION = 10; //6
     public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
 
     //Max speeds (turbo button)
-    public static final double MAX_LINEAR_SPEED = 4;
-    public static final double MAX_LINEAR_ACCELERATION = 8;
+    public static final double MAX_LINEAR_SPEED = 5;
+    public static final double MAX_LINEAR_ACCELERATION = 10;
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
@@ -120,25 +119,25 @@ public final class Constants {
     public static final int MODULE_1_DRIVE_ID = 11;
     public static final int MODULE_1_TURN_ID = 12;
     public static final int MODULE_1_ENCODER_ID = 11;
-    public static final double MODULE_1_OFFSET = 45.97;
+    public static final double MODULE_1_OFFSET = -119.002734;
 
     //back left
     public static final int MODULE_2_DRIVE_ID = 13;
     public static final int MODULE_2_TURN_ID = 14;
     public static final int MODULE_2_ENCODER_ID = 13;
-    public static final double MODULE_2_OFFSET = -69.79;
+    public static final double MODULE_2_OFFSET = -15.553125;
 
     //back right
     public static final int MODULE_3_DRIVE_ID = 15;
     public static final int MODULE_3_TURN_ID = 16;
     public static final int MODULE_3_ENCODER_ID = 15;
-    public static final double MODULE_3_OFFSET = -135.7;
+    public static final double MODULE_3_OFFSET = -113.199023;
 
     //front right
     public static final int MODULE_4_DRIVE_ID = 17;
     public static final int MODULE_4_TURN_ID = 18;
     public static final int MODULE_4_ENCODER_ID = 17;
-    public static final double MODULE_4_OFFSET = -139.48;
+    public static final double MODULE_4_OFFSET = 30.585938;
 
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
@@ -163,8 +162,8 @@ public final class Constants {
             0.25, 
             0,
             0,
-            0.35, 
-            .11066 
+            0.3, 
+            0.1135
     );
   }
 
@@ -204,8 +203,7 @@ public final class Constants {
     //Elevator hardware details
     public static final int ELEVATOR_ID = 22;
     public static final double ELEVATOR_INPUT_TO_OUTPUT =
-                (1.0 / 35.0) * //Gearbox
-                // (54.0 / 18.0) * //Actual gears
+                (1.0 / 15.0) * //Gearbox
                 1.273 * PI * //Pitch diameter (1.273") --> distance traveled by chain (in inches)
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
