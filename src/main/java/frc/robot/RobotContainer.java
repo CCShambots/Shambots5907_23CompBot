@@ -229,9 +229,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
-    leftStick.trigger().onTrue(new InstantCommand(drivetrain::resetGyro));
+    leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 
-    leftStick.topBase().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
+    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
