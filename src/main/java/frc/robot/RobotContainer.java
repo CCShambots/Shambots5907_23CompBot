@@ -138,9 +138,9 @@ public class RobotContainer {
     rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
     rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
-    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
+    leftStick.topBase().onTrue(new InstantCommand(dt::resetGyro));
 
-    leftStick.topBase().onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)))
+    leftStick.trigger().onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
