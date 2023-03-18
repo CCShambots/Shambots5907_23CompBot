@@ -72,8 +72,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
         }));
 
         registerStateCommand(INTAKING, new InstantCommand(() -> turret.set(0)).andThen(new RunCommand(() -> {
-                if(clawHasTarget.getAsBoolean()) {
-                    setTarget(getTurretTarget() + clawVisionOffset.getAsDouble());
+                if(!isBusy() && clawHasTarget.getAsBoolean()) {
+                    setTarget(getTurretAngle() + clawVisionOffset.getAsDouble());
                 }
         })));
 
@@ -123,8 +123,16 @@ public class Turret extends StateMachine<Turret.TurretState> {
         return turret.getTarget();
     }
 
+    public double getErorr() {
+        return Math.abs(getTurretAngle() - getTurretTarget());
+    }
+
     public void pullAbsoluteAngle() {
         turret.resetPosition(turretPotentiometer.get() * (PI / 180));
+    }
+
+    public boolean isBusy() {
+        return getErorr() > TURRET_ALLOWED_ERROR;
     }
 
     /**

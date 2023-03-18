@@ -270,6 +270,8 @@ public final class Constants {
 
 
     public static double MANUAL_CONTROL_VELOCITY = 30;
+
+    public static final double TURRET_ALLOWED_ERROR = toRadians(1);
   }
 
   public static class Lights {
