@@ -12,7 +12,7 @@ import static frc.robot.subsystems.Lights.LightState.*;
 
 public class Lights extends StateMachine<Lights.LightState> {
 
-    private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LEDS);
+    private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LIGHTS);
 
     public Lights() {
         super("Lights", DISABLED, LightState.class);

@@ -270,34 +270,34 @@ public final class Constants {
   public static class Lights {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
-    public static final int NUM_LEDS = 308;
+    public static final int NUM_LIGHTS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
     public static final double BLINK_SPEED = .6;
 
     public static final Animation DISABLED_ANIMATION =
-            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 7);
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS, Front, 7);
 
     public static final RGB IDLE_RGB = new RGB(0, 0, 255);
 
     public static final RGB ELEMENT_GRABBED_RGB = new RGB(0, 255, 0);
     public static final Animation SCORING_ANIMATION =
-            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LEDS);
+            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final RGB SCORING_RGB = new RGB(0, 255, 0);
 
     public static final RGB CONE_RGB = new RGB(255, 255, 0);
 
     public static final Animation INTAKE_CONE_ANIMATION =
-            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
+            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final RGB CUBE_RGB = new RGB(144,22,153);
 
     public static final Animation INTAKE_CUBE_ANIMATION =
-            new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LEDS);
+            new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final Animation SOFT_STOP_ANIMATION =
-            new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LEDS);
+            new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LIGHTS);
   }
 
   public static void pullAllianceFromFMS(RobotContainer rc) {
