@@ -69,14 +69,14 @@ public final class Constants {
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
 
     // Standard speeds (MK4 standard modules capable of 4.1)
-    public static final double STANDARD_LINEAR_SPEED = 5; //3
-    public static final double STANDARD_LINEAR_ACCELERATION = 10; //6
+    public static final double STANDARD_LINEAR_SPEED = 3; //3
+    public static final double STANDARD_LINEAR_ACCELERATION = 6; //6
     public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
 
     //Max speeds (turbo button)
     public static final double MAX_LINEAR_SPEED = 5;
-    public static final double MAX_LINEAR_ACCELERATION = 10;
+    public static final double MAX_LINEAR_ACCELERATION = 7.5;
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
