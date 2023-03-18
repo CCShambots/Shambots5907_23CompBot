@@ -100,7 +100,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         });
 
         //Easy logics
-        addTransition(STOWED, PICKUP_DOUBLE, () -> goToArmState(PICKUP_DOUBLE_POS));
+        addTransition(STOWED, PICKUP_DOUBLE, new InstantCommand(() -> goToArmState(PICKUP_DOUBLE_POS)).alongWith(claw.transitionCommand(State.OPENED)));
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
         addTransition(STOWED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
