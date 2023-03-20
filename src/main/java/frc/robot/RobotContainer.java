@@ -148,7 +148,9 @@ public class RobotContainer {
             .and(() -> dt.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
             .onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)));
     leftStick.trigger().onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
-    new Trigger(() -> dt.getTargetLinearSpeed() < MIN_TURBO_SPEED).onTrue(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
+    new Trigger(() -> dt.getTargetLinearSpeed() < MIN_TURBO_SPEED)
+            .or(() -> arm.getState() != ArmMode.STOWED)
+            .onTrue(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
 
     // rightStick.trigger().onTrue(dt.calculateModuleDrive(leftStick.trigger(), rightStick.trigger(), () -> leftStick.topBase().getAsBoolean()));
 
