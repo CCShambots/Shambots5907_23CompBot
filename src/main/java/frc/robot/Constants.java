@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
@@ -41,7 +42,7 @@ public final class Constants {
     public static final int SOLENOID_ID_1 = 2;
     public static final int SOLENOID_ID_2 = 3;
 
-    public static final boolean SOLENOID_CLAW_OPEN_STATE = true;
+    public static final DoubleSolenoid.Value SOLENOID_CLAW_OPEN_VALUE = DoubleSolenoid.Value.kForward;
   }
 
 
@@ -65,17 +66,22 @@ public final class Constants {
     // Distance between front and back wheels on robot in meters
     public static final double WHEEL_BASE = Units.inchesToMeters(18.75);
 
-    // Maximum linear chassis speed in meters per second (MK4 standard modules capable of 4.1)
-    public static final double MAX_LINEAR_SPEED = 3;
-    public static final double MAX_LINEAR_ACCELERATION = 6;
+    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
+
+    // Standard speeds (MK4 standard modules capable of 4.1)
+    public static final double STANDARD_LINEAR_SPEED = 3; //3
+    public static final double STANDARD_LINEAR_ACCELERATION = 6; //6
+    public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
+    public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
+
+    //Max speeds (turbo button)
+    public static final double MAX_LINEAR_SPEED = 5;
+    public static final double MAX_LINEAR_ACCELERATION = 7.5;
+    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
+    public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
     public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
     public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
-
-    // Maximum chassis rotational speed in radians per second
-    public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
-    public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
-    public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
@@ -113,25 +119,25 @@ public final class Constants {
     public static final int MODULE_1_DRIVE_ID = 11;
     public static final int MODULE_1_TURN_ID = 12;
     public static final int MODULE_1_ENCODER_ID = 11;
-    public static final double MODULE_1_OFFSET = 45.97;
+    public static final double MODULE_1_OFFSET = -119.002734;
 
     //back left
     public static final int MODULE_2_DRIVE_ID = 13;
     public static final int MODULE_2_TURN_ID = 14;
     public static final int MODULE_2_ENCODER_ID = 13;
-    public static final double MODULE_2_OFFSET = -69.79;
+    public static final double MODULE_2_OFFSET = -15.553125;
 
     //back right
     public static final int MODULE_3_DRIVE_ID = 15;
     public static final int MODULE_3_TURN_ID = 16;
     public static final int MODULE_3_ENCODER_ID = 15;
-    public static final double MODULE_3_OFFSET = -135.7;
+    public static final double MODULE_3_OFFSET = -113.199023;
 
     //front right
     public static final int MODULE_4_DRIVE_ID = 17;
     public static final int MODULE_4_TURN_ID = 18;
     public static final int MODULE_4_ENCODER_ID = 17;
-    public static final double MODULE_4_OFFSET = -139.48;
+    public static final double MODULE_4_OFFSET = 30.585938;
 
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
@@ -156,8 +162,8 @@ public final class Constants {
             0.25, 
             0,
             0,
-            0.35, 
-            .11066 
+            0.3, 
+            0.1135
     );
   }
 
@@ -197,8 +203,7 @@ public final class Constants {
     //Elevator hardware details
     public static final int ELEVATOR_ID = 22;
     public static final double ELEVATOR_INPUT_TO_OUTPUT =
-                (1.0 / 35.0) * //Gearbox
-                // (54.0 / 18.0) * //Actual gears
+                (1.0 / 15.0) * //Gearbox
                 1.273 * PI * //Pitch diameter (1.273") --> distance traveled by chain (in inches)
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
@@ -231,7 +236,7 @@ public final class Constants {
 
     //PID gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
-    public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
+    public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
     public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
@@ -241,7 +246,7 @@ public final class Constants {
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
-    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(16);
+    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(22);
     public static final double SHOULDER_ELEVATOR_THRESHOLD = toRadians(75); // The point at which we can start moving the elevator whilst moving the shoulder
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     

@@ -4,6 +4,8 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,6 +43,8 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
 public class RobotContainer {
 
@@ -86,7 +90,7 @@ public class RobotContainer {
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
     SubsystemManagerFactory.getInstance().registerSubsystem(arm);
-    SubsystemManagerFactory.getInstance().registerSubsystem(l);
+    SubsystemManagerFactory.getInstance().registerSubsystem(l, false);
 
     autoLoader = instantiateAutoLoader();
 
@@ -143,9 +147,11 @@ public class RobotContainer {
     rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
     rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
 
-    leftStick.trigger().onTrue(new InstantCommand(dt::resetGyro));
-
-    leftStick.topBase().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.DOCKING)));
+  
+    leftStick.topBase().onTrue(new InstantCommand(dt::resetGyro));
+    
+    leftStick.trigger().onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)))
+                    .onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
