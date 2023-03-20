@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -17,17 +18,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.swerve.DriveCommand;
-import frc.robot.ShamLib.swerve.ModuleInfo;
-import frc.robot.ShamLib.swerve.SwerveDrive;
+import frc.robot.ShamLib.swerve.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathPlanner;
-import frc.robot.ShamLib.swerve.TrajectoryBuilder;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 
@@ -285,6 +284,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public Command setPositiveDockDirectionCommand(boolean value) {
         return new InstantCommand(() -> setPositiveDockDirection(value));
+    }
+
+    public void registerMisalignedSwerveTriggers(EventLoop loop) {
+        for(SwerveModule module : drive.getModules()) {
+            new Trigger(loop, () -> module.isModuleMisaligned()).onTrue(new RealignModuleCommand(module));
+        }
     }
 
     @Override

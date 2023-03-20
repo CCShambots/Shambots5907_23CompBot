@@ -37,6 +37,8 @@ public class Robot extends TimedRobot {
 
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
 
+    addPeriodic(() -> robotContainer.checkMisalignedSwerve().poll(), 10);
+
     Constants.pullAllianceFromFMS();
   }
 
