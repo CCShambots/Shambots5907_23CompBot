@@ -82,6 +82,9 @@ public final class Constants {
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
+    //Min speed to allow turbo button to work
+    public static final double MIN_TURBO_SPEED = 2.5;
+
     public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
     public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
 

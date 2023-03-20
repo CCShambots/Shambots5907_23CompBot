@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
@@ -36,6 +37,7 @@ import java.util.Map;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
+import static frc.robot.Constants.SwerveDrivetrain.MIN_TURBO_SPEED;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
@@ -141,8 +143,12 @@ public class RobotContainer {
 
     leftStick.topBase().onTrue(new InstantCommand(dt::resetGyro));
     
-    leftStick.trigger().onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)))
-                    .onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
+    leftStick.trigger()
+            .and(() -> arm.getState() == ArmMode.STOWED)
+            .and(() -> dt.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
+            .onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)));
+    leftStick.trigger().onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
+    new Trigger(() -> dt.getTargetLinearSpeed() < MIN_TURBO_SPEED).onTrue(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
 
     // rightStick.trigger().onTrue(dt.calculateModuleDrive(leftStick.trigger(), rightStick.trigger(), () -> leftStick.topBase().getAsBoolean()));
 

@@ -296,6 +296,19 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.setSpeedMode(mode.ordinal());
     }
 
+    public ChassisSpeeds getTargetChassisSpeed() {
+        return drive.getTargetChassisSpeeds();
+    }
+
+    /**
+     * Get the current target linear speed of the chassis
+     * @return target speed (in m/s)
+     */
+    public double getTargetLinearSpeed() {
+        ChassisSpeeds target = getTargetChassisSpeed();
+        return Math.hypot(target.vxMetersPerSecond, target.vyMetersPerSecond);
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
