@@ -13,7 +13,6 @@ public class DockChargingStationCommand extends CommandBase {
     private Drivetrain dt;
 
     public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
-        addRequirements(dt);
 
         this.directionSupplier = directionSupplier;
         this.dt = dt;

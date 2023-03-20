@@ -121,13 +121,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
 
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
+                new InstantCommand(() -> setFieldRelative(true)),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
                 transitionCommand(DrivetrainState.BALANCING)
         ));
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
-            new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1),
-            transitionCommand(DrivetrainState.X_SHAPE)
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                transitionCommand(DrivetrainState.X_SHAPE)
         ));
     }
 
