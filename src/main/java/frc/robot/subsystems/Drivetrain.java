@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -63,7 +64,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 false,
                 "drivetrain",
                 "",
-                Constants.CURRENT_LIMIT,
+                Constants.getCurrentLimit(),
                 ModuleInfo.getMK4IL2Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
                 ModuleInfo.getMK4IL2Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
                 ModuleInfo.getMK4IL2Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
@@ -300,6 +301,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
+        builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
 
         builder.addDoubleProperty("pitch", () -> getPitch(), null);
         builder.addDoubleProperty("roll", () -> getRoll(), null);

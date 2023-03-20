@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
-import frc.robot.ShamLib.motors.rev.PositionSpark;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.subsystems.Claw.State;
 import frc.robot.util.kinematics.ArmKinematics;
@@ -24,13 +24,14 @@ import java.util.function.BooleanSupplier;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
-import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 import static frc.robot.Constants.Arm.*;
+import static frc.robot.Constants.applyCurrentLimit;
 import static frc.robot.subsystems.Arm.ArmMode.*;
 import static java.lang.Math.*;
 
 public class Arm extends StateMachine<Arm.ArmMode> {
 
+    //TODO: Apply current limits to turret
     private final ArmKinematics kinematics = new ArmKinematics(baseToTurret, turretToArm, armToWrist, wristToEndEffector);
 
 
@@ -175,10 +176,14 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         turret.configure(Brake, Clockwise_Positive);
 
         elevator.configure(Brake, CounterClockwise_Positive);
+        applyCurrentLimit(elevator);
 
         shoulder.configure(Brake, CounterClockwise_Positive);
+        applyCurrentLimit(shoulder);
 
         wrist.configure(Brake, Clockwise_Positive);
+        applyCurrentLimit(wrist);
+
     }
 
 

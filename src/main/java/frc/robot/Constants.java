@@ -5,6 +5,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
+import com.ctre.phoenixpro.configs.TalonFXConfiguration;
+import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -47,7 +50,6 @@ public final class Constants {
 
 
   public static final SupplyCurrentLimitConfiguration CURRENT_LIMIT = new SupplyCurrentLimitConfiguration(true, 20, 20, 0.1);
-
   public static final class ControllerConversions{
     public static final double DEADBAND = 0.025;
     public static final UnaryOperator<Double> conversionFunction = (input) -> (Math.copySign(input * input, input));
@@ -68,7 +70,7 @@ public final class Constants {
 
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
 
-    // Standard speeds (MK4 standard modules capable of 4.1)
+    // Standard speeds (MK4 standard modules capable of 4.9)
     public static final double STANDARD_LINEAR_SPEED = 3; //3
     public static final double STANDARD_LINEAR_ACCELERATION = 6; //6
     public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
@@ -89,8 +91,6 @@ public final class Constants {
             new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), //back right
             new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2) //front right
     };
-
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(moduleOffsets);
 
     public static final double P_HOLDANGLETELE = 0.25;
     public static final double I_HOLDANGLETELE = 0;
@@ -291,6 +291,20 @@ public final class Constants {
   public static void pullAllianceFromFMS() {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
     if(!overrideAlliance) alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+  }
+
+  public static CurrentLimitsConfigs getCurrentLimit() {
+    CurrentLimitsConfigs configs = new CurrentLimitsConfigs();
+    configs.SupplyCurrentLimitEnable = true;
+    configs.SupplyCurrentLimit = 20;
+    return configs;
+  }
+
+  public static void applyCurrentLimit(TalonFX motor) {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    motor.getConfigurator().refresh(config);
+    config.CurrentLimits = getCurrentLimit();
+    motor.getConfigurator().apply(config);
   }
   
 }
