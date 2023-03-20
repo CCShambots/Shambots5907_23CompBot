@@ -65,9 +65,9 @@ public class RobotContainer {
 
   private final Lights l;
 
-  private final EventLoop checkModulesLoop = new EventLoop();
+  private final EventLoop checkModulesLoop;
 
-  public RobotContainer() {
+  public RobotContainer(EventLoop checkModulesLoop) {
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
 
@@ -82,7 +82,10 @@ public class RobotContainer {
     this.arm = new Arm();
     this.l = new Lights();
 
+    this.checkModulesLoop = checkModulesLoop;
+
     dt.registerMisalignedSwerveTriggers(checkModulesLoop);
+
 
     //Load the trajectories into the hashmap
     loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
@@ -239,8 +242,11 @@ public class RobotContainer {
     );
   }
 
-  public EventLoop checkMisalignedSwerve() {
-    return checkModulesLoop;
+  public Runnable checkMisalignedSwerve() {
+    return () -> {
+      // checkModulesLoop.poll();
+      System.out.println("YAY");
+    };
   }
 
   public enum AutoRoutes {
