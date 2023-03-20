@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -81,7 +82,7 @@ public class RobotContainer {
      "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
 
     SubsystemManagerFactory.getInstance().registerSubsystem(dt);
-    SubsystemManagerFactory.getInstance().registerSubsystem(arm, false);
+    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
     SubsystemManagerFactory.getInstance().registerSubsystem(l, false);
 
     autoLoader = instantiateAutoLoader();
@@ -144,10 +145,6 @@ public class RobotContainer {
     
     leftStick.trigger().onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
-
-    // rightStick.trigger().onTrue(dt.calculateModuleDrive(leftStick.trigger(), rightStick.trigger(), () -> leftStick.topBase().getAsBoolean()));
-
-    // rightStick.topBase().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, new Rotation2d()))));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
