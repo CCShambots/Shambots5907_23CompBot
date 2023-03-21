@@ -96,12 +96,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
 
     //Load the trajectories into the hashmap
-    loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
-     "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
-
-    SubsystemManagerFactory.getInstance().registerSubsystem(drivetrain);
-    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
-    SubsystemManagerFactory.getInstance().registerSubsystem(lights, false);
+    loadPaths(
+            "red-pickup-right",
+            "red-dock-right",
+            "red-dock-center",
+            "red-score-left",
+            "blue-dock-left",
+            "blue-pickup-left",
+            "blue-dock-center",
+            "blue-score-right"
+    );
 
     autoLoader = instantiateAutoLoader();
 
@@ -239,6 +243,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
+    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
     operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
@@ -369,6 +375,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
+    //TODO: Sussy
     new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 

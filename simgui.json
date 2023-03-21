@@ -48,6 +48,12 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Drivetrain": {
+          "open": true
+        },
+        "Lights": {
+          "open": true
+        },
         "Robot": {
           "open": true
         },

@@ -13,7 +13,6 @@ public class DockChargingStationCommand extends CommandBase {
     private Drivetrain dt;
 
     public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
-        addRequirements(dt);
 
         this.directionSupplier = directionSupplier;
         this.dt = dt;
@@ -26,7 +25,9 @@ public class DockChargingStationCommand extends CommandBase {
 
     @Override
     public void execute() {
-        ChassisSpeeds speeds = new ChassisSpeeds(Constants.SwerveDrivetrain.DOCK_SPEED * direction, 0, 0);
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(Constants.SwerveDrivetrain.DOCK_SPEED * direction, 0, 0), 
+            dt.getCurrentAngle());
         dt.drive(speeds, false);
     }
 

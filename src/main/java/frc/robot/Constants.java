@@ -57,9 +57,19 @@ public final class Constants {
   }
 
   public static final class SwerveDrivetrain {
-    public static final double AUTO_BALANCE_SPEED = 0.35;
+
+    //NEEDS TO BE TUNED
+    public static final PIDGains AUTO_BALANCE_GAINS = new PIDGains(
+            0.025,
+            0,
+            0.015
+    );
+
+    public static final double AUTO_BALANCE_SPEED = 0.6;
     public static final double DOCK_SPEED = 0.8;
-    public static final double MIN_BALANCE_TIME = 2;
+
+    //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
+    public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
 
     // Distance between centers of right and left wheels on robot in meters
     public static final double TRACK_WIDTH = Units.inchesToMeters(18.75);
