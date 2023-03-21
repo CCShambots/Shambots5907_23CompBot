@@ -5,10 +5,19 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -57,7 +66,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private final AutonomousLoader<AutoRoutes> autoLoader;
 
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
-
+  
+  private final EventLoop checkModulesLoop;
 
   public RobotContainer() {
     super("Robot", State.UNDETERMINED, State.class);
@@ -86,17 +96,21 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
           baseVision.getLLHasTargetSupplier()
     );
 
+    this.arm = new Arm();
+    this.l = new Lights();
+
+    this.checkModulesLoop = checkModulesLoop;
+
+    dt.registerMisalignedSwerveTriggers(checkModulesLoop);
+
+
     //Load the trajectories into the hashmap
-    loadPaths(
-            "red-pickup-right",
-            "red-dock-right",
-            "red-dock-center",
-            "red-score-left",
-            "blue-dock-left",
-            "blue-pickup-left",
-            "blue-dock-center",
-            "blue-score-right"
-    );
+    loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
+     "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
+
+    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
+    SubsystemManagerFactory.getInstance().registerSubsystem(arm);
+    SubsystemManagerFactory.getInstance().registerSubsystem(l, false);
 
     autoLoader = instantiateAutoLoader();
 
@@ -377,6 +391,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     MANUAL_CONTROL
   }
+
 
   public enum AutoRoutes {
     NOTHING,
