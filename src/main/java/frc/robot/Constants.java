@@ -60,12 +60,12 @@ public final class Constants {
 
     //NEEDS TO BE TUNED
     public static final PIDGains AUTO_BALANCE_GAINS = new PIDGains(
-            0.1,
-            1,
-            1
+            0.045,
+            0,
+            0.025
     );
 
-    public static final double AUTO_BALANCE_SPEED = 0.35;
+    public static final double AUTO_BALANCE_SPEED = 0.6;
     public static final double DOCK_SPEED = 0.8;
 
     //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits

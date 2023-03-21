@@ -3,6 +3,7 @@ package frc.robot.commands.drivetrain;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -15,21 +16,24 @@ public class AutoBalanceCommand extends CommandBase {
     private int direction;
     private final IntSupplier directionSupplier;
     private final Drivetrain dt;
+    
+    private int bufferSize;
 
     private final PIDController pid;
 
-    private final ArrayList<Double> buff;
+    private ArrayList<Double> buff;
 
     private int rMod, pMod;
+
+    private Timer timer = new Timer();
 
     public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
         this.directionSupplier = directionSupplier;
         this.dt = dt;
 
         pid = new PIDController(pidGains.p, pidGains.i, pidGains.d, 0.02);
-        buff = new ArrayList<>(Collections.nCopies(bufferSize, getCumulativeAngle()));
 
-        defineMods();
+        this.bufferSize = bufferSize;
     }
 
     private void defineMods() {
@@ -43,20 +47,33 @@ public class AutoBalanceCommand extends CommandBase {
 
     @Override
     public void initialize() {
+
+        defineMods();
+
         pid.reset();
         this.direction = Math.max(Math.min(1, directionSupplier.getAsInt()), -1);
+
+        buff = new ArrayList<>(Collections.nCopies(bufferSize, Math.abs(getCumulativeAngle())));
+
+        timer.reset();
+        timer.start();
     }
 
     @Override
     public void execute() {
         buff.remove(buff.size() - 1);
-        buff.add(0, getCumulativeAngle());
+        buff.add(0, Math.abs(getCumulativeAngle()));
 
-        ChassisSpeeds speeds = new ChassisSpeeds(
-                Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED * direction * pid.calculate(getCumulativeAngle(), 0),
+        // SmartDashboard.putNumber("cumulative angle", getCumulativeAngle());
+        double pidOutput = Math.max(Math.min(1, pid.calculate(getCumulativeAngle(), 0)), -1);
+
+        if(timer.get() < 2) pidOutput = 1;
+
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+                Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED * direction * pidOutput,
                 0,
                 0
-        );
+        ), dt.getCurrentAngle());
 
         dt.drive(speeds, false);
     }
@@ -64,6 +81,7 @@ public class AutoBalanceCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         dt.stopModules();
+        timer.stop();
     }
 
     @Override   

@@ -27,13 +27,19 @@
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
       "/SmartDashboard//Drivetrain/field": "Field2d",
+      "/SmartDashboard/Claw": "Subsystem",
       "/SmartDashboard/Drivetrain": "Subsystem",
-      "/SmartDashboard/InstantCommand": "Command"
+      "/SmartDashboard/InstantCommand": "Command",
+      "/SmartDashboard/Robot": "Subsystem",
+      "/SmartDashboard/Vision": "Subsystem"
     },
     "windows": {
       "/SmartDashboard///Robot/Drivetrain/field": {
         "height": 8.229599952697754,
-        "width": 16.459199905395508
+        "width": 16.459199905395508,
+        "window": {
+          "visible": true
+        }
       },
       "/SmartDashboard//Drivetrain/field": {
         "Module-1": {
@@ -72,7 +78,7 @@
     }
   },
   "NetworkTables Settings": {
-    "mode": "Client (NT3)",
+    "mode": "Client (NT4)",
     "serverTeam": "5907"
   },
   "Plots": {
@@ -111,6 +117,36 @@
           ]
         }
       ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "height": 1435,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard//Drivetrain/module-1/Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard//Drivetrain/module-1/Angle (wrapped - encoder)"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

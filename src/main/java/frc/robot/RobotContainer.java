@@ -5,8 +5,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.*;
@@ -236,6 +234,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
+    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
     operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
@@ -366,6 +366,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
+    //TODO: Sussy
     new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 

@@ -107,6 +107,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         addTransition(DrivetrainState.IDLE, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.TRAJECTORY, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.DOCKING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+        addTransition(DrivetrainState.BALANCING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
     private void defineStateCommands() {
@@ -312,6 +316,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
+        
+        builder.addDoubleProperty("speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
 
         builder.addDoubleProperty("pitch", () -> getPitch(), null);
         builder.addDoubleProperty("roll", () -> getRoll(), null);
@@ -321,7 +327,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
             "field", drive.getField()
-            // "module-1", drive.getModules().get(0),
+            // "module-1", drive.getModules().get(0)
             // "module-2", drive.getModules().get(1),
             // "module-3", drive.getModules().get(2),
             // "module-4", drive.getModules().get(3)
