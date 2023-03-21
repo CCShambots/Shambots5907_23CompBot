@@ -60,7 +60,7 @@ public final class Constants {
 
     //NEEDS TO BE TUNED
     public static final PIDGains AUTO_BALANCE_GAINS = new PIDGains(
-            0.0325,
+            0.025,
             0,
             0.015
     );
