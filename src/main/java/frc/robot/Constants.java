@@ -273,7 +273,7 @@ public final class Constants {
     public static final int NUM_LIGHTS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
-    public static final double BLINK_SPEED = .6;
+    public static final double BLINK_SPEED = .25;
 
     public static final Animation DISABLED_ANIMATION =
             new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS, Front, 7);
