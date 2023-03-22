@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
 import frc.robot.commands.auto.blue.BlueScoreLeft;
@@ -31,6 +30,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
+import frc.robot.subsystems.Turret.TurretState;
 import frc.robot.util.grid.GridElement;
 
 import java.util.HashMap;
@@ -259,6 +259,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
+
+    operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
+    operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
 
     /*
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));

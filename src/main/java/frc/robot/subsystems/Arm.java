@@ -2,15 +2,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -89,7 +86,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     private void defineTransitions() {
-        addOmniTransition(SEEKING_STOWED, new InstantCommand());
+        addOmniTransition(SEEKING_STOWED);
         addTransition(SEEKING_STOWED, STOWED);
 
         addOmniTransition(SOFT_STOP, () -> {
@@ -118,8 +115,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(HIGH, SEEKING_PICKUP_GROUND);
         removeTransition(SEEKING_PICKUP_GROUND, STOWED);
         addTransition(SEEKING_PICKUP_GROUND, PICKUP_GROUND);
-
-
     }
 
     private void registerStateCommands() {
@@ -137,7 +132,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         registerStateCommand(SEEKING_STOWED,
         new FunctionalCommand(() -> {
             if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-            if(getShoulderAngle() < 0) setShoulderTarget(0);
+            if(getShoulderAngle() < 0) setShoulderTarget(15);
         }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
             new FunctionalCommand(
                 () -> setElevatorTarget(STOWED_POS.getElevatorExtension()),

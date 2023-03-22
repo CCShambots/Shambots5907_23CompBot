@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
@@ -55,27 +56,39 @@ public class Turret extends StateMachine<Turret.TurretState> {
     }
 
     private void defineTransitions() {
-        addOmniTransition(IDLE);
-        addOmniTransition(SCORING);
-        addOmniTransition(INTAKING);
-        addOmniTransition(CARDINALS);
-        addOmniTransition(MANUAL_CONTROL);
+        addOmniTransition(IDLE, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        addOmniTransition(SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        addOmniTransition(INTAKING, new InstantCommand(() -> turret.changeSpeed(TURRET_SLOW_VEL, TURRET_SLOW_ACCEL, 1000)));
+        addOmniTransition(CARDINALS, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        addOmniTransition(MANUAL_CONTROL, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
 
         addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
     }
 
     private void registerStateCommands() {
-        registerStateCommand(CARDINALS, new InstantCommand(() -> turret.set(0)).andThen(new TurretCardinalsCommand(this, towardSupplier, awaySupplier)));
+        registerStateCommand(CARDINALS, new InstantCommand(() -> setTarget(getTurretAngle())).andThen(new TurretCardinalsCommand(this, towardSupplier, awaySupplier)));
 
         registerStateCommand(SCORING, new RunCommand(() -> {
             setTargetToPoint(Constants.gridInterface.getNextElement().getLocation().toTranslation2d());
         }));
 
-        registerStateCommand(INTAKING, new InstantCommand(() -> turret.set(0)).andThen(new RunCommand(() -> {
+        registerStateCommand(INTAKING, new RunCommand(() -> {
                 if(!isBusy() && clawHasTarget.getAsBoolean()) {
-                    setTarget(getTurretAngle() + clawVisionOffset.getAsDouble());
+                    double clawOffset = clawVisionOffset.getAsDouble();
+
+                    double mult = AIMING_LUT.getClosest(clawOffset);
+
+                    if(Math.abs(clawOffset) < 3) {
+                        SmartDashboard.putNumber("mult", mult);
+                        SmartDashboard.putNumber("clawOffset-with-mult", toDegrees(mult * clawOffset));
+                        
+                        setTarget(getTurretAngle() + mult * clawVisionOffset.getAsDouble());
+                    }
+                   
                 }
-        })));
+
+                SmartDashboard.putBoolean("turret busy", isBusy());
+        }));
 
         registerStateCommand(MANUAL_CONTROL, new TurretManualControlCommand(this, leftSupplier, rightSupplier));
     }
@@ -147,9 +160,9 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        builder.addDoubleProperty("turret/angle", () -> toDegrees(getTurretAngle()), null);
-        builder.addDoubleProperty("turret/target", () -> toDegrees(getTurretTarget()), null);
-        builder.addDoubleProperty("turret/error", () -> Math.abs(toDegrees(getTurretTarget()) -  toDegrees((getTurretAngle()))), null);
-        // builder.addDoubleProperty("turret/absolute", () -> turretPotentiometer.get(), null);
+        builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
+        builder.addDoubleProperty("target", () -> toDegrees(getTurretTarget()), null);
+        builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -  toDegrees((getTurretAngle()))), null);
+        builder.addBooleanProperty("is busy", () -> isBusy(), null);
     }
 }

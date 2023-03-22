@@ -25,6 +25,7 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
+import frc.robot.util.LUT;
 import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
@@ -245,12 +246,12 @@ public final class Constants {
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(112), toRadians(-150), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(16), toRadians(-81), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-40), toRadians(45), 0);
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(22), toRadians(17), toRadians(4), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(49), toRadians(-32), 0);
-  }
+}
 
   public static class Turret {
     //Turret hardawre details
@@ -265,6 +266,8 @@ public final class Constants {
     public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
     public static final double TURRET_MAX_VEL = 400; //1000
     public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final double TURRET_SLOW_VEL = 100;
+    public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
     public static final double TURRET_START_ANGLE  = 0;
@@ -274,7 +277,18 @@ public final class Constants {
 
     public static double MANUAL_CONTROL_VELOCITY = 30;
 
-    public static final double TURRET_ALLOWED_ERROR = toRadians(1);
+    public static final double TURRET_ALLOWED_ERROR = toRadians(2);
+
+    public static final LUT<Double, Double> AIMING_LUT = new LUT<Double, Double>() {{
+        add(toRadians(30.0), .2);
+        add(toRadians(25.0), .2);
+        add(toRadians(20.0), .2);
+        add(toRadians(15.0), .2);
+        add(toRadians(10.0), .4);
+        add(toRadians(5.0), .6);
+        add(toRadians(0.0), 1.0);
+
+    }};
   }
 
   public static class Lights {

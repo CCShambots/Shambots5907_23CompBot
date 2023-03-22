@@ -14,8 +14,7 @@
               "open": false
             },
             "open": false
-          },
-          "open": true
+          }
         },
         "open": true
       }
@@ -36,10 +35,7 @@
     "windows": {
       "/SmartDashboard///Robot/Drivetrain/field": {
         "height": 8.229599952697754,
-        "width": 16.459199905395508,
-        "window": {
-          "visible": true
-        }
+        "width": 16.459199905395508
       },
       "/SmartDashboard//Drivetrain/field": {
         "Module-1": {
@@ -116,7 +112,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -147,6 +146,23 @@
       "window": {
         "visible": false
       }
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "height": 958
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "height": 1217
+        }
+      ]
     }
   }
 }
