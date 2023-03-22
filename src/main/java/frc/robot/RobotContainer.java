@@ -21,10 +21,7 @@ import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
 import frc.robot.commands.auto.blue.BlueScoreLeft;
 import frc.robot.commands.auto.blue.BlueScoreRight;
-import frc.robot.commands.auto.red.RedScoreBalanceCenter;
-import frc.robot.commands.auto.red.RedScoreBalanceRight;
-import frc.robot.commands.auto.red.RedScoreLeft;
-import frc.robot.commands.auto.red.RedScoreRight;
+import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
@@ -209,6 +206,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
       RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
       RED_SCORE_LEFT, new RedScoreLeft(this),
+      RED_NEW_AUTO, new RedNewAuto(this),
       BLUE_SCORE_LEFT, new BlueScoreLeft(this),
       BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
       BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
@@ -404,7 +402,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }
