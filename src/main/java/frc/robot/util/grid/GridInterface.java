@@ -3,6 +3,8 @@ package frc.robot.util.grid;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +65,25 @@ public class GridInterface {
         return grid.accessElement(row, col);
     }
 
+    public void setNextElement(int row, int col) {
+        overrideMode();
+
+        table.getEntry("next/row").setInteger(row);
+        table.getEntry("next/col").setInteger(col);
+    }
+
+    public Command setNextElementCommand(int row, int col) {
+        return new InstantCommand(() -> setNextElement(row, col));
+    }
+
+    public void overrideMode() {
+        table.getEntry("override").setBoolean(true);
+    }
+
+    public void indicateMode() {
+        table.getEntry("override").setBoolean(false);
+    }
+
 
     /**
      * Evaluate if the dashboard is ready to accept a newly placed element
@@ -80,6 +101,10 @@ public class GridInterface {
         elementsToSend.add(ele);
     }
 
+    public Command indicateElementPlacedCommand(GridElement ele) {
+        return new InstantCommand(() -> indicateElementPlaced(ele));
+    }
+
     /**
      * Indicate that an element has been placed
      * @param row the row of the element
@@ -89,6 +114,10 @@ public class GridInterface {
         indicateElementPlaced(grid.accessElement(row, col));
     }
 
+
+    public Command indicateElementPlacedCommand(int row, int col) {
+        return new InstantCommand(() -> indicateElementPlaced(row, col));
+    }
 
     /**
      * Notifies the dashboard that an element has been placed

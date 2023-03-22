@@ -53,7 +53,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private ArmState currentArmState = STOWED_POS;
 
-    private GridInterface gridInterface;
 
     public Arm() {
         super("Arm", UNDETERMINED, ArmMode.class);
@@ -68,7 +67,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         goToArmState(STOWED_POS);
 
-        gridInterface = new GridInterface(Constants.alliance);
 
         //TODO: check if abs encoders are zero and disable joint on startup if so
     }
@@ -115,6 +113,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(HIGH, SEEKING_PICKUP_GROUND);
         removeTransition(SEEKING_PICKUP_GROUND, STOWED);
         addTransition(SEEKING_PICKUP_GROUND, PICKUP_GROUND);
+        addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
     }
 
     private void registerStateCommands() {
@@ -315,22 +314,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void update() {
-        gridInterface.update();
     }
-
-    public void forceCone() {
-        gridInterface.forceCone();
-    }
-
-    public void forceCube() {
-        gridInterface.forceCube();
-    }
-
-    public void forceNone() {
-        gridInterface.removeForceElement();
-    }
-
-    public GridInterface getGridInterface() { return gridInterface;}
 
     @Override
     protected void onEnable() {

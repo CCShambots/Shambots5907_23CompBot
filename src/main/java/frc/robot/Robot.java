@@ -7,10 +7,13 @@ package frc.robot;
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+
+import static frc.robot.Constants.gridInterface;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -60,9 +63,10 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-
     //TODO: Remove
     robotContainer.updateTarget();
+
+    gridInterface.update();
    }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -78,12 +82,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     SubsystemManagerFactory.getInstance().notifyAutonomousStart();
-    autonomousCommand = robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -93,16 +92,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
+    //Send the grid interface into indicate so that I can update things quickly from autonomous
+    gridInterface.indicateMode();
+    new WaitCommand(6).andThen(new InstantCommand(gridInterface::overrideMode));
+
   }
 
   /** This function is called periodically during operator control. */
@@ -113,6 +109,8 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    robotContainer.turret().setTarget(Math.toRadians(-90));
   }
 
   /** This function is called periodically during test mode. */

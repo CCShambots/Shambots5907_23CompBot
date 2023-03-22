@@ -44,7 +44,7 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
      * @return the rotation offset
      */
     public Rotation2d getGameElementOffset() {
-        return ll.getXOffset(); //TODO: Figure out how this actually works with the vision model
+        return ll.getXOffset();
     }
 
     public boolean hasTarget() {

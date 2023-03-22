@@ -40,6 +40,7 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
+import static frc.robot.Constants.gridInterface;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
@@ -103,7 +104,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             "blue-dock-left",
             "blue-pickup-left",
             "blue-dock-center",
-            "blue-score-right"
+            "blue-score-right",
+            "red-get-element-right",
+            "red-go-score-right",
+            "red-balance-right"
     );
 
     autoLoader = instantiateAutoLoader();
@@ -161,7 +165,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState correctState = Constants.gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
+      LightState correctState = gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
 
       if (lights.getState() != correctState) {
         lights.requestTransition(correctState);
@@ -172,7 +176,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private ArmMode getNextScoringMode() {
-    GridElement e = Constants.gridInterface.getNextElement();
+    GridElement e = gridInterface.getNextElement();
 
     switch (e.getRow()) {
       case 0:
@@ -352,9 +356,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return drivetrain;
   }
 
+  public Turret turret() {
+    return turret;
+  }
+
   //TODO: Remove
   public void updateTarget() {
-    drivetrain.getField().getObject("target").setPose(new Pose2d(arm.getGridInterface().getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
+    drivetrain.getField().getObject("target").setPose(new Pose2d(gridInterface.getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {
@@ -383,6 +391,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   @Override
   protected void onAutonomousStart() {
+    registerStateCommand(State.AUTONOMOUS, getAutonomousCommand());
     requestTransition(State.AUTONOMOUS);
   }
 
