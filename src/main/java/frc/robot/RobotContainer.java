@@ -73,13 +73,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     clawVision = new ClawVision();
 
     turret = new Turret(
-            operatorCont.pov(0),
             operatorCont.pov(180),
+            operatorCont.pov(0),
             clawVision::hasTarget,
             () -> clawVision.getGameElementOffset().getRadians(),
             operatorCont.pov(270),
             operatorCont.pov(90)
-
     );
 
     baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getTurretAngle()));
