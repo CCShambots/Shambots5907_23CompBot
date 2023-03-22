@@ -40,7 +40,7 @@ public class TurretCardinalsCommand extends CommandBase {
 
         if(currentToward && !prevToward) {
             Rotation2d base = getCurrentCardinal();
-            
+
             //Flip on blue alliance
             if(alliance == Blue) {
                 base = base.times(-1);
