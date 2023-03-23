@@ -91,8 +91,8 @@ public final class Constants {
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
-    public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
-    public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
+    public static final double MAX_LINEAR_SPEED_AUTO = .5;
+    public static final double MAX_LINEAR_ACCELERATION_AUTO = .5;
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
@@ -270,7 +270,7 @@ public final class Constants {
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
-    public static final double TURRET_START_ANGLE  = 0;
+    public static final double TURRET_START_ANGLE  = -90;
 
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
 
@@ -332,7 +332,7 @@ public final class Constants {
   }
 
   public static void reInstantiateGridUI(Alliance alliance) {
-    gridInterface = new GridInterface(alliance);
+    gridInterface.setAlliance(alliance);
     Constants.gridReinstantiated = true;
   }
 
