@@ -37,7 +37,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     private final VelocityTalonFXPro shoulder = new VelocityTalonFXPro(SHOULDER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT);
     private final ThroughBoreEncoder shoulderEncoder = new ThroughBoreEncoder(SHOULDER_ENCODER_PORT, SHOULDER_ENCODER_OFFSET);
     private final ProfiledPIDController shoulderPID = new ProfiledPIDController(SHOULDER_CONT_GAINS.p, SHOULDER_CONT_GAINS.i, SHOULDER_CONT_GAINS.d, 
-        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL));
+        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL), 0.005);
     private final ArmFeedforward shoulderFF = new ArmFeedforward(SHOULDER_KS, SHOULDER_KG, SHOULDER_KV);
     private double shoulderTarget = toRadians(0);
 
@@ -234,6 +234,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
 
             //Shoulder code
+            //TODO: might need to change the ff calc pos input to actual pos rather than predicted
             double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
             double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
 
