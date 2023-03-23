@@ -12,6 +12,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
@@ -35,6 +36,12 @@ import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
 public final class Constants {
+  public static final class Testing {
+    public static Trigger RAISE = new Trigger(() -> false);
+    public static Trigger LOWER = new Trigger(() -> false);
+    public static Trigger STOP = new Trigger(() -> true);
+  }
+
 
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc

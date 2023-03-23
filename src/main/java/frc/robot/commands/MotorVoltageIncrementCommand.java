@@ -1,8 +1,10 @@
-package frc.robot.commands.arm;
+package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
 
 public class MotorVoltageIncrementCommand extends CommandBase {
@@ -11,12 +13,15 @@ public class MotorVoltageIncrementCommand extends CommandBase {
     final double incrementSize;
     double increment;
 
-    public MotorVoltageIncrementCommand(EnhancedTalonFXPro motor, Trigger raiseTrigger, Trigger lowerTrigger, Trigger stopTrigger, double incrementSize) {
+    final double kS = 0;
+    final double kG = 0;
+
+    public MotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize) {
         this.motor = motor;
 
-        raiseTrigger.onTrue(new InstantCommand(() -> increment(1)));
-        lowerTrigger.onTrue(new InstantCommand(() -> increment(-1)));
-        stopTrigger.onTrue(new InstantCommand(() -> increment = 0));
+        Constants.Testing.RAISE.onTrue(new InstantCommand(() -> increment(1)));
+        Constants.Testing.LOWER.onTrue(new InstantCommand(() -> increment(-1)));
+        Constants.Testing.STOP.onTrue(new InstantCommand(() -> increment = 0));
 
         this.incrementSize = incrementSize;
 
@@ -24,7 +29,11 @@ public class MotorVoltageIncrementCommand extends CommandBase {
     }
 
     private void increment(int mod) {
-        increment = Math.min(Math.max(-12, increment + (incrementSize * mod)), 12);
+        increment = MathUtil.clamp(getUnModifiedIncrement(mod) + ((kS + kG) * Math.signum((getUnModifiedIncrement(mod)))), -12, 12);
+    }
+
+    private double getUnModifiedIncrement(int mod) {
+        return increment + (incrementSize * mod);
     }
 
     @Override

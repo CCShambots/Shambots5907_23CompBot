@@ -242,6 +242,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void configureBindings() {
+    /*
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
@@ -250,14 +251,18 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));*/
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
     operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
 
+    //TODO: remove when done testing
+    Constants.Testing.STOP = operatorCont.y();
+    Constants.Testing.RAISE = operatorCont.pov(0);
+    Constants.Testing.LOWER = operatorCont.pov(180);
 
-    operatorCont.leftBumper().onTrue(arm.openClaw());
+    /*operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
     operatorCont.leftTrigger(0.8)
@@ -268,7 +273,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
     operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
-    operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+    operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));*/
 
     /*
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));

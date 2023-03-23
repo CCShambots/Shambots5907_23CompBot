@@ -14,7 +14,7 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
-import frc.robot.commands.arm.MotorVoltageIncrementCommand;
+import frc.robot.commands.MotorVoltageIncrementCommand;
 import frc.robot.subsystems.Claw.State;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
@@ -169,9 +169,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         registerStateCommand(TESTING, new MotorVoltageIncrementCommand(
                 shoulder,
-                new Trigger(() -> false),
-                new Trigger(() -> false),
-                new Trigger(() -> true),
                 0.05
         ));
     }
