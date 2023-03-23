@@ -66,10 +66,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         defineTransitions();
         registerStateCommands();
 
-        goToArmState(STOWED_POS);
-
-
-        //TODO: check if abs encoders are zero and disable joint on startup if so
+        //TODO: uncomment
+        //goToArmState(STOWED_POS);
     }
 
     public Command openClaw() {
@@ -232,10 +230,11 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
             //Shoulder code
             //TODO: might need to change the ff calc pos input to actual pos rather than predicted
-            double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
+            //TODO: uncomment
+            /*double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
             double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
 
-            shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);
+            shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);*/
         };
     }
 
@@ -316,7 +315,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     protected void determineSelf() {
         pullAbsoluteAngles();
 
-        requestTransition(ArmMode.SEEKING_STOWED);
+        //TODO: uncomment
+        setState(TESTING);
+        //requestTransition(ArmMode.SEEKING_STOWED);
     }
 
     @Override
