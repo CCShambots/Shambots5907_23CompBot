@@ -157,7 +157,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
-
+    //TODO: REMOVE ALL TESTING STUFF
+    addOmniTransition(State.TESTING, new ParallelCommandGroup(
+            lights.transitionCommand(LightState.IDLE),
+            drivetrain.transitionCommand(DrivetrainState.IDLE),
+            turret.transitionCommand(TurretState.IDLE),
+            arm.transitionCommand(ArmMode.TESTING)
+    ));
   }
 
   private void defineStateCommands() {
@@ -394,7 +400,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public enum State {
-    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE, TESTING,
 
     MANUAL_CONTROL
   }

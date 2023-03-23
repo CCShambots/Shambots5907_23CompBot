@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.motors.pro.VelocityTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
+import frc.robot.commands.arm.MotorVoltageIncrementCommand;
 import frc.robot.subsystems.Claw.State;
-import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
@@ -165,6 +164,14 @@ public class Arm extends StateMachine<Arm.ArmMode> {
                 new InstantCommand(() -> requestTransition(AT_POSE))
             )
         );
+
+        registerStateCommand(TESTING, new MotorVoltageIncrementCommand(
+                shoulder,
+                new Trigger(() -> false),
+                new Trigger(() -> false),
+                new Trigger(() -> true),
+                0.05
+        ));
     }
 
 
@@ -179,7 +186,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         SOFT_STOP,
 
         SEEKING_POSE,
-        AT_POSE
+        AT_POSE,
+
+        TESTING
     }
 
     private void configureHardware() {
