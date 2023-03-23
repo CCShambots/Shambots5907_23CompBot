@@ -227,10 +227,13 @@ public final class Constants {
     public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
 
 
-    //PID gains
+    //Control gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
+    public static final double SHOULDER_KS = 0;
+    public static final double SHOULDER_KG = 0;
+    public static final double SHOULDER_KV = 0;
     public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
     public static final PIDGains WRIST_CONT_GAINS = new PIDGains(3.5, 0, 0);

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -36,7 +37,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     private final VelocityTalonFXPro shoulder = new VelocityTalonFXPro(SHOULDER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT);
     private final ThroughBoreEncoder shoulderEncoder = new ThroughBoreEncoder(SHOULDER_ENCODER_PORT, SHOULDER_ENCODER_OFFSET);
     private final ProfiledPIDController shoulderPID = new ProfiledPIDController(SHOULDER_CONT_GAINS.p, SHOULDER_CONT_GAINS.i, SHOULDER_CONT_GAINS.d, 
-        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL)); 
+        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL));
+    private final ArmFeedforward shoulderFF = new ArmFeedforward(SHOULDER_KS, SHOULDER_KG, SHOULDER_KV);
     private double shoulderTarget = toRadians(0);
 
     private final VelocityTalonFXPro wrist = new VelocityTalonFXPro(WRIST_ID, WRIST_GAINS, WRIST_INPUT_TO_OUTPUT);
@@ -232,12 +234,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
 
             //Shoulder code
-            double shoulderPIDOutput = shoulderPID.calculate(shoulderEncoder.getRadians(), shoulderTarget);
-            
-            double shoulderClampRange = toRadians(40);
-            shoulderPIDOutput = Math.max(-shoulderClampRange, Math.min(shoulderClampRange, shoulderPIDOutput));
+            double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
+            double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
 
-            shoulder.setTarget(shoulderPIDOutput + shoulderPID.getSetpoint().velocity);
+            shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);
         };
     }
 
