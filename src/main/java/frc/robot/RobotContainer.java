@@ -254,8 +254,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));*/
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
-    operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
+    operatorCont.b().onTrue(/*handleManualRequest(INTAKING)*/ arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
+    operatorCont.x().onTrue(/*handleManualRequest(SCORING)*/ arm.transitionCommand(ArmMode.MID_SCORE));
 
     //TODO: remove when done testing
     Constants.Testing.STOP = operatorCont.y();

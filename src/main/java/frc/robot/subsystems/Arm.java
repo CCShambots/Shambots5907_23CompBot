@@ -229,7 +229,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
 
             //Shoulder code
-            //TODO: might need to change the ff calc pos input to actual pos rather than predicted
             //TODO: uncomment
             /*double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
             double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
