@@ -219,7 +219,7 @@ public final class Constants {
     public static final int SHOULDER_ID = 23;
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/70.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
-    public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
+    public static final double SHOULDER_ENCODER_OFFSET = -67.7; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
     public static final double SHOULDER_MAX_VEL = toRadians(40); //Radians/sec
     public static final double SHOULDER_MAX_ACCEL = toRadians(30); //Radians/sec^2
