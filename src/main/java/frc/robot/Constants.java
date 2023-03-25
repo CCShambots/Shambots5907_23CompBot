@@ -227,8 +227,8 @@ public final class Constants {
     //Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
-    public static final int WRIST_ENCODER_PORT = 9;
-    public static final double WRIST_ENCODER_OFFSET = 93.733337; //Degrees
+    public static final int WRIST_ENCODER_PORT = 7;
+    public static final double WRIST_ENCODER_OFFSET = 89.733337; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_MAX_VEL = toRadians(180); //Radians/sec
     public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
