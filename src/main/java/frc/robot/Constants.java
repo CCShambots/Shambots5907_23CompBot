@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -221,8 +222,8 @@ public final class Constants {
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = -67.7; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
-    public static final double SHOULDER_MAX_VEL = toRadians(40); //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(30); //Radians/sec^2
+    public static final double SHOULDER_MAX_VEL = toRadians(2); //40 //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(2); //30 //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
