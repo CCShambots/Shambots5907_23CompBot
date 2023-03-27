@@ -1,26 +1,29 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
+import frc.robot.subsystems.Arm;
 
-public class MotorVoltageIncrementCommand extends CommandBase {
+import static frc.robot.Constants.Arm.*;
+
+public class ArmMotorVoltageIncrementCommand extends CommandBase {
     final EnhancedTalonFXPro motor;
+    final Arm arm;
+    final ArmFeedforward ff;
 
     final double incrementSize;
     int increment;
 
-    final double kS = 0;
-    final double kG = 0;
-
-    public MotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize) {
+    public ArmMotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize, Arm arm) {
         this.motor = motor;
-
         this.incrementSize = incrementSize;
+        this.arm = arm;
 
+        ff = new ArmFeedforward(WRIST_GAINS.getS(), WRIST_KG, 0, 0);
         increment = 0;
     }
 
@@ -29,11 +32,11 @@ public class MotorVoltageIncrementCommand extends CommandBase {
     }
 
     private double getVoltage() {
-       return (increment * 0.05) + (Math.signum(increment) * (kS + kG));
+       return (increment * 0.05) + ff.calculate(arm.getShoulderAngle(), Math.signum(increment));
     }
 
     private double getUnModifiedVoltage() {
-        return getVoltage() - (Math.signum(increment) * (kS + kG));
+        return getVoltage() - ff.calculate(arm.getShoulderAngle(), Math.signum(increment));
     }
 
     @Override
@@ -49,7 +52,7 @@ public class MotorVoltageIncrementCommand extends CommandBase {
     @Override
     public void execute() {
         motor.setVoltage(getVoltage());
-        System.out.println("Voltage (Unmodified): " + getUnModifiedVoltage() + " Velocity: " + motor.getEncoderVelocity());
+        System.out.println("Voltage (Unmodified): " + getUnModifiedVoltage() + " Velocity: " + motor.getEncoderVelocity() + " Voltage (Modified): " + getVoltage());
     }
 
     @Override
