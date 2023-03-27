@@ -94,17 +94,17 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Load the trajectories into the hashmap
     loadPaths(
-            "red-pickup-right",
-            "red-dock-right",
-            "red-dock-center",
-            "red-score-left",
-            "blue-dock-left",
-            "blue-pickup-left",
-            "blue-dock-center",
-            "blue-score-right",
-            "red-get-element-right",
-            "red-go-score-right",
-            "red-balance-right"
+        "red-pickup-right",
+        "red-dock-right",
+        "red-dock-center",
+        "red-score-left",
+        "blue-dock-left",
+        "blue-pickup-left",
+        "blue-dock-center",
+        "blue-score-right",
+        "red-get-element-right",
+        "red-go-score-right",
+        "red-balance-right"
     );
 
     autoLoader = instantiateAutoLoader();
@@ -274,6 +274,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
     operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));*/
+    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
+    // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+
+    operatorCont.button(9).onTrue(Constants.gridInterface.indicateElementPlacedCommand(2, 7));
+    operatorCont.button(10).onTrue(Constants.gridInterface.indicateElementPlacedCommand(0, 0));
 
     /*
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));

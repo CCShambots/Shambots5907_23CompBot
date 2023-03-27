@@ -21,6 +21,10 @@ public class GridInterface {
         grid = alliance == Alliance.Red ? getRedGrid() : getBlueGrid();
     }
 
+    public void setAlliance(Alliance alliance) {
+        grid = alliance == Alliance.Red ? getRedGrid() : getBlueGrid();
+    }
+
     /**
      * Updates the grid interface by checking to see if the robot has placed elements and sending them to the dashboard
      * Must be called periodically
