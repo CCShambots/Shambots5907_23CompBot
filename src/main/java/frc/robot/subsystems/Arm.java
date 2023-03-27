@@ -16,12 +16,15 @@ import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.ArmMotorVoltageIncrementCommand;
+import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.subsystems.Claw.State;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
+
+import com.fasterxml.jackson.core.StreamWriteCapability;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
@@ -101,8 +104,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             // rotator.set(0);
         });
 
-        //Easy logics
-        addTransition(STOWED, PICKUP_DOUBLE, new InstantCommand(() -> goToArmState(PICKUP_DOUBLE_POS)).alongWith(claw.transitionCommand(State.OPENED)));
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
         addTransition(STOWED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
@@ -110,7 +111,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(STOWED, SEEKING_POSE);
         addTransition(SEEKING_POSE, AT_POSE);
 
-        //hard logics :( 
+        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(State.OPENED));
+        addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
+
         addTransition(STOWED, SEEKING_HIGH);
         removeTransition(SEEKING_HIGH, STOWED);
         addTransition(SEEKING_HIGH, HIGH);
@@ -125,23 +128,27 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private void registerStateCommands() {
         registerStateCommand(SEEKING_HIGH, 
-            new FunctionalCommand(() -> {
-                setRotatorTarget(HIGH_POS.getRotatorAngle());
-                setWristTarget(HIGH_POS.getWristAngle());
-                setShoulderTarget(HIGH_POS.getShoulderAngle());
-            }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() <= SHOULDER_ELEVATOR_THRESHOLD).andThen(
-                new InstantCommand(() -> setElevatorTarget(HIGH_POS.getElevatorExtension())),
-                new InstantCommand(() -> requestTransition(HIGH))
-            )
+            new ExtendArmCommand(this, HIGH_POS).andThen(transitionCommand(HIGH))
+        );
+
+        registerStateCommand(SEEKING_PICKUP_GROUND, 
+            new ExtendArmCommand(this, GROUND_PICKUP_POS).andThen(transitionCommand(PICKUP_GROUND))
+        );
+
+        registerStateCommand(SEEKING_PICKUP_DOUBLE, 
+            new ExtendArmCommand(this, PICKUP_DOUBLE_POS).andThen(transitionCommand(PICKUP_DOUBLE))
         );
 
         registerStateCommand(SEEKING_STOWED,
         new FunctionalCommand(() -> {
             if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-            if(getShoulderAngle() < 0) setShoulderTarget(15);
+            if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
         }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
             new FunctionalCommand(
-                () -> setElevatorTarget(STOWED_POS.getElevatorExtension()),
+                () -> {
+                    setElevatorTarget(STOWED_POS.getElevatorExtension());
+                    setShoulderTarget(toRadians(-45));
+                },
                 () -> {},
                 (interrupted) -> {},
                 () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
@@ -149,17 +156,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             new InstantCommand(() -> goToArmState(STOWED_POS)),
             new InstantCommand(() -> requestTransition(STOWED))
         )
-        );
-
-        registerStateCommand(SEEKING_PICKUP_GROUND,
-                    new FunctionalCommand(() -> {
-                        setRotatorTarget(GROUND_PICKUP_POS.getRotatorAngle());
-                        setWristTarget(GROUND_PICKUP_POS.getWristAngle());
-                        setShoulderTarget(GROUND_PICKUP_POS.getShoulderAngle());
-                    }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() <= SHOULDER_ELEVATOR_THRESHOLD).andThen(
-                        new InstantCommand(() -> setElevatorTarget(GROUND_PICKUP_POS.getElevatorExtension())),
-                        new InstantCommand(() -> requestTransition(PICKUP_GROUND))
-                    )
         );
 
         registerStateCommand(SEEKING_POSE, 
@@ -188,7 +184,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public enum ArmMode {
         UNDETERMINED, 
         SEEKING_STOWED, STOWED,
-        PICKUP_DOUBLE,
+        SEEKING_PICKUP_DOUBLE, PICKUP_DOUBLE,
         SEEKING_PICKUP_GROUND, PICKUP_GROUND,
         LOW_SCORE, MID_SCORE,
         SEEKING_HIGH, HIGH,
@@ -383,6 +379,14 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private double getError(double num1, double num2) {
         return abs(num1 - num2);
+    }
+
+    public boolean isShoulderSafe() {
+        return getElevatorHeight() <= ELEVATOR_TOLERANCE;
+    }
+
+    public boolean isElevatorSafe() {
+        return getShoulderAngle() <= SHOULDER_ELEVATOR_THRESHOLD;
     }
 
     public void pullAbsoluteAngles() {

@@ -260,12 +260,12 @@ public final class Constants {
     
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-40), toRadians(45), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(22), toRadians(17), toRadians(4), 0);
-    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-114), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-35), toRadians(45), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(20), toRadians(21), 0);
+    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
-    public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(49), toRadians(-32), 0);
+    public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
 }
 
   public static class Turret {

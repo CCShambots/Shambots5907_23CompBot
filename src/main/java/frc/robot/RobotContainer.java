@@ -149,7 +149,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE),
             turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
@@ -255,9 +255,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     // rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
 
-    // operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    // operatorCont.b().onTrue(/*handleManualRequest(INTAKING)*/ arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
-    // operatorCont.x().onTrue(/*handleManualRequest(SCORING)*/ arm.transitionCommand(ArmMode.MID_SCORE));
+    operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
+    operatorCont.b().onTrue(handleManualRequest(INTAKING) arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
+    operatorCont.x().onTrue(handleManualRequest(SCORING) arm.transitionCommand(ArmMode.MID_SCORE));
 
     //TODO: remove when done testing
     Constants.Testing.STOP = operatorCont.y();
@@ -278,11 +278,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
     // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
     // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
-
-    operatorCont.a().onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
-    operatorCont.b().onTrue(arm.transitionCommand(ArmMode.SEEKING_HIGH));
-    operatorCont.x().onTrue(arm.transitionCommand(ArmMode.MID_SCORE));
-    operatorCont.y().onTrue(arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
 
   }
 
