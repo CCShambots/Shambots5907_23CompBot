@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -54,7 +53,7 @@ public final class Constants {
     public static final int SOLENOID_ID_1 = 2;
     public static final int SOLENOID_ID_2 = 3;
 
-    public static final DoubleSolenoid.Value SOLENOID_CLAW_OPEN_VALUE = DoubleSolenoid.Value.kForward;
+    public static final DoubleSolenoid.Value SOLENOID_CLAW_OPEN_VALUE = DoubleSolenoid.Value.kReverse;
   }
 
 
@@ -222,29 +221,34 @@ public final class Constants {
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = -67.7; //Degrees
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
-    public static final double SHOULDER_MAX_VEL = toRadians(2); //40 //Radians/sec
-    public static final double SHOULDER_MAX_ACCEL = toRadians(2); //30 //Radians/sec^2
+    public static final double SHOULDER_MAX_VEL = toRadians(160); //Radians/sec
+    public static final double SHOULDER_MAX_ACCEL = toRadians(160); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
-    public static final double WRIST_ENCODER_OFFSET = 89.733337; //Degrees
+    public static final double WRIST_ENCODER_OFFSET = 100.8; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
-    public static final double WRIST_MAX_VEL = toRadians(180); //Radians/sec
-    public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
+    public static final double WRIST_MAX_VEL = toRadians(160); //Radians/sec
+//     public static final double WRIST_MAX_VEL = toRadians(240); //Radians/sec
+    public static final double WRIST_MAX_ACCEL = toRadians(380); //Radians/sec^2
+//     public static final double WRIST_MAX_ACCEL = toRadians(400); //Radians/sec^2
 
 
     //Control gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
-    public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
-    public static final double SHOULDER_KS = 0;
+
+    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0);
+    public static final double SHOULDER_KS = 0.1;
     public static final double SHOULDER_KG = 0;
-    public static final double SHOULDER_KV = 0;
-    public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
-    public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
-    public static final PIDGains WRIST_CONT_GAINS = new PIDGains(3.5, 0, 0);
+    public static final double SHOULDER_KV = 2.6;
+
+    public static final PIDGains WRIST_GAINS = new PIDGains(5, 0, .25); 
+    public static final double WRIST_KS = 0.25;
+    public static final double WRIST_KG = 0.3;
+    public static final double WRIST_KV = 0.9; //1.4
 
     public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
 
@@ -255,7 +259,7 @@ public final class Constants {
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     
     //Arm setpoints
-    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(112), toRadians(-150), 0);
+    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-40), toRadians(45), 0);
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(22), toRadians(17), toRadians(4), 0);

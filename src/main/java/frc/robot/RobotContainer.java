@@ -33,6 +33,8 @@ import frc.robot.util.grid.GridElement;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.opencv.photo.TonemapReinhard;
+
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
@@ -242,49 +244,46 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void configureBindings() {
-    /*
+    
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 
-    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
-                    .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+    // leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
+    //                 .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));*/
+    // rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
 
-    operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    operatorCont.b().onTrue(/*handleManualRequest(INTAKING)*/ arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
-    operatorCont.x().onTrue(/*handleManualRequest(SCORING)*/ arm.transitionCommand(ArmMode.MID_SCORE));
+    // operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
+    // operatorCont.b().onTrue(/*handleManualRequest(INTAKING)*/ arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
+    // operatorCont.x().onTrue(/*handleManualRequest(SCORING)*/ arm.transitionCommand(ArmMode.MID_SCORE));
 
     //TODO: remove when done testing
     Constants.Testing.STOP = operatorCont.y();
     Constants.Testing.RAISE = operatorCont.pov(0);
     Constants.Testing.LOWER = operatorCont.pov(180);
 
-    /*operatorCont.leftBumper().onTrue(arm.openClaw());
+    operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    operatorCont.leftTrigger(0.8)
-            .and(operatorCont.rightTrigger(0.8))
-            .onTrue(transitionCommand(State.DISABLED));
+    // operatorCont.leftTrigger(0.8)
+    //         .and(operatorCont.rightTrigger(0.8))
+    //         .onTrue(transitionCommand(State.DISABLED));
 
-    operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
-    operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    // operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    // operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
-    operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
-    operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));*/
+    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
+    // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
     // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
     // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
 
-    operatorCont.button(9).onTrue(Constants.gridInterface.indicateElementPlacedCommand(2, 7));
-    operatorCont.button(10).onTrue(Constants.gridInterface.indicateElementPlacedCommand(0, 0));
+    operatorCont.a().onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+    operatorCont.b().onTrue(arm.transitionCommand(ArmMode.SEEKING_HIGH));
+    operatorCont.x().onTrue(arm.transitionCommand(ArmMode.MID_SCORE));
+    operatorCont.y().onTrue(arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
 
-    /*
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
-
-    leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
-    leftStick.button(11).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));*/
   }
 
   private void handleManualTurretRequest() {
@@ -398,10 +397,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   @Override
   protected void onTeleopStart() {
-    /*requestTransition(State.TRAVELING);
+    // requestTransition(State.TRAVELING);
     //TODO: Sussy
-    new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();*/
-    requestTransition(State.TESTING);
+    // new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 
   @Override

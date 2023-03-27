@@ -23,7 +23,7 @@ public class ArmMotorVoltageIncrementCommand extends CommandBase {
         this.incrementSize = incrementSize;
         this.arm = arm;
 
-        ff = new ArmFeedforward(WRIST_GAINS.getS(), WRIST_KG, 0, 0);
+        ff = new ArmFeedforward(WRIST_KS, WRIST_KG, 0);
         increment = 0;
     }
 
@@ -31,12 +31,12 @@ public class ArmMotorVoltageIncrementCommand extends CommandBase {
         increment = MathUtil.clamp(increment + mod, -240, 240);
     }
 
-    private double getVoltage() {
-       return (increment * 0.05) + ff.calculate(arm.getShoulderAngle(), Math.signum(increment));
+    private double getVoltage(double angle) {
+       return (increment * incrementSize) + ff.calculate(angle, Math.signum(increment));
     }
 
-    private double getUnModifiedVoltage() {
-        return getVoltage() - ff.calculate(arm.getShoulderAngle(), Math.signum(increment));
+    private double getUnModifiedVoltage(double angle) {
+        return getVoltage(angle) - ff.calculate(angle, Math.signum(increment));
     }
 
     @Override
@@ -51,8 +51,10 @@ public class ArmMotorVoltageIncrementCommand extends CommandBase {
 
     @Override
     public void execute() {
-        motor.setVoltage(getVoltage());
-        System.out.println("Voltage (Unmodified): " + getUnModifiedVoltage() + " Velocity: " + motor.getEncoderVelocity() + " Voltage (Modified): " + getVoltage());
+        double angle = arm.getShoulderAngle();
+
+        motor.setVoltage(getVoltage(angle));
+        System.out.println("Voltage (Unmodified): " + getUnModifiedVoltage(angle) + " Velocity: " + motor.getEncoderVelocity() + " Voltage (Modified): " + getVoltage(angle));
     }
 
     @Override
