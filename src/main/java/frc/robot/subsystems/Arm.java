@@ -220,20 +220,22 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Runnable runControlLoops() {
         return () -> {
-            //Wrist code
-            double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
-            
-            double wristClampRange = toRadians(90);
-            wristPIDOutput = Math.max(-wristClampRange, Math.min(wristClampRange, wristPIDOutput));
+            if(isEnabled()) {
+                //Wrist code
+                double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
+                            
+                double wristClampRange = toRadians(90);
+                wristPIDOutput = Math.max(-wristClampRange, Math.min(wristClampRange, wristPIDOutput));
 
-            wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
+                wrist.setTarget(wristPIDOutput + wristPID.getSetpoint().velocity);
 
-            //Shoulder code
-            //TODO: uncomment
-            /*double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
-            double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
+                //Shoulder code
+                //TODO: uncomment
+                /*double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
+                double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
 
-            shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);*/
+                shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);*/
+            }
         };
     }
 
@@ -325,6 +327,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void onEnable() {
+        //Make sure no I buildup or anything insane happens
+        wristPID.reset(getWristAngle());
+        shoulderPID.reset(getShoulderAngle());
     }
 
     @Override
