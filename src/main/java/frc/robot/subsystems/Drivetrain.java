@@ -194,10 +194,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.updateField2dObject();
 
         //Only integrate vision measurement if the limelight has a target
-        if(llHasPose.getAsBoolean()) {
-            // System.out.println(llPose.get());
-            //TODO: Get this working
-            // drive.addVisionMeasurement(llPose.get().toPose2d());
+        if(getState() == DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE && llHasPose.getAsBoolean()) {
+            drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }
 

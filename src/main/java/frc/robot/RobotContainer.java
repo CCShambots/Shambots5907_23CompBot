@@ -30,9 +30,12 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 import frc.robot.util.grid.GridElement;
+import frc.robot.util.kinematics.ArmState;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.opencv.photo.TonemapReinhard;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
@@ -59,12 +62,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private final Lights lights;
   private final Turret turret;
 
+  private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
+  private LightState currentLightState = LightState.CONE;
+
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
 
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
   
-
   public RobotContainer(EventLoop checkModulesLoop) {
     super("Robot", State.UNDETERMINED, State.class);
 
@@ -73,8 +78,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     clawVision = new ClawVision();
 
     turret = new Turret(
-            operatorCont.pov(180),
-            operatorCont.pov(0),
+            operatorCont.x(),
+            operatorCont.y(),
             clawVision::hasTarget,
             () -> clawVision.getGameElementOffset().getRadians(),
             operatorCont.pov(270),
@@ -106,7 +111,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "blue-score-right",
         "red-get-element-right",
         "red-go-score-right",
-        "red-balance-right"
+        "red-balance-right",
+        "red-go-balance-right"
     );
 
     autoLoader = instantiateAutoLoader();
@@ -149,29 +155,42 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE),
             turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            new InstantCommand(() -> arm.requestTransition(getNextScoringMode())),
+            new InstantCommand(() -> arm.requestTransition(currentScoreMode)),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
-
+    //TODO: REMOVE ALL TESTING STUFF
+    addOmniTransition(State.TESTING, new ParallelCommandGroup(
+            lights.transitionCommand(LightState.IDLE),
+            drivetrain.transitionCommand(DrivetrainState.IDLE),
+            turret.transitionCommand(TurretState.IDLE),
+            arm.transitionCommand(ArmMode.TESTING)
+    ));
   }
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState correctState = gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
+      LightState correctState = currentLightState;
 
       if (lights.getState() != correctState) {
         lights.requestTransition(correctState);
       }
     }));
 
-    //perhaps dt drive over when scoring
+    registerStateCommand(State.INTAKING, new RunCommand(() -> {
+      LightState correctState = currentLightState;
+
+      if (lights.getState() != correctState) {
+        lights.requestTransition(correctState);
+      }
+    }));
+
   }
 
   private ArmMode getNextScoringMode() {
@@ -203,18 +222,33 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     final AutonomousLoader<AutoRoutes> autoLoader;
 
     //Put new auto routes here
-    autoLoader = new AutonomousLoader<>(Map.of(
+    Map<AutoRoutes, Command> routes = new HashMap<>();
+
+    //Red routes
+    routes.putAll(Map.of(
       RED_SCORE_RIGHT, new RedScoreRight(this),
       RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
       RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
       RED_SCORE_LEFT, new RedScoreLeft(this),
       RED_NEW_AUTO, new RedNewAuto(this),
+      RED_SCORE_PICKUP_BALANCE_RIGHT, new RedScorePickupBalanceRight(this)
+    ));
+
+    //Blue routes
+    routes.putAll(Map.of(
       BLUE_SCORE_LEFT, new BlueScoreLeft(this),
       BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
       BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
-      BLUE_SCORE_RIGHT, new BlueScoreRight(this),
-      NOTHING, new InstantCommand()
+      BLUE_SCORE_RIGHT, new BlueScoreRight(this)
+      )
+    );
+
+    //Route to do nothing
+    routes.putAll(Map.of(
+            NOTHING, new InstantCommand()
     ));
+
+    autoLoader = new AutonomousLoader<>(routes);
 
     return autoLoader;
   }
@@ -238,6 +272,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void configureBindings() {
+    
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
@@ -255,31 +290,45 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 //    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
-    operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
+    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, TurretState.INTAKING)));
+    // operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, TurretState.SCORING)));
 
+    operatorCont.pov(270).onTrue(new InstantCommand(() -> {
+      currentScoreMode = ArmMode.LOW_SCORE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
+
+    operatorCont.pov(0).onTrue(new InstantCommand(() -> {
+      currentScoreMode = ArmMode.MID_SCORE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
+
+    operatorCont.pov(90).onTrue(new InstantCommand(() -> {
+      currentScoreMode = currentLightState == LightState.CONE ? ArmMode.SEEKING_HIGH : ArmMode.HIGH_CUBE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
+
+    operatorCont.button(9).onTrue(new InstantCommand(() -> {
+        currentLightState = LightState.CONE;
+    }));
+
+    operatorCont.button(10).onTrue(new InstantCommand(() -> {
+      currentLightState = LightState.CUBE;
+  }));
 
     operatorCont.leftTrigger(0.8)
             .and(operatorCont.rightTrigger(0.8))
             .onTrue(transitionCommand(State.DISABLED));
 
-    operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
-    operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
     // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
     // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
 
-    operatorCont.button(9).onTrue(Constants.gridInterface.indicateElementPlacedCommand(2, 7));
-    operatorCont.button(10).onTrue(Constants.gridInterface.indicateElementPlacedCommand(0, 0));
-
-    /*
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
-
-    leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
-    leftStick.button(11).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));*/
   }
 
   private void handleManualTurretRequest() {
@@ -394,7 +443,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
-    //TODO: Sussy
+    // TODO: Sussy
     new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 
@@ -405,15 +454,15 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public enum State {
-    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE, TESTING,
 
-    MANUAL_CONTROL
+    MANUAL_CONTROL, CONE
   }
 
 
   public enum AutoRoutes {
     NOTHING,
-    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO, RED_SCORE_PICKUP_BALANCE_RIGHT,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

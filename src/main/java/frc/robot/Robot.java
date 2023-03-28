@@ -82,7 +82,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    robotContainer.turret().setTarget(Math.toRadians(-90));
+    //robotContainer.turret().setTarget(Math.toRadians(-90));
+    robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
 
   @Override

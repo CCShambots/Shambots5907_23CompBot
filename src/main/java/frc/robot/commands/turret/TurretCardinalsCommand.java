@@ -1,11 +1,16 @@
 package frc.robot.commands.turret;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 import java.util.function.BooleanSupplier;
+
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
@@ -38,30 +43,20 @@ public class TurretCardinalsCommand extends CommandBase {
         boolean currentToward = towardSupplier.getAsBoolean();
         boolean currentAway = awaySupplier.getAsBoolean();
 
-        if(currentToward && !prevToward) {
-            Rotation2d base = getCurrentCardinal();
+        if((currentToward && !prevToward) || (currentAway && !prevAway)) {
+            Rotation2d globalTarget = new Rotation2d();
+            if(currentToward && alliance == Blue) globalTarget = new Rotation2d(PI);
+            if(currentAway && alliance == Red) globalTarget = new Rotation2d(PI);
 
-            //Flip on blue alliance
-            if(alliance == Blue) {
-                base = base.times(-1);
-            }
+            //Get the current rotation of the bot to the nearest 90 degrees
+            Rotation2d botRotation = roundToQuadrantal(Constants.SwerveDrivetrain.getOdoPose.get().getRotation());
 
-            base = base.minus(new Rotation2d(PI/2));
+            //Get what the target of the turret should be
+            Rotation2d turretAngle = globalTarget.minus(botRotation).minus(new Rotation2d(PI/2));
 
-            t.setTarget(base.getRadians());
-        }
+            System.out.println("evaluating: " + turretAngle.getDegrees() + " (turret); " + botRotation.getDegrees() + " (bot rotation)");
 
-        else if(currentAway && !prevAway) {
-            Rotation2d base = getCurrentCardinal();
-
-            //Flip on red alliance
-            if(alliance == Red) {
-                base = base.times(-1);
-            }
-
-            base = base.minus(new Rotation2d(PI/2));
-
-            t.setTarget(base.getRadians());
+            t.setTarget(MathUtil.angleModulus(turretAngle.getRadians()));
         }
 
         prevToward = currentToward;
@@ -69,8 +64,13 @@ public class TurretCardinalsCommand extends CommandBase {
 
     }
 
-    private Rotation2d getCurrentCardinal() {
-        return new Rotation2d(Math.round(Constants.SwerveDrivetrain.getOdoPose.get().getRotation().getRadians() / (PI /2)) * (PI / 2));
+    private Rotation2d getCurrentCardinal(Translation2d point) {
+        Pose2d botPose = Constants.SwerveDrivetrain.getOdoPose.get();
+        return new Rotation2d(Math.round(Math.atan2(point.getY() - botPose.getY(), point.getX() - botPose.getX()) / (PI / 2)) * (PI / 2));
+    }
+
+    private Rotation2d roundToQuadrantal(Rotation2d rot) {
+        return new Rotation2d(Math.round(rot.getRadians() / (PI / 2)) * PI / 2);
     }
 
 }
