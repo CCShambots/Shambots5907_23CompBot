@@ -252,10 +252,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .or(() -> arm.getState() != ArmMode.STOWED)
             .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
-                    .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
-
-    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+//    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
