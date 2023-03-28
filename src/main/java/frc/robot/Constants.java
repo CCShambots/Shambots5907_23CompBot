@@ -9,7 +9,6 @@ import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -89,8 +88,8 @@ public final class Constants {
     public static final double rotationRadius = Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * PI;
 
     // Standard speeds (MK4 standard modules capable of 4.9)
-    public static final double STANDARD_LINEAR_SPEED = 3; //3
-    public static final double STANDARD_LINEAR_ACCELERATION = 6; //6
+    public static final double STANDARD_LINEAR_SPEED = 3;
+    public static final double STANDARD_LINEAR_ACCELERATION = 6;
     public static final double STANDARD_ROTATION = (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
 

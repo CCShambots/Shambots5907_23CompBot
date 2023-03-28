@@ -1,9 +1,7 @@
 package frc.robot.commands.turret;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -62,11 +60,6 @@ public class TurretCardinalsCommand extends CommandBase {
         prevToward = currentToward;
         prevAway = currentAway;
 
-    }
-
-    private Rotation2d getCurrentCardinal(Translation2d point) {
-        Pose2d botPose = Constants.SwerveDrivetrain.getOdoPose.get();
-        return new Rotation2d(Math.round(Math.atan2(point.getY() - botPose.getY(), point.getX() - botPose.getX()) / (PI / 2)) * (PI / 2));
     }
 
     private Rotation2d roundToQuadrantal(Rotation2d rot) {

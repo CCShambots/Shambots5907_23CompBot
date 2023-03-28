@@ -155,8 +155,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     ));
 
     addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE),
-            turret.transitionCommand(Turret.TurretState.INTAKING)
+            arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE)
+            // turret.transitionCommand(Turret.TurretState.INTAKING)
     ));
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
@@ -291,7 +291,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, TurretState.INTAKING)));
-    // operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, TurretState.SCORING)));
 
     operatorCont.pov(270).onTrue(new InstantCommand(() -> {
       currentScoreMode = ArmMode.LOW_SCORE;
@@ -326,8 +325,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
-    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
-    // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+    operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.HIGH_CUBE));
 
   }
 
@@ -443,8 +441,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
-    // TODO: Sussy
-    new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
+    new WaitCommand(134).andThen(new ConditionalCommand(transitionCommand(State.BRAKE), new InstantCommand(), () -> drivetrain.getTargetLinearSpeed() < 0.5)).schedule();
   }
 
   @Override
