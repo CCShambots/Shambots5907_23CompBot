@@ -1,11 +1,13 @@
 package frc.robot.commands.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 import java.util.function.BooleanSupplier;
+
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
@@ -20,6 +22,9 @@ public class TurretCardinalsCommand extends CommandBase {
 
     private boolean prevToward;
     private boolean prevAway;
+
+    private Translation2d blueAllianceSide = new Translation2d(0, Units.feetToMeters(14.5));
+    private Translation2d redAllianceSide = new Translation2d(Units.feetToMeters(54), Units.feetToMeters(14.5));
 
     public TurretCardinalsCommand(Turret t, BooleanSupplier towardSupplier, BooleanSupplier awaySupplier) {
         this.t = t;
@@ -38,26 +43,14 @@ public class TurretCardinalsCommand extends CommandBase {
         boolean currentToward = towardSupplier.getAsBoolean();
         boolean currentAway = awaySupplier.getAsBoolean();
 
-        if(currentToward && !prevToward) {
-            Rotation2d base = getCurrentCardinal();
+        if((currentToward && !prevToward) || (currentAway && !prevAway)) {
+            Translation2d workingPoint = redAllianceSide;
+            if(currentToward && alliance == Blue) workingPoint = blueAllianceSide;
+            if(currentAway && alliance == Red) workingPoint = blueAllianceSide;
 
-            //Flip on blue alliance
-            if(alliance == Blue) {
-                base = base.times(-1);
-            }
+            Rotation2d base = getCurrentCardinal(workingPoint);
 
-            base = base.minus(new Rotation2d(PI/2));
-
-            t.setTarget(base.getRadians());
-        }
-
-        else if(currentAway && !prevAway) {
-            Rotation2d base = getCurrentCardinal();
-
-            //Flip on red alliance
-            if(alliance == Red) {
-                base = base.times(-1);
-            }
+            System.out.println("evaluating: " + base.getDegrees());
 
             base = base.minus(new Rotation2d(PI/2));
 
@@ -69,8 +62,8 @@ public class TurretCardinalsCommand extends CommandBase {
 
     }
 
-    private Rotation2d getCurrentCardinal() {
-        return new Rotation2d(Math.round(Constants.SwerveDrivetrain.getOdoPose.get().getRotation().getRadians() / (PI /2)) * (PI / 2));
+    private Rotation2d getCurrentCardinal(Translation2d point) {
+        return new Rotation2d(Math.round(Math.atan2(point.getY(), point.getX()) / (PI / 2)) * (PI / 2));
     }
 
 }

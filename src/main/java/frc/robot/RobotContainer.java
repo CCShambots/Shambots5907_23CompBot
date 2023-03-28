@@ -29,6 +29,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 import frc.robot.util.grid.GridElement;
+import frc.robot.util.kinematics.ArmState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,12 +60,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private final Lights lights;
   private final Turret turret;
 
+  private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
+  private LightState currentLightState = LightState.CONE;
+
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
 
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
   
-
   public RobotContainer(EventLoop checkModulesLoop) {
     super("Robot", State.UNDETERMINED, State.class);
 
@@ -73,8 +76,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     clawVision = new ClawVision();
 
     turret = new Turret(
-            operatorCont.pov(180),
-            operatorCont.pov(0),
+            operatorCont.x(),
+            operatorCont.y(),
             clawVision::hasTarget,
             () -> clawVision.getGameElementOffset().getRadians(),
             operatorCont.pov(270),
@@ -155,7 +158,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            new InstantCommand(() -> arm.requestTransition(getNextScoringMode())),
+            new InstantCommand(() -> arm.requestTransition(currentScoreMode)),
             turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
@@ -170,14 +173,21 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState correctState = gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
+      LightState correctState = currentLightState;
 
       if (lights.getState() != correctState) {
         lights.requestTransition(correctState);
       }
     }));
 
-    //perhaps dt drive over when scoring
+    registerStateCommand(State.INTAKING, new RunCommand(() -> {
+      LightState correctState = currentLightState;
+
+      if (lights.getState() != correctState) {
+        lights.requestTransition(correctState);
+      }
+    }));
+
   }
 
   private ArmMode getNextScoringMode() {
@@ -253,29 +263,44 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     // leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
     //                 .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    // rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
-    operatorCont.b().onTrue(handleManualRequest(INTAKING) arm.transitionCommand(ArmMode.PICKUP_DOUBLE));
-    operatorCont.x().onTrue(handleManualRequest(SCORING) arm.transitionCommand(ArmMode.MID_SCORE));
+    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, TurretState.INTAKING)));
+    // operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, TurretState.SCORING)));
 
-    //TODO: remove when done testing
-    Constants.Testing.STOP = operatorCont.y();
-    Constants.Testing.RAISE = operatorCont.pov(0);
-    Constants.Testing.LOWER = operatorCont.pov(180);
+    operatorCont.pov(270).onTrue(new InstantCommand(() -> {
+      currentScoreMode = ArmMode.LOW_SCORE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
+
+    operatorCont.pov(0).onTrue(new InstantCommand(() -> {
+      currentScoreMode = ArmMode.MID_SCORE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
+
+    operatorCont.pov(90).onTrue(new InstantCommand(() -> {
+      currentScoreMode = currentLightState == LightState.CONE ? ArmMode.SEEKING_HIGH : ArmMode.HIGH_CUBE;
+      handleManualRequest(State.SCORING, TurretState.SCORING);
+    }));
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    // operatorCont.leftTrigger(0.8)
-    //         .and(operatorCont.rightTrigger(0.8))
-    //         .onTrue(transitionCommand(State.DISABLED));
+    operatorCont.button(9).onTrue(new InstantCommand(() -> {
+        currentLightState = LightState.CONE;
+    }));
 
-    // operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
-    // operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.button(10).onTrue(new InstantCommand(() -> {
+      currentLightState = LightState.CUBE;
+  }));
 
-    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
-    // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+    operatorCont.leftTrigger(0.8)
+            .and(operatorCont.rightTrigger(0.8))
+            .onTrue(transitionCommand(State.DISABLED));
+
+    operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
+
     // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
     // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
 
@@ -392,9 +417,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   @Override
   protected void onTeleopStart() {
-    // requestTransition(State.TRAVELING);
-    //TODO: Sussy
-    // new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
+    requestTransition(State.TRAVELING);
+    // TODO: Sussy
+    new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
   }
 
   @Override
@@ -406,7 +431,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public enum State {
     INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE, TESTING,
 
-    MANUAL_CONTROL
+    MANUAL_CONTROL, CONE
   }
 
 

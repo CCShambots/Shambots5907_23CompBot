@@ -69,9 +69,9 @@ public class Turret extends StateMachine<Turret.TurretState> {
     private void registerStateCommands() {
         registerStateCommand(CARDINALS, new InstantCommand(() -> setTarget(getTurretAngle())).andThen(new TurretCardinalsCommand(this, towardSupplier, awaySupplier)));
 
-        registerStateCommand(SCORING, new RunCommand(() -> {
-            setTargetToPoint(Constants.gridInterface.getNextElement().getLocation().toTranslation2d());
-        }));
+        // registerStateCommand(SCORING, new RunCommand(() -> {
+        //     setTargetToPoint(Constants.gridInterface.getNextElement().getLocation().toTranslation2d());
+        // }));
 
         registerStateCommand(INTAKING, new RunCommand(() -> {
                 if(!isBusy() && clawHasTarget.getAsBoolean()) {

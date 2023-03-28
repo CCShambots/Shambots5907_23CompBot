@@ -196,7 +196,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         if(llHasPose.getAsBoolean()) {
             // System.out.println(llPose.get());
             //TODO: Get this working
-            // drive.addVisionMeasurement(llPose.get().toPose2d());
+            drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }
 
