@@ -28,6 +28,8 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.ShamLib.motors.v5.PIDFGains;
+import frc.robot.util.LUT;
+import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 
@@ -39,6 +41,8 @@ public final class Constants {
 
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
+  public static GridInterface gridInterface = new GridInterface(alliance);
+  public static boolean gridReinstantiated = true;
 
   public static final class Claw {
     public static final int COMPRESSOR_ID = 1;
@@ -56,12 +60,19 @@ public final class Constants {
   }
 
   public static final class SwerveDrivetrain {
-    public static final double AUTO_BALANCE_SPEED = 0.35;
+
+    //NEEDS TO BE TUNED
+    public static final PIDGains AUTO_BALANCE_GAINS = new PIDGains(
+            0.025,
+            0,
+            0.015
+    );
+
+    public static final double AUTO_BALANCE_SPEED = 0.6;
     public static final double DOCK_SPEED = 0.8;
-    public static final double MIN_BALANCE_TIME = 2;
 
-
-    public static final Pose3d limelightPose = new Pose3d(0, Units.inchesToMeters(12.25), Units.inchesToMeters(5.75), new Rotation3d(0, 0, toRadians(90)));
+    //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
+    public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
 
     // Distance between centers of right and left wheels on robot in meters
     public static final double TRACK_WIDTH = Units.inchesToMeters(18.75);
@@ -85,8 +96,8 @@ public final class Constants {
     //Min speed to allow turbo button to work
     public static final double MIN_TURBO_SPEED = 2.5;
 
-    public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
-    public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
+    public static final double MAX_LINEAR_SPEED_AUTO = .5;
+    public static final double MAX_LINEAR_ACCELERATION_AUTO = .5;
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
@@ -171,7 +182,7 @@ public final class Constants {
   }
 
   public static final class Vision {
-    public static Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-5), 0, inchesToMeters(31), new Rotation3d());
+    public static Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-7.549165), 0, inchesToMeters(8.585326+1.44), new Rotation3d());
 
     //Base
     public static final int APRIL_TAG_PIPELINE = 0;
@@ -184,24 +195,10 @@ public final class Constants {
 
   public static class Arm {
     //Physial constants for arm dimensions
-    public static final double baseToTurret = inchesToMeters(5.5 + 1.44);//Distance from the floor to the top of the turret plate
-    public static final double turretToArm = inchesToMeters(14.5); //Distance from the turret to the arm (when the elevator is at 0)
-    public static final double armToWrist = inchesToMeters(28.765564);
-    public static final double wristToEndEffector = inchesToMeters(12.9016);
-
-    //Turret hardawre details
-    public static final int TURRET_ID = 21;
-    public static final double TURRET_INPUT_TO_OUTPUT =
-            (1.0/ 25.0) * //TODO: Gear ratio on motor
-            (10.0 / 140.0) *
-            2 * PI //To radians
-    ; //Rotations --> Radians
-    public static final int TURRET_POT_PORT = 0; //Analog port
-    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
-    public static final double TURRET_MAX_VEL = 1000;
-    public static final double TURRET_MAX_ACCEL = 1000;
-    public static final Range turretRange = Range.fromDegrees(-90, 90);
+    public static final double baseToTurret = inchesToMeters(7.5);//Distance from the floor to the top of the turret plate
+    public static final double turretToShoulder = inchesToMeters(14); //Distance from the turret to the arm (when the elevator is at 0)
+    public static final double shoulderToWrist = inchesToMeters(28.75);
+    public static final double wristToEndEffector = inchesToMeters(25.5);
 
     //Elevator hardware details
     public static final int ELEVATOR_ID = 22;
@@ -211,15 +208,15 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 5000
-    public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2
+    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 3000
+    public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2 5000
 
     //Shoulder hardware details
     public static final int SHOULDER_ID = 23;
-    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/70.0) * (2.0 / 3.0) * 2 * PI; //Rotations --> Radians
+    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/30.0) * (10.0 / 33.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 110.983395; //Degrees
-    public static final Range shoulderRange = Range.fromDegrees(-35, 115); //TODO
+    public static final Range shoulderRange = Range.fromDegrees(-45, 115);
     public static final double SHOULDER_MAX_VEL = toRadians(40); //Radians/sec
     public static final double SHOULDER_MAX_ACCEL = toRadians(30); //Radians/sec^2
 
@@ -228,18 +225,14 @@ public final class Constants {
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 9;
     public static final double WRIST_ENCODER_OFFSET = 93.733337; //Degrees
-    public static final Range wristRange = Range.fromDegrees(-155, 0); //Degrees //TODO:
+    public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_MAX_VEL = toRadians(180); //Radians/sec
     public static final double WRIST_MAX_ACCEL = toRadians(180); //Radians/sec^2
 
-    //Rotator hardware details
-    public static final int ROTATOR_ID = 25;
-    public static final double ROTATOR_ENCODER_OFFSET = toRadians(48.112586); //Radians //TODO
-    public static final Range rotatorRange = Range.fromDegrees(-180, 180);
 
     //PID gains
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
-    public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.3, 0.116);
+    public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0.35, 0, 0, 0.4, .15);
     public static final PIDGains SHOULDER_CONT_GAINS = new PIDGains(2.5, 0, 0);
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(.35, 0, 0, 0, 0.14); 
@@ -249,51 +242,96 @@ public final class Constants {
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians
-    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(16);
+    public static final double ELEVATOR_TOLERANCE = Units.inchesToMeters(22);
     public static final double SHOULDER_ELEVATOR_THRESHOLD = toRadians(75); // The point at which we can start moving the elevator whilst moving the shoulder
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(112), toRadians(-150), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(98.7), toRadians(-115), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(0), toRadians(16), toRadians(-81), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-40), toRadians(45), 0);
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(22), toRadians(17), toRadians(4), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(65), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(49), toRadians(-32), 0);
+}
+
+  public static class Turret {
+    //Turret hardawre details
+    public static final int TURRET_ID = 21;
+    public static final double TURRET_INPUT_TO_OUTPUT =
+            (1.0/ 25.0) *
+                    (10.0 / 140.0) *
+                    2 * PI //To radians
+            ; //Rotations --> Radians
+    public static final int TURRET_POT_PORT = 0; //Analog port
+    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
+    public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
+    public static final double TURRET_MAX_VEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final double TURRET_SLOW_VEL = 100;
+    public static final double TURRET_SLOW_ACCEL = 100;
+    public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
+
+    public static final double TURRET_START_ANGLE  = -90;
+
+    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+
+
+    public static double MANUAL_CONTROL_VELOCITY = 30;
+
+    public static final double TURRET_ALLOWED_ERROR = toRadians(2);
+
+    public static final LUT<Double, Double> AIMING_LUT = new LUT<Double, Double>() {{
+        add(toRadians(30.0), .2);
+        add(toRadians(25.0), .2);
+        add(toRadians(20.0), .2);
+        add(toRadians(15.0), .2);
+        add(toRadians(10.0), .4);
+        add(toRadians(5.0), .6);
+        add(toRadians(0.0), 1.0);
+
+    }};
   }
 
   public static class Lights {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
-    public static final int NUM_LEDS = 308;
+    public static final int NUM_LIGHTS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
-    public static final double BLINK_SPEED = 0.5;
+    public static final double BLINK_SPEED = .25;
 
     public static final Animation DISABLED_ANIMATION =
-            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LEDS, Front, 7);
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS, Front, 7);
 
     public static final RGB IDLE_RGB = new RGB(0, 0, 255);
 
     public static final RGB ELEMENT_GRABBED_RGB = new RGB(0, 255, 0);
-    public static final Animation DEPLOYING_ANIMATION =
-            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LEDS);
+    public static final Animation SCORING_ANIMATION =
+            new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final RGB SCORING_RGB = new RGB(0, 255, 0);
 
+    public static final RGB CONE_RGB = new RGB(255, 255, 0);
 
-    public static final RGB UPRIGHT_CONE_RGB = new RGB(255, 255, 0);
-
-    public static final Animation DOWNED_CONE_ANIMATION =
-            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LEDS);
+    public static final Animation INTAKE_CONE_ANIMATION =
+            new StrobeAnimation(255, 255, 0, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final RGB CUBE_RGB = new RGB(144,22,153);
+
+    public static final Animation INTAKE_CUBE_ANIMATION =
+            new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LIGHTS);
+
+    public static final Animation SOFT_STOP_ANIMATION =
+            new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LIGHTS);
   }
 
-  public static void pullAllianceFromFMS() {
+  public static void pullAllianceFromFMS(RobotContainer rc) {
     boolean isRedAlliance = NetworkTableInstance.getDefault().getTable("FMSInfo").getEntry("IsRedAlliance").getBoolean(true);
     if(!overrideAlliance) alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
+
+    reInstantiateGridUI(alliance);
   }
 
   public static CurrentLimitsConfigs getCurrentLimit() {
@@ -310,4 +348,10 @@ public final class Constants {
     motor.getConfigurator().apply(config);
   }
   
+  public static void reInstantiateGridUI(Alliance alliance) {
+    gridInterface.setAlliance(alliance);
+    Constants.gridReinstantiated = true;
+  }
+
+
 }

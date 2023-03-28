@@ -2,35 +2,34 @@ package frc.robot;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
-import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
 import frc.robot.commands.auto.blue.BlueScoreLeft;
 import frc.robot.commands.auto.blue.BlueScoreRight;
-import frc.robot.commands.auto.red.RedScoreBalanceCenter;
-import frc.robot.commands.auto.red.RedScoreBalanceRight;
-import frc.robot.commands.auto.red.RedScoreLeft;
-import frc.robot.commands.auto.red.RedScoreRight;
+import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.BaseVision;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
+import frc.robot.subsystems.Turret.TurretState;
+import frc.robot.util.grid.GridElement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +39,12 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.SwerveDrivetrain.MIN_TURBO_SPEED;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
+import static frc.robot.Constants.gridInterface;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
-public class RobotContainer {
+public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   //Declare HIDs
   private final CommandFlightStick leftStick = new CommandFlightStick(0);
@@ -53,51 +53,150 @@ public class RobotContainer {
 
   //Declare subsystems
   private final BaseVision baseVision;
-  private final Drivetrain dt;
+  private final ClawVision clawVision;
+  private final Drivetrain drivetrain;
   private final Arm arm;
+  private final Lights lights;
+  private final Turret turret;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
-  
+
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
+  
 
-  private final Lights l;
+  public RobotContainer(EventLoop checkModulesLoop) {
+    super("Robot", State.UNDETERMINED, State.class);
 
-  public RobotContainer() {
+    arm = new Arm();
+    lights = new Lights();
+    clawVision = new ClawVision();
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d()); //TODO: Give turret information to the vision subsystem
+    turret = new Turret(
+            operatorCont.pov(180),
+            operatorCont.pov(0),
+            clawVision::hasTarget,
+            () -> clawVision.getGameElementOffset().getRadians(),
+            operatorCont.pov(270),
+            operatorCont.pov(90)
+    );
 
-    dt = new Drivetrain(
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getTurretAngle()));
+
+    drivetrain = new Drivetrain(
           () -> -leftStick.getY(),
           () -> -leftStick.getX(),
           () -> -rightStick.getRawAxis(0),
-          baseVision.getLLPoseSupplier(),
+          baseVision.getPoseSupplier(),
           baseVision.getLLHasTargetSupplier()
     );
 
-    this.arm = new Arm();
-    this.l = new Lights();
+    drivetrain.registerMisalignedSwerveTriggers(checkModulesLoop);
+
 
     //Load the trajectories into the hashmap
-    loadPaths("red-pickup-right", "red-dock-right", "red-dock-center",
-     "red-score-left", "blue-dock-left", "blue-pickup-left", "blue-dock-center", "blue-score-right");
-
-    SubsystemManagerFactory.getInstance().registerSubsystem(dt);
-    SubsystemManagerFactory.getInstance().registerSubsystem(arm, false);
-    SubsystemManagerFactory.getInstance().registerSubsystem(l, false);
+    loadPaths(
+        "red-pickup-right",
+        "red-dock-right",
+        "red-dock-center",
+        "red-score-left",
+        "blue-dock-left",
+        "blue-pickup-left",
+        "blue-dock-center",
+        "blue-score-right",
+        "red-get-element-right",
+        "red-go-score-right",
+        "red-balance-right"
+    );
 
     autoLoader = instantiateAutoLoader();
 
+    initializeDriveTab();
+
+    addChildSubsystem(drivetrain);
+    addChildSubsystem(arm);
+    addChildSubsystem(lights);
+    addChildSubsystem(clawVision);
+    addChildSubsystem(turret);
+
+    defineTransitions();
+    defineStateCommands();
+
+    configureBindings();
+  }
+
+  private void defineTransitions() {
+    addOmniTransition(State.DISABLED, new ParallelCommandGroup(
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            arm.transitionCommand(ArmMode.SOFT_STOP),
+            turret.transitionCommand(Turret.TurretState.SOFT_STOP),
+            lights.transitionCommand(LightState.SOFT_STOP)
+    ));
+
+    addOmniTransition(State.BRAKE, new ParallelCommandGroup(
+            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            arm.transitionCommand(ArmMode.SEEKING_STOWED),
+            lights.transitionCommand(LightState.IDLE),
+            turret.transitionCommand(Turret.TurretState.IDLE)
+    ));
+
+    addTransition(State.DISABLED, State.AUTONOMOUS);
+
+    addOmniTransition(State.TRAVELING, new ParallelCommandGroup(
+            arm.transitionCommand(ArmMode.SEEKING_STOWED),
+            drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
+            turret.transitionCommand(Turret.TurretState.CARDINALS)
+    ));
+
+    addTransition(State.TRAVELING, State.INTAKING, new ParallelCommandGroup(
+            arm.transitionCommand(ArmMode.PICKUP_DOUBLE),
+            turret.transitionCommand(Turret.TurretState.INTAKING)
+    ));
+
+    addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
+            lights.transitionCommand(LightState.SCORING),
+            new InstantCommand(() -> arm.requestTransition(getNextScoringMode())),
+            turret.transitionCommand(Turret.TurretState.SCORING)
+    ));
+
+
+  }
+
+  private void defineStateCommands() {
+    registerStateCommand(State.TRAVELING, new RunCommand(() -> {
+      LightState correctState = gridInterface.getNextElement().isCube() ? LightState.CUBE : LightState.CONE;
+
+      if (lights.getState() != correctState) {
+        lights.requestTransition(correctState);
+      }
+    }));
+
+    //perhaps dt drive over when scoring
+  }
+
+  private ArmMode getNextScoringMode() {
+    GridElement e = gridInterface.getNextElement();
+
+    switch (e.getRow()) {
+      case 0:
+        return ArmMode.LOW_SCORE;
+      case 1:
+        return ArmMode.MID_SCORE;
+      case 2:
+        return e.isCube() ? ArmMode.HIGH_CUBE : ArmMode.SEEKING_HIGH;
+      default:
+        return ArmMode.SEEKING_STOWED;
+    }
+  }
+
+  private void initializeDriveTab() {
     ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
     driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
     driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
     driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().indexOf(alliance.name().toLowerCase()) != -1)
-    .withPosition(4, 2).withSize(2, 2);
-    
-    configureBindings();
-
+            .withPosition(4, 2).withSize(2, 2);
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
@@ -109,6 +208,7 @@ public class RobotContainer {
       RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
       RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
       RED_SCORE_LEFT, new RedScoreLeft(this),
+      RED_NEW_AUTO, new RedNewAuto(this),
       BLUE_SCORE_LEFT, new BlueScoreLeft(this),
       BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
       BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
@@ -131,15 +231,15 @@ public class RobotContainer {
   private InstantCommand syncAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
-              Constants.pullAllianceFromFMS();
+              Constants.pullAllianceFromFMS(this);
               Constants.overrideAlliance = false;
             }
     );
   }
 
   private void configureBindings() {
-    rightStick.trigger().onTrue(new InstantCommand(() -> dt.requestTransition(DrivetrainState.X_SHAPE)));
-    rightStick.trigger().onFalse(new InstantCommand(() -> dt.requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+    rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
+    rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
     leftStick.topBase().onTrue(new InstantCommand(dt::resetGyro));
     
@@ -152,29 +252,62 @@ public class RobotContainer {
             .or(() -> arm.getState() != ArmMode.STOWED)
             .onTrue(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
 
-    // rightStick.trigger().onTrue(dt.calculateModuleDrive(leftStick.trigger(), rightStick.trigger(), () -> leftStick.topBase().getAsBoolean()));
+    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
+                    .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    // rightStick.topBase().onTrue(new InstantCommand(() -> dt.setAllModules(new SwerveModuleState(0, new Rotation2d()))));
+    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+
+    operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
+    operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING)));
+    operatorCont.x().onTrue(new InstantCommand(() -> handleManualRequest(State.SCORING, Turret.TurretState.SCORING)));
+
 
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    operatorCont.a().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_STOWED)));
-    operatorCont.b().onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.PICKUP_DOUBLE)));
-
-    operatorCont.pov(0).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.MID_SCORE)));
-    operatorCont.pov(90).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_HIGH)));
-    operatorCont.pov(270).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.LOW_SCORE)));
-    operatorCont.pov(180).onTrue(new InstantCommand(() -> arm.requestTransition(ArmMode.SEEKING_PICKUP_GROUND)));
-
     operatorCont.leftTrigger(0.8)
-      .and(() -> operatorCont.rightTrigger(0.8)
-      .getAsBoolean()).onTrue(arm.transitionCommand(ArmMode.SOFT_STOP));
+            .and(operatorCont.rightTrigger(0.8))
+            .onTrue(transitionCommand(State.DISABLED));
 
-    operatorCont.leftStick().onTrue(l.transitionCommand(LightState.CUBE));
-    operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
+    operatorCont.pov(90).onTrue(new InstantCommand(this::handleManualTurretRequest));
+    operatorCont.pov(270).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
+    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.SEEKING_PICKUP_GROUND).alongWith(turret.transitionCommand(TurretState.INTAKING)));
+    // operatorCont.button(10).onTrue(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+
+    operatorCont.button(9).onTrue(Constants.gridInterface.indicateElementPlacedCommand(2, 7));
+    operatorCont.button(10).onTrue(Constants.gridInterface.indicateElementPlacedCommand(0, 0));
+
+    /*
+    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS(this)));
+
+    leftStick.button(10).onTrue(new InstantCommand(arm::forceCone)).onFalse(new InstantCommand(arm::forceNone));
+    leftStick.button(11).onTrue(new InstantCommand(arm::forceCube)).onFalse(new InstantCommand(arm::forceNone));*/
+  }
+
+  private void handleManualTurretRequest() {
+    if (isFlag(State.MANUAL_CONTROL)) return;
+
+    if (getState() == State.INTAKING) handleManualRequest(State.INTAKING, Turret.TurretState.INTAKING);
+    else if (getState() == State.SCORING) handleManualRequest(State.SCORING, Turret.TurretState.SCORING);
+  }
+
+  private void handleManualRequest(State s, Turret.TurretState ts) {
+    if (!(s == State.SCORING || s == State.INTAKING)) return;
+
+    if (getState() == s) {
+      if (isFlag(State.MANUAL_CONTROL)) {
+        clearFlag(State.MANUAL_CONTROL);
+        turret.requestTransition(ts);
+      }
+      else {
+        setFlag(State.MANUAL_CONTROL);
+        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+      }
+    }
+    else {
+      requestTransition(s);
+    }
   }
 
   public Command getAutonomousCommand() {
@@ -212,11 +345,11 @@ public class RobotContainer {
   }
 
   public Command runTraj(PathPlannerTrajectory traj) {
-    return dt.runTrajectory(traj, DrivetrainState.IDLE);
+    return drivetrain.runTrajectory(traj, DrivetrainState.IDLE);
   }
 
   public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
-    return dt.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
+    return drivetrain.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
   }
 
   public Command runTraj(String traj) {
@@ -232,19 +365,58 @@ public class RobotContainer {
   }
 
   public Drivetrain dt() {
-    return dt;
+    return drivetrain;
+  }
+
+  public Turret turret() {
+    return turret;
+  }
+
+  //TODO: Remove
+  public void updateTarget() {
+    drivetrain.getField().getObject("target").setPose(new Pose2d(gridInterface.getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
   }
 
   public Command waitForReady() {
     return new WaitUntilCommand(() ->
-            dt.getState() == DrivetrainState.IDLE &&
+            drivetrain.getState() == DrivetrainState.IDLE &&
             arm.getState() == ArmMode.STOWED
     );
   }
 
+  @Override
+  protected void determineSelf() {
+    setState(State.TRAVELING);
+  }
+
+  @Override
+  protected void onDisable() {
+    setState(State.DISABLED);
+  }
+
+  @Override
+  protected void onTeleopStart() {
+    requestTransition(State.TRAVELING);
+    //TODO: Sussy
+    new WaitCommand(134).andThen(transitionCommand(State.BRAKE)).schedule();
+  }
+
+  @Override
+  protected void onAutonomousStart() {
+    registerStateCommand(State.AUTONOMOUS, getAutonomousCommand());
+    requestTransition(State.AUTONOMOUS);
+  }
+
+  public enum State {
+    INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE,
+
+    MANUAL_CONTROL
+  }
+
+
   public enum AutoRoutes {
     NOTHING,
-    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

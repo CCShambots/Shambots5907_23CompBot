@@ -28,14 +28,14 @@ public class ArmState {
         this.valid = computeValid();
     }
 
-    private boolean computeValid() {
-        return turretRange.isWithin(turretAngle) &&
-                elevatorRange.isWithin(elevatorExtension) &&
-                shoulderRange.isWithin(shoulderAngle) &&
-                wristRange.isWithin(wristAngle) &&
-                rotatorRange.isWithin(rotatorAngle)
-                ;
+    public ArmState(double elevatorExtension, double shoulderAngle, double wristAngle) {
+        this(0, elevatorExtension, shoulderAngle, wristAngle, 0);
+    }
 
+    private boolean computeValid() {
+        return elevatorRange.isWithin(elevatorExtension) &&
+                shoulderRange.isWithin(shoulderAngle) &&
+                wristRange.isWithin(wristAngle);
     }
 
     public boolean isValid() {

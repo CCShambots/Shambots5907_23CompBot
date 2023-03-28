@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -9,10 +11,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -50,6 +53,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         this.llPose = llPoseSupplier;
         this.llHasPose = llHasPose;
 
+        getOdoPose = this::getPose;
+
         drive = new SwerveDrive(
                 PIGEON_ID,
                 DRIVE_GAINS,
@@ -61,7 +66,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                false,
+                true, //TODO: Disable before comp
                 "drivetrain",
                 "",
                 Constants.getCurrentLimit(),
@@ -104,6 +109,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         addTransition(DrivetrainState.IDLE, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.TRAJECTORY, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.DOCKING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+        addTransition(DrivetrainState.BALANCING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
     private void defineStateCommands() {
@@ -118,13 +127,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
 
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
+                new InstantCommand(() -> setFieldRelative(true)),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
                 transitionCommand(DrivetrainState.BALANCING)
         ));
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
-            new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1),
-            transitionCommand(DrivetrainState.X_SHAPE)
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                transitionCommand(DrivetrainState.X_SHAPE)
         ));
     }
 
@@ -185,13 +195,18 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         //Only integrate vision measurement if the limelight has a target
         if(llHasPose.getAsBoolean()) {
-            drive.addVisionMeasurement(llPose.get().toPose2d());
+            // System.out.println(llPose.get());
+            //TODO: Get this working
+            // drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }
 
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
         drive.drive(speeds, allowHoldAngleChange);
     }
+
+    //TODO: remove
+    public Field2d getField() {return drive.getField();}
 
     /**
      *
@@ -257,12 +272,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
 
         drive.resetGyro(rotation);
-        // drive.resetRotationOffset(rotation);
-        drive.drive(new ChassisSpeeds(0, 0, 1), true);
+        drive.fixHoldAngle();
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
-
-        new WaitCommand(134).andThen(transitionCommand(DrivetrainState.X_SHAPE)).schedule();
     }
 
     @Override
@@ -292,6 +304,22 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
+
+    public Pose2d getPose() {
+        return drive.getPose();
+    }
+    
+    public void registerMisalignedSwerveTriggers(EventLoop loop) {
+        for(SwerveModule module : drive.getModules()) {
+            loop.bind(() -> {
+                    if(module.isModuleMisaligned() && !isEnabled()) {
+                        new RealignModuleCommand(module).schedule();
+                    }
+                }
+            );  
+        }    
+    }
+    
     public void setSpeedMode(SpeedMode mode) {
         drive.setSpeedMode(mode.ordinal());
     }
@@ -314,7 +342,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
+
         builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
+        
+        builder.addDoubleProperty("linear-speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
 
         builder.addDoubleProperty("pitch", () -> getPitch(), null);
         builder.addDoubleProperty("roll", () -> getRoll(), null);
@@ -323,11 +354,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            "field", drive.getField(),
-            "module-1", drive.getModules().get(0),
-            "module-2", drive.getModules().get(1),
-            "module-3", drive.getModules().get(2),
-            "module-4", drive.getModules().get(3)
+            "field", drive.getField()
+            // "module-1", drive.getModules().get(0)
+            // "module-2", drive.getModules().get(1),
+            // "module-3", drive.getModules().get(2),
+            // "module-4", drive.getModules().get(3)
         );
     }
 
