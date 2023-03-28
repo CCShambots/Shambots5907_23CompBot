@@ -26,9 +26,6 @@ public class TurretCardinalsCommand extends CommandBase {
     private boolean prevToward;
     private boolean prevAway;
 
-    private Translation2d blueAllianceSide = new Translation2d(0, Units.feetToMeters(14.5));
-    private Translation2d redAllianceSide = new Translation2d(Units.feetToMeters(54), Units.feetToMeters(14.5));
-
     public TurretCardinalsCommand(Turret t, BooleanSupplier towardSupplier, BooleanSupplier awaySupplier) {
         this.t = t;
         this.towardSupplier = towardSupplier;
