@@ -1,9 +1,12 @@
 package frc.robot.commands.turret;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 import java.util.function.BooleanSupplier;
@@ -44,17 +47,19 @@ public class TurretCardinalsCommand extends CommandBase {
         boolean currentAway = awaySupplier.getAsBoolean();
 
         if((currentToward && !prevToward) || (currentAway && !prevAway)) {
-            Translation2d workingPoint = redAllianceSide;
-            if(currentToward && alliance == Blue) workingPoint = blueAllianceSide;
-            if(currentAway && alliance == Red) workingPoint = blueAllianceSide;
+            Rotation2d globalTarget = new Rotation2d();
+            if(currentToward && alliance == Blue) globalTarget = new Rotation2d(PI);
+            if(currentAway && alliance == Red) globalTarget = new Rotation2d(PI);
 
-            Rotation2d base = getCurrentCardinal(workingPoint);
+            //Get the current rotation of the bot to the nearest 90 degrees
+            Rotation2d botRotation = roundToQuadrantal(Constants.SwerveDrivetrain.getOdoPose.get().getRotation());
 
-            System.out.println("evaluating: " + base.getDegrees());
+            //Get what the target of the turret should be
+            Rotation2d turretAngle = globalTarget.minus(botRotation).minus(new Rotation2d(PI/2));
 
-            base = base.minus(new Rotation2d(PI/2));
+            System.out.println("evaluating: " + turretAngle.getDegrees() + " (turret); " + botRotation.getDegrees() + " (bot rotation)");
 
-            t.setTarget(base.getRadians());
+            t.setTarget(MathUtil.angleModulus(turretAngle.getRadians()));
         }
 
         prevToward = currentToward;
@@ -63,7 +68,12 @@ public class TurretCardinalsCommand extends CommandBase {
     }
 
     private Rotation2d getCurrentCardinal(Translation2d point) {
-        return new Rotation2d(Math.round(Math.atan2(point.getY(), point.getX()) / (PI / 2)) * (PI / 2));
+        Pose2d botPose = Constants.SwerveDrivetrain.getOdoPose.get();
+        return new Rotation2d(Math.round(Math.atan2(point.getY() - botPose.getY(), point.getX() - botPose.getX()) / (PI / 2)) * (PI / 2));
+    }
+
+    private Rotation2d roundToQuadrantal(Rotation2d rot) {
+        return new Rotation2d(Math.round(rot.getRadians() / (PI / 2)) * PI / 2);
     }
 
 }
