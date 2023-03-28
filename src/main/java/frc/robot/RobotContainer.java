@@ -241,16 +241,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
-    leftStick.topBase().onTrue(new InstantCommand(dt::resetGyro));
+    leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
     
     leftStick.trigger()
             .and(() -> arm.getState() == ArmMode.STOWED)
-            .and(() -> dt.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
-            .onTrue(new InstantCommand(() -> dt.setSpeedMode(TURBO)));
-    leftStick.trigger().onFalse(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
-    new Trigger(() -> dt.getTargetLinearSpeed() < MIN_TURBO_SPEED)
+            .and(() -> drivetrain.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
+            .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)));
+    leftStick.trigger().onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+    new Trigger(() -> drivetrain.getTargetLinearSpeed() < MIN_TURBO_SPEED)
             .or(() -> arm.getState() != ArmMode.STOWED)
-            .onTrue(new InstantCommand(() -> dt.setSpeedMode(NORMAL)));
+            .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
     leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)))
                     .onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
