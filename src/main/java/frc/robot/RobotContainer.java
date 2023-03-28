@@ -109,7 +109,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "blue-score-right",
         "red-get-element-right",
         "red-go-score-right",
-        "red-balance-right"
+        "red-balance-right",
+        "red-go-balance-right"
     );
 
     autoLoader = instantiateAutoLoader();
@@ -219,18 +220,33 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     final AutonomousLoader<AutoRoutes> autoLoader;
 
     //Put new auto routes here
-    autoLoader = new AutonomousLoader<>(Map.of(
+    Map<AutoRoutes, Command> routes = new HashMap<>();
+
+    //Red routes
+    routes.putAll(Map.of(
       RED_SCORE_RIGHT, new RedScoreRight(this),
       RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
       RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
       RED_SCORE_LEFT, new RedScoreLeft(this),
       RED_NEW_AUTO, new RedNewAuto(this),
+      RED_SCORE_PICKUP_BALANCE_RIGHT, new RedScorePickupBalanceRight(this)
+    ));
+
+    //Blue routes
+    routes.putAll(Map.of(
       BLUE_SCORE_LEFT, new BlueScoreLeft(this),
       BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
       BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
-      BLUE_SCORE_RIGHT, new BlueScoreRight(this),
-      NOTHING, new InstantCommand()
+      BLUE_SCORE_RIGHT, new BlueScoreRight(this)
+      )
+    );
+
+    //Route to do nothing
+    routes.putAll(Map.of(
+            NOTHING, new InstantCommand()
     ));
+
+    autoLoader = new AutonomousLoader<>(routes);
 
     return autoLoader;
   }
@@ -437,7 +453,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO,
+    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO, RED_SCORE_PICKUP_BALANCE_RIGHT,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

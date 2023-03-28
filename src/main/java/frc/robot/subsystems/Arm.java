@@ -15,7 +15,6 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
-import frc.robot.commands.ArmMotorVoltageIncrementCommand;
 import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.subsystems.Claw.State;
 import frc.robot.util.kinematics.ArmKinematics;
@@ -23,8 +22,6 @@ import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
-
-import com.fasterxml.jackson.core.StreamWriteCapability;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
@@ -44,7 +41,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     
     //Shoulder control loops
     private final ProfiledPIDController shoulderPID = new ProfiledPIDController(SHOULDER_GAINS.p, SHOULDER_GAINS.i, SHOULDER_GAINS.d,
-        new TrapezoidProfile.Constraints(SHOULDER_MAX_VEL, SHOULDER_MAX_ACCEL), 0.005);
+        new TrapezoidProfile.Constraints(SHOULDER_VEL, SHOULDER_ACCEL), 0.005);
     private final ArmFeedforward shoulderFF = new ArmFeedforward(SHOULDER_KS, SHOULDER_KG, SHOULDER_KV);
     private double shoulderTarget = toRadians(0);
     
@@ -55,10 +52,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     //Wrist control loops
     private final ArmFeedforward wristFF = new ArmFeedforward(WRIST_KS, WRIST_KG, WRIST_KV);
     private final ProfiledPIDController wristPID = new ProfiledPIDController(WRIST_GAINS.p, WRIST_GAINS.i, WRIST_GAINS.d,
-        new TrapezoidProfile.Constraints(WRIST_MAX_VEL, WRIST_MAX_ACCEL), 0.005);
+        new TrapezoidProfile.Constraints(WRIST_VEL, WRIST_ACCEL), 0.005);
     private double wristTarget = toRadians(0);
-
-    // private final PositionSpark rotator = new PositionSpark(ROTATOR_ID, kBrushless, ROTATOR_GAINS, ROTATOR_ENCODER_OFFSET, Math.toRadians(1));
 
     private final ClawVision clawVision = new ClawVision();
     private final Claw claw = new Claw();
@@ -101,7 +96,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             elevator.set(0);
             shoulder.set(0);
             wrist.set(0);
-            // rotator.set(0);
         });
 
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
@@ -168,16 +162,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
                 new InstantCommand(() -> requestTransition(AT_POSE))
             )
         );
-
-        //TODO: for shoulder
-        // registerStateCommand(TESTING, new ArmMotorVoltageIncrementCommand(
-        //         shoulder,
-        //         0.05,
-        //         this
-        // ));
-
-
-
     }
 
 
@@ -322,6 +306,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     protected void determineSelf() {
         pullAbsoluteAngles();
 
+        setArmNormalSpeed();
+
         setState(STOWED);
         requestTransition(ArmMode.SEEKING_STOWED);
     }
@@ -335,6 +321,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         //Make sure no I buildup or anything insane happens
         wristPID.reset(getWristAngle());
         shoulderPID.reset(getShoulderAngle());
+
+        setArmNormalSpeed();
     }
 
     @Override
@@ -392,6 +380,24 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public void pullAbsoluteAngles() {
         shoulder.resetPosition(shoulderEncoder.getRadians());
         wrist.resetPosition(wristEncoder.getRadians());
+    }
+
+    public void setArmSlowSpeed() {
+        shoulderPID.setConstraints(new TrapezoidProfile.Constraints(SHOULDER_SLOW_VEL, SHOULDER_SLOW_ACCEL));
+        wristPID.setConstraints(new TrapezoidProfile.Constraints(WRIST_SLOW_VEL, WRIST_SLOW_ACCEL));
+    }
+
+    public Command setArmSlowSpeedCommand() {
+        return new InstantCommand(this::setArmSlowSpeed);
+    }
+
+    public void setArmNormalSpeed() {
+        shoulderPID.setConstraints(new TrapezoidProfile.Constraints(SHOULDER_VEL, SHOULDER_ACCEL));
+        wristPID.setConstraints(new TrapezoidProfile.Constraints(WRIST_VEL, WRIST_ACCEL));
+    }
+
+    public Command setArmNormalSpeedCommand() {
+        return new InstantCommand(this::setArmNormalSpeed);
     }
 
     @Override
