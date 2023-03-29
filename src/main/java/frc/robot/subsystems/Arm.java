@@ -21,6 +21,7 @@ import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
+import javax.management.InstanceNotFoundException;
 import java.util.function.BooleanSupplier;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
@@ -89,6 +90,13 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         });
     }
 
+    public Command enableClawProx() {
+        return new InstantCommand(claw::enableProx);
+    }
+
+    public Command disableClawProx() {
+        return new InstantCommand(claw::disableProx);
+    }
     private void defineTransitions() {
         addOmniTransition(SEEKING_STOWED);
         addTransition(SEEKING_STOWED, STOWED);
@@ -99,9 +107,13 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             wrist.set(0);
         });
 
+        addTransition(STOWED, PRIMED, () -> goToArmState(PRIMED_POS));
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
+        addTransition(PRIMED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
+        addTransition(PRIMED, MID_SCORE, () -> goToArmState(MID_POS));
         addTransition(STOWED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
+        addTransition(PRIMED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
 
         addTransition(STOWED, SEEKING_POSE);
         addTransition(SEEKING_POSE, AT_POSE);
@@ -110,6 +122,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
 
         addTransition(STOWED, SEEKING_HIGH);
+        addTransition(PRIMED, SEEKING_HIGH);
         removeTransition(SEEKING_HIGH, STOWED);
         addTransition(SEEKING_HIGH, HIGH);
         addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
@@ -174,6 +187,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         LOW_SCORE, MID_SCORE,
         SEEKING_HIGH, HIGH,
         HIGH_CUBE,
+        PRIMED,
         SOFT_STOP,
 
         SEEKING_POSE,

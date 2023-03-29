@@ -56,6 +56,9 @@ public final class Constants {
     public static final int SOLENOID_ID_2 = 3;
 
     public static final DoubleSolenoid.Value SOLENOID_CLAW_OPEN_VALUE = DoubleSolenoid.Value.kReverse;
+
+    public static final int PROX_PORT = 9;
+
   }
 
 
@@ -272,6 +275,7 @@ public final class Constants {
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
+    public static final ArmState PRIMED_POS = new ArmState(0, 0, toRadians(90), toRadians(-90), 0);
 }
 
   public static class Turret {
@@ -286,7 +290,7 @@ public final class Constants {
     public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
     public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 300; //1000
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);

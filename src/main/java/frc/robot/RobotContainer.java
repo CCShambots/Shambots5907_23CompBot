@@ -141,7 +141,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addOmniTransition(State.BRAKE, new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
-            arm.transitionCommand(ArmMode.SEEKING_STOWED),
+            // arm.transitionCommand(ArmMode.SEEKING_STOWED),
             lights.transitionCommand(LightState.IDLE),
             turret.transitionCommand(Turret.TurretState.IDLE)
     ));
@@ -149,7 +149,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addTransition(State.DISABLED, State.AUTONOMOUS);
 
     addOmniTransition(State.TRAVELING, new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.SEEKING_STOWED),
+            // arm.transitionCommand(ArmMode.SEEKING_STOWED),
             drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
             turret.transitionCommand(Turret.TurretState.CARDINALS)
     ));
@@ -277,7 +277,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
-    
+
+    //Turbo logic
     leftStick.trigger()
             .and(() -> arm.getState() == ArmMode.STOWED)
             .and(() -> drivetrain.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
@@ -287,11 +288,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .or(() -> arm.getState() != ArmMode.STOWED)
             .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-//    rightStick.topBase().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
-
-    operatorCont.a().onTrue(transitionCommand(State.TRAVELING));
+    operatorCont.a().onTrue(transitionCommand(State.TRAVELING).alongWith(arm.transitionCommand(ArmMode.SEEKING_STOWED)));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, TurretState.INTAKING)));
 
+    //Scoring modes for the arm
     operatorCont.pov(270).onTrue(new InstantCommand(() -> {
       currentScoreMode = ArmMode.LOW_SCORE;
       handleManualRequest(State.SCORING, TurretState.SCORING);
@@ -307,14 +307,26 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       handleManualRequest(State.SCORING, TurretState.SCORING);
     }));
 
+    //Setting the arm to primed position
+    operatorCont.pov(180).onTrue(arm.transitionCommand(ArmMode.PRIMED));
+
+    //Claw controls
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    operatorCont.button(9).onTrue(new InstantCommand(() -> {
+    new Trigger(() -> operatorCont.getLeftX() > 0.5)
+            .or(() -> operatorCont.getRightX() > 0.5)
+            .onTrue(arm.enableClawProx());
+
+    new Trigger(() -> operatorCont.getLeftX() < -0.5)
+            .or(() -> operatorCont.getRightX() < -0.5)
+            .onTrue(arm.disableClawProx());
+
+    operatorCont.leftStick().onTrue(new InstantCommand(() -> {
         currentLightState = LightState.CONE;
     }));
 
-    operatorCont.button(10).onTrue(new InstantCommand(() -> {
+    operatorCont.rightStick().onTrue(new InstantCommand(() -> {
       currentLightState = LightState.CUBE;
   }));
 
@@ -325,7 +337,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
-    operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.HIGH_CUBE));
+    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.HIGH_CUBE));
+    // operatorCont.button(10).onTrue(new InstantCommand(() -> arm.setArmSlowSpeed()));
+    // new Trigger(() -> operatorCont.getLeftX() > 0.8).onTrue(new InstantCommand(() -> arm.setArmNormalSpeed()));
 
   }
 
