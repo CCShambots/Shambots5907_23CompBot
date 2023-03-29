@@ -178,7 +178,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
       LightState correctState = currentLightState;
 
-      if (lights.getState() != correctState) {
+      LightState currentState = lights.getState();
+
+      if (lights.getState() != correctState &&
+              currentState != LightState.ENABLE_PROX &&
+              currentState != LightState.DISABLE_PROX) {
         lights.requestTransition(correctState);
       }
     }));
@@ -186,7 +190,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     registerStateCommand(State.INTAKING, new RunCommand(() -> {
       LightState correctState = currentLightState;
 
-      if (lights.getState() != correctState) {
+      if(correctState == LightState.CONE) correctState = LightState.INTAKE_CONE;
+      else if(correctState == LightState.CUBE) correctState = LightState.INTAKE_CUBE;
+
+      LightState currentState = lights.getState();
+
+      if (lights.getState() != correctState &&
+              currentState != LightState.ENABLE_PROX &&
+              currentState != LightState.DISABLE_PROX) {
         lights.requestTransition(correctState);
       }
     }));
@@ -316,11 +327,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     new Trigger(() -> operatorCont.getLeftX() > 0.5)
             .or(() -> operatorCont.getRightX() > 0.5)
-            .onTrue(arm.enableClawProx());
+            .onTrue(arm.enableClawProx().alongWith(lights.transitionCommand(LightState.ENABLE_PROX)));
 
     new Trigger(() -> operatorCont.getLeftX() < -0.5)
             .or(() -> operatorCont.getRightX() < -0.5)
-            .onTrue(arm.disableClawProx());
+            .onTrue(arm.disableClawProx().alongWith(lights.transitionCommand(LightState.DISABLE_PROX)));
 
     operatorCont.leftStick().onTrue(new InstantCommand(() -> {
         currentLightState = LightState.CONE;
@@ -337,9 +348,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
-    // operatorCont.button(9).onTrue(arm.transitionCommand(ArmMode.HIGH_CUBE));
-    // operatorCont.button(10).onTrue(new InstantCommand(() -> arm.setArmSlowSpeed()));
-    // new Trigger(() -> operatorCont.getLeftX() > 0.8).onTrue(new InstantCommand(() -> arm.setArmNormalSpeed()));
 
   }
 

@@ -333,8 +333,6 @@ public final class Constants {
     public static final Animation SCORING_ANIMATION =
             new StrobeAnimation(0, 0, 255, 0, BLINK_SPEED, NUM_LIGHTS);
 
-    public static final RGB SCORING_RGB = new RGB(0, 255, 0);
-
     public static final RGB CONE_RGB = new RGB(255, 255, 0);
 
     public static final Animation INTAKE_CONE_ANIMATION =
@@ -347,6 +345,9 @@ public final class Constants {
 
     public static final Animation SOFT_STOP_ANIMATION =
             new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LIGHTS);
+
+    public static final RGB ENABLE_PROX_RGB = new RGB(0, 255, 0);
+    public static final RGB DISABLE_PROX_RGB = new RGB(255, 0, 0);
   }
 
   public static void pullAllianceFromFMS(RobotContainer rc) {

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.led.Animation;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.Candle.CANdleEX;
 import frc.robot.ShamLib.SMF.StateMachine;
 
@@ -13,6 +14,7 @@ import static frc.robot.subsystems.Lights.LightState.*;
 public class Lights extends StateMachine<Lights.LightState> {
 
     private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LIGHTS);
+    private LightState prevState = CONE;
 
     public Lights() {
         super("Lights", DISABLED, LightState.class);
@@ -22,11 +24,22 @@ public class Lights extends StateMachine<Lights.LightState> {
         addOmniTransition(IDLE, new InstantCommand(() -> candle.setLEDs(IDLE_RGB)));
         addOmniTransition(CONE, new InstantCommand(() -> candle.setLEDs(CONE_RGB)));
         addOmniTransition(CUBE, new InstantCommand(() -> candle.setLEDs(CUBE_RGB)));
+        addOmniTransition(ENABLE_PROX, new InstantCommand(() -> {
+            candle.setLEDs(ENABLE_PROX_RGB);
+            prevState = getState();
+        }));
+        addOmniTransition(DISABLE_PROX, new InstantCommand(() -> {
+            candle.setLEDs(DISABLE_PROX_RGB);
+            prevState = getState();
+        }));
         addOmniTransition(GAME_PIECE_GRABBED, new InstantCommand(() -> candle.setLEDs(ELEMENT_GRABBED_RGB)));
         addAnimationTransition(INTAKE_CONE);
         addAnimationTransition(INTAKE_CUBE);
         addAnimationTransition(SOFT_STOP);
         addAnimationTransition(SCORING);
+
+        registerStateCommand(ENABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
+        registerStateCommand(DISABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
     }
 
     public enum LightState {
@@ -38,6 +51,8 @@ public class Lights extends StateMachine<Lights.LightState> {
         INTAKE_CONE(INTAKE_CONE_ANIMATION),
         CUBE(null), //The arm will grab a cube next
         INTAKE_CUBE(INTAKE_CUBE_ANIMATION),
+        ENABLE_PROX(null),
+        DISABLE_PROX(null),
         SOFT_STOP(SOFT_STOP_ANIMATION);
 
         private final Animation animation;
