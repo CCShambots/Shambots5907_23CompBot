@@ -9,13 +9,21 @@ import java.util.function.IntSupplier;
 
 public class DockChargingStationCommand extends CommandBase {
     private int direction;
-    private IntSupplier directionSupplier;
-    private Drivetrain dt;
+    private final IntSupplier directionSupplier;
+    private final Drivetrain dt;
+
+    private double dockThreshold = 20;
 
     public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
 
         this.directionSupplier = directionSupplier;
         this.dt = dt;
+    }
+
+    public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier, double dockThreshold) {
+        this(dt, directionSupplier);
+
+        this.dockThreshold = dockThreshold;
     }
 
     @Override
@@ -38,6 +46,6 @@ public class DockChargingStationCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > 20;
+        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > dockThreshold;
     }
 }
