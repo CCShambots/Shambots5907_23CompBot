@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -158,7 +160,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
                 setFlagCommand(DrivetrainState.BALANCING_GROUND),
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                new ParallelRaceGroup(
+                    new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                    new WaitCommand(3)
+                ),
                 new InstantCommand(this::clearFlags),
                 setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
                 transitionCommand(DrivetrainState.DOCKING)

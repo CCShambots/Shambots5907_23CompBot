@@ -19,10 +19,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.commands.auto.blue.BlueScoreBalanceCenter;
-import frc.robot.commands.auto.blue.BlueScoreBalanceLeft;
-import frc.robot.commands.auto.blue.BlueScoreLeft;
-import frc.robot.commands.auto.blue.BlueScoreRight;
+import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
+import frc.robot.commands.auto.blue.old.BlueScoreBalanceCenter;
+import frc.robot.commands.auto.blue.old.BlueScoreBalanceLeft;
+import frc.robot.commands.auto.blue.old.BlueScoreLeft;
+import frc.robot.commands.auto.blue.old.BlueScoreRight;
 import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
@@ -101,19 +102,20 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(
         "red-pickup-right",
         "red-dock-right",
-        "red-dock-center",
-        "blue-dock-left",
-        "blue-pickup-left",
-        "blue-dock-center",
-        "blue-score-right",
         "red-go-score-right",
         "red-balance-right",
-        "red-go-balance-right"
+        "red-go-balance-right",
+        "blue-dock-left",
+        "blue-pickup-left",
+        "blue-score-right",
+        "blue-go-balance-left"
     );
 
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(2, 2, "red-go-balance-right");
-    loadPaths(0.5, 0.5, "red-pickup-left");
+    loadPaths(0.75, 0.75, "red-pickup-left");
+
+    loadPaths(1.25, 1, "blue-get-element-left");
 
     autoLoader = instantiateAutoLoader();
 
@@ -125,7 +127,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(clawVision);
     addChildSubsystem(turret);
 
+    //TODO: Remove
     SmartDashboard.putData("drivetrain", drivetrain);
+    SmartDashboard.putData("arm", arm);
+    SmartDashboard.putData("turret", turret);
 
     defineTransitions();
     defineStateCommands();
@@ -242,16 +247,15 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       RED_PICKUP_RIGHT, new RedPickupRight(this),
       RED_BALANCE_CENTER, new RedBalanceCenter(this),
       RED_PICKUP_LEFT, new RedPickupLeft(this),
-      // RED_NEW_AUTO, new RedNewAuto(this),
       RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
     ));
 
     //Blue routes
     routes.putAll(Map.of(
-      BLUE_SCORE_LEFT, new BlueScoreLeft(this),
-      BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
-      BLUE_SCORE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
-      BLUE_SCORE_RIGHT, new BlueScoreRight(this)
+            BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
+            BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
+            BLUE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
+            BLUE_RIGHT, new BlueScoreRight(this)
       )
     );
 
@@ -486,6 +490,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public enum AutoRoutes {
     NOTHING,
     RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_PICKUP_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
-    BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
+    BLUE_PICKUP_BALANCE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_BALANCE_CENTER, BLUE_RIGHT
   }
 }

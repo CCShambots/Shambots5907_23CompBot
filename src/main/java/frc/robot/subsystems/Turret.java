@@ -107,7 +107,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
     @Override
     protected void determineSelf() {
         pullAbsoluteAngle();
-        setTarget(TURRET_START_ANGLE);
+//        setTarget(TURRET_START_ANGLE); //TODO: no worries right
         setState(IDLE);
     }
 

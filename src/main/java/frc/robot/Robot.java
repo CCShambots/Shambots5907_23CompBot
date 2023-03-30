@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -82,7 +83,7 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    robotContainer.turret().setTarget(Math.toRadians(-90));
+    robotContainer.turret().setTarget((Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE);
     // robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
 

@@ -107,6 +107,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         addTransition(STOWED, PRIMED, () -> goToArmState(PRIMED_POS));
         addOmniTransition(SEEKING_PRIMED);
+        addTransition(SEEKING_PRIMED, PRIMED);
+        addOmniTransition(SEEKING_PICKUP_GROUND);
 
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(PRIMED, LOW_SCORE, () -> goToArmState(LOW_POS));

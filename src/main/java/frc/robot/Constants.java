@@ -295,7 +295,7 @@ public final class Constants {
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
-    public static final double TURRET_START_ANGLE  = -90;
+    public static final double TURRET_START_ANGLE  = toRadians(-90);
 
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
 
