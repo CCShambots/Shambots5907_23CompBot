@@ -102,7 +102,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "red-pickup-right",
         "red-dock-right",
         "red-dock-center",
-        "red-score-left",
         "blue-dock-left",
         "blue-pickup-left",
         "blue-dock-center",
@@ -114,6 +113,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(2, 2, "red-go-balance-right");
+    loadPaths(0.5, 0.5, "red-pickup-left");
 
     autoLoader = instantiateAutoLoader();
 
@@ -241,7 +241,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     routes.putAll(Map.of(
       RED_PICKUP_RIGHT, new RedPickupRight(this),
       RED_BALANCE_CENTER, new RedBalanceCenter(this),
-      RED_LEFT, new RedScoreLeft(this),
+      RED_PICKUP_LEFT, new RedPickupLeft(this),
       // RED_NEW_AUTO, new RedNewAuto(this),
       RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
     ));
@@ -485,7 +485,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
+    RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_PICKUP_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

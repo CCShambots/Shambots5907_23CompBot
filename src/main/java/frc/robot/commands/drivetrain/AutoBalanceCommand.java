@@ -3,7 +3,6 @@ package frc.robot.commands.drivetrain;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
@@ -26,14 +25,21 @@ public class AutoBalanceCommand extends CommandBase {
     private int rMod, pMod;
 
     private Timer timer = new Timer();
+    private final double time;
 
-    public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
+    public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize, double time) {
         this.directionSupplier = directionSupplier;
         this.dt = dt;
+
+        this.time = time;
 
         pid = new PIDController(pidGains.p, pidGains.i, pidGains.d, 0.02);
 
         this.bufferSize = bufferSize;
+    }
+
+    public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
+        this(dt, directionSupplier, pidGains, bufferSize, 2);
     }
 
     private void defineMods() {
@@ -67,7 +73,7 @@ public class AutoBalanceCommand extends CommandBase {
         // SmartDashboard.putNumber("cumulative angle", getCumulativeAngle());
         double pidOutput = Math.max(Math.min(1, pid.calculate(getCumulativeAngle(), 0)), -1);
 
-        if(timer.get() < 2) pidOutput = 1;
+        if(timer.get() < time) pidOutput = 1;
 
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
                 Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED * direction * pidOutput,
@@ -90,6 +96,6 @@ public class AutoBalanceCommand extends CommandBase {
 
         //3 is how many cumulative degrees of incline it should be less than for however long the buffer is
         //can be changed to "v.isPresent() && v.get() < 3" but this is easier to read
-        return v.isPresent() ? v.get() < 3 : false;
+        return v.isPresent() ? v.get() < 3 && timer.get() > time : false ;
     }
 }

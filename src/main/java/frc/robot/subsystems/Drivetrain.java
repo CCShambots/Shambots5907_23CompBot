@@ -115,6 +115,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.DOCKING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
         addTransition(DrivetrainState.BALANCING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+
+        // addTransition(DrivetrainState.GOING_OVER_CHARGE_STATION, DrivetrainState.DOCKING);
+        addOmniTransition(DrivetrainState.DOCKING);
     }
 
     private void defineStateCommands() {
@@ -157,6 +160,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 setFlagCommand(DrivetrainState.BALANCING_GROUND),
                 new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
                 new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
                 transitionCommand(DrivetrainState.DOCKING)
         ));
     }
@@ -278,6 +282,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public void resetGyro(Rotation2d angle) {
         drive.resetGyro(angle);
+    }
+
+    public Command resetGyroCommand(Rotation2d angle) {
+        return new InstantCommand(() -> drive.resetGyro(angle));
     }
 
     public void resetGyro() {
