@@ -9,18 +9,18 @@ import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Turret.TurretState;
 
-public class RedPickupRight extends SequentialCommandGroup {
+public class BluePickupLeft extends SequentialCommandGroup {
 
-    public RedPickupRight(RobotContainer rc) {
+    public BluePickupLeft(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 new ScoreFirstElementCommand(rc),
 
                 new ParallelCommandGroup(
-                        rc.runTraj("red-get-element-right", true),
+                        rc.runTraj("blue-get-element-left", true),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.5),
-                                rc.turret().goToAngle(Math.toRadians(90)),
+                                rc.turret().goToAngle(Math.toRadians(-90)),
                                 new WaitCommand(1),
                                 rc.arm().setArmSlowSpeedCommand(),
                                 rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
@@ -34,7 +34,7 @@ public class RedPickupRight extends SequentialCommandGroup {
                 new WaitCommand(0.5),
                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
                 rc.turret().transitionCommand(TurretState.IDLE),
-                rc.turret().goToAngle(Math.toRadians(-90)),
+                rc.turret().goToAngle(Math.toRadians(90)),
                 rc.arm().setArmNormalSpeedCommand()
         );
     }

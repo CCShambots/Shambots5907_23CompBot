@@ -19,7 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
+import frc.robot.commands.auto.blue.BluePickupLeft;
+import frc.robot.commands.auto.blue.BluePickupRight;
 import frc.robot.commands.auto.blue.old.BlueScoreBalanceCenter;
 import frc.robot.commands.auto.blue.old.BlueScoreBalanceLeft;
 import frc.robot.commands.auto.blue.old.BlueScoreLeft;
@@ -107,15 +110,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "red-go-balance-right",
         "blue-dock-left",
         "blue-pickup-left",
-        "blue-score-right",
-        "blue-go-balance-left"
+        "blue-score-right"
     );
 
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(2, 2, "red-go-balance-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
-
+    
     loadPaths(1.25, 1, "blue-get-element-left");
+    loadPaths(2, 2, "blue-go-balance-left");
+    loadPaths(0.75, 0.75, "blue-pickup-right");
 
     autoLoader = instantiateAutoLoader();
 
@@ -253,9 +257,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     //Blue routes
     routes.putAll(Map.of(
             BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
-            BLUE_SCORE_BALANCE_LEFT, new BlueScoreBalanceLeft(this),
-            BLUE_BALANCE_CENTER, new BlueScoreBalanceCenter(this),
-            BLUE_RIGHT, new BlueScoreRight(this)
+            BLUE_PICKUP_LEFT, new BluePickupLeft(this),
+            BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
+            BLUE_PICKUP_RIGHT, new BluePickupRight(this) 
       )
     );
 
@@ -490,6 +494,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public enum AutoRoutes {
     NOTHING,
     RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_PICKUP_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
-    BLUE_PICKUP_BALANCE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_BALANCE_CENTER, BLUE_RIGHT
+    BLUE_PICKUP_BALANCE_LEFT, BLUE_PICKUP_LEFT, BLUE_BALANCE_CENTER, BLUE_PICKUP_RIGHT
   }
 }
