@@ -81,6 +81,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     private void defineTransitions() {
+        addTransition(DrivetrainState.IDLE, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
+
         addOmniTransition(
                 DrivetrainState.X_SHAPE,
                 new InstantCommand(() -> setModuleStates(X_SHAPE_ARRAY))
@@ -146,10 +148,15 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         ));
 
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
+                setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
                 new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, 1),
+                new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
+                setFlagCommand(DrivetrainState.BALANCING_GROUND),
                 new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                new InstantCommand(this::clearFlags),
                 transitionCommand(DrivetrainState.DOCKING)
         ));
     }
@@ -387,7 +394,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         BALANCING,
         DRIVING_OVER_CHARGE_STATION,
 
-        DONT_BALANCE
+        DONT_BALANCE,
+
+        BALANCING_GROUND,
+        BEFORE_CHARGE_STATION,
+        GOING_OVER_CHARGE_STATION,
+        OFF_CHARGE_STATION
     }
 
     public enum SpeedMode {
