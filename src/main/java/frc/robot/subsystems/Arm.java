@@ -108,6 +108,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         });
 
         addTransition(STOWED, PRIMED, () -> goToArmState(PRIMED_POS));
+        addOmniTransition(SEEKING_PRIMED);
+
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(PRIMED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
@@ -126,6 +128,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         removeTransition(SEEKING_HIGH, STOWED);
         addTransition(SEEKING_HIGH, HIGH);
         addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
+
+        addTransition(PICKUP_GROUND, SEEKING_STOWED, new InstantCommand(() -> setWristTarget(toRadians(-45))));
 
         addTransition(STOWED, SEEKING_PICKUP_GROUND);
         addTransition(HIGH, SEEKING_PICKUP_GROUND);
@@ -166,6 +170,25 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         )
         );
 
+        registerStateCommand(SEEKING_PRIMED,
+        new FunctionalCommand(() -> {
+            if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
+            if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
+        }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
+            new FunctionalCommand(
+                () -> {
+                    setElevatorTarget(PRIMED_POS.getElevatorExtension());
+                    setShoulderTarget(toRadians(-45));
+                },
+                () -> {},
+                (interrupted) -> {},
+                () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
+            ),
+            new InstantCommand(() -> goToArmState(PRIMED_POS)),
+            new InstantCommand(() -> requestTransition(PRIMED))
+        )
+        );
+
         registerStateCommand(SEEKING_POSE, 
             new FunctionalCommand(() -> {
                 setRotatorTarget(currentArmState.getRotatorAngle());
@@ -187,7 +210,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         LOW_SCORE, MID_SCORE,
         SEEKING_HIGH, HIGH,
         HIGH_CUBE,
-        PRIMED,
+        SEEKING_PRIMED, PRIMED,
         SOFT_STOP,
 
         SEEKING_POSE,
@@ -235,13 +258,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
                 wrist.setVoltage(wristPIDOutput + wristFFOutput);
                 
                 //Shoulder code
-                //TODO: uncomment
                 double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
                 double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
                 
-                SmartDashboard.putNumber("shoulderPIDOutput", shoulderPIDOutput);
-                SmartDashboard.putNumber("shoulderFFOutput", shoulderFFOutput);
-
                 shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);
             }
         };

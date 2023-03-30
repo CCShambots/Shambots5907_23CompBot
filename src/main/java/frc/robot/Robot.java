@@ -17,10 +17,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     robotContainer = new RobotContainer(checkModulesLoop);
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer);
+    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-    PathPlannerServer.startServer(5811); //TODO: disable before comp
+    // PathPlannerServer.startServer(5811); //TODO: disable before comp
 
     //Run the module control loops every 5 ms
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
@@ -82,8 +82,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    //robotContainer.turret().setTarget(Math.toRadians(-90));
-    robotContainer.requestTransition(RobotContainer.State.TESTING);
+    robotContainer.turret().setTarget(Math.toRadians(-90));
+    // robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
 
   @Override

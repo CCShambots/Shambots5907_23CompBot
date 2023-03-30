@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
-import frc.robot.commands.turret.TurretManualControlCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -91,7 +91,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
                 SmartDashboard.putBoolean("turret busy", isBusy());
         }));
 
-        registerStateCommand(MANUAL_CONTROL, new TurretManualControlCommand(this, leftSupplier, rightSupplier));
+        registerStateCommand(MANUAL_CONTROL, new NewTurretManualControlCommand(this, leftSupplier, rightSupplier));
     }
 
     public enum TurretState {

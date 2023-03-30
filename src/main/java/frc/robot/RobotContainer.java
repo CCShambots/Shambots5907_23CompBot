@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,12 +31,9 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 import frc.robot.util.grid.GridElement;
-import frc.robot.util.kinematics.ArmState;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.opencv.photo.TonemapReinhard;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
@@ -109,11 +107,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "blue-pickup-left",
         "blue-dock-center",
         "blue-score-right",
-        "red-get-element-right",
         "red-go-score-right",
         "red-balance-right",
         "red-go-balance-right"
     );
+
+    loadPaths(1.25, 1, "red-get-element-right");
+    loadPaths(2, 2, "red-go-balance-right");
 
     autoLoader = instantiateAutoLoader();
 
@@ -124,6 +124,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(lights);
     addChildSubsystem(clawVision);
     addChildSubsystem(turret);
+
+    SmartDashboard.putData("drivetrain", drivetrain);
 
     defineTransitions();
     defineStateCommands();
@@ -325,12 +327,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    new Trigger(() -> operatorCont.getLeftX() > 0.5)
-            .or(() -> operatorCont.getRightX() > 0.5)
+    new Trigger(() -> operatorCont.getLeftX() > 0.8)
+            .or(() -> operatorCont.getRightX() > 0.8)
             .onTrue(arm.enableClawProx().alongWith(lights.transitionCommand(LightState.ENABLE_PROX)));
 
-    new Trigger(() -> operatorCont.getLeftX() < -0.5)
-            .or(() -> operatorCont.getRightX() < -0.5)
+    new Trigger(() -> operatorCont.getLeftX() < -0.8)
+            .or(() -> operatorCont.getRightX() < -0.8)
             .onTrue(arm.disableClawProx().alongWith(lights.transitionCommand(LightState.DISABLE_PROX)));
 
     operatorCont.leftStick().onTrue(new InstantCommand(() -> {
@@ -391,10 +393,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
    * @param reversed whether the trajectories should be loaded as reversed
    * @param names the names of the trajectories to load
    */
-  public void loadPaths(boolean reversed, String... names) {
+  public void loadPaths(double maxSpeed, double maxAccel, boolean reversed, String... names) {
     for (String n : names) {
-      trajectories.put(n, PathPlanner.loadPath(n, Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO,
-              Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, reversed));
+      trajectories.put(n, PathPlanner.loadPath(n, maxSpeed, maxAccel, reversed));
     }
   }
 
@@ -402,8 +403,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
    * Load a sequence of paths directly into the map of trajectories
    * @param names the names of the trajectories to load
    */
+  public void loadPaths(double maxSpeed, double maxAccel, String... names) {
+    loadPaths(maxSpeed, maxAccel, false, names);
+  }
+
   public void loadPaths(String... names) {
-    loadPaths(false, names);
+    loadPaths(Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO, Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, names);
   }
 
   public Map<String, PathPlannerTrajectory> paths() {

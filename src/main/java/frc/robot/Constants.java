@@ -78,7 +78,7 @@ public final class Constants {
     );
 
     public static final double AUTO_BALANCE_SPEED = 0.6;
-    public static final double DOCK_SPEED = 0.8;
+    public static final double DOCK_SPEED = 1.2;
 
     //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
     public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
@@ -105,8 +105,8 @@ public final class Constants {
     //Min speed to allow turbo button to work
     public static final double MIN_TURBO_SPEED = 2.5;
 
-    public static final double MAX_LINEAR_SPEED_AUTO = .5;
-    public static final double MAX_LINEAR_ACCELERATION_AUTO = .5;
+    public static final double MAX_LINEAR_SPEED_AUTO = 1.5;
+    public static final double MAX_LINEAR_ACCELERATION_AUTO = 1.5;
 
     public static final Translation2d[] moduleOffsets = {
             new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2), //front left
@@ -241,8 +241,8 @@ public final class Constants {
     public static final double WRIST_VEL = toRadians(160); //Radians/sec
     public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
 
-    public static final double WRIST_SLOW_VEL = toRadians(40); //Radians/sec
-    public static final double WRIST_SLOW_ACCEL = toRadians(80); //Radians/sec^2
+    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
+    public static final double WRIST_SLOW_ACCEL = toRadians(160); //Radians/sec^2
 
 
     //Control gains
@@ -270,7 +270,7 @@ public final class Constants {
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-114), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-35), toRadians(45), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(48), 0);
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(20), toRadians(21), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
@@ -300,8 +300,9 @@ public final class Constants {
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
 
 
-    public static double MANUAL_CONTROL_VELOCITY = 30;
-
+    public static double MANUAL_CONTROL_VELOCITY = 15; //Deg / sec
+    public static double MANUAL_CONTROL_BUMP = toRadians(2);
+ 
     public static final double TURRET_ALLOWED_ERROR = toRadians(2);
 
     public static final LUT<Double, Double> AIMING_LUT = new LUT<Double, Double>() {{
@@ -322,7 +323,7 @@ public final class Constants {
     public static final int NUM_LIGHTS = 308;
 
     public static final double BOUNCE_SPEED = 0.75;
-    public static final double BLINK_SPEED = .25;
+    public static final double BLINK_SPEED = .075;
 
     public static final Animation DISABLED_ANIMATION =
             new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS, Front, 7);

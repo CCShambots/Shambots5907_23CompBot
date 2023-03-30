@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -66,7 +66,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                true, //TODO: Disable before comp
+                false, //TODO: Disable before comp
                 "drivetrain",
                 "",
                 Constants.getCurrentLimit(),
@@ -129,12 +129,20 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
                 new InstantCommand(() -> setFieldRelative(true)),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
-                transitionCommand(DrivetrainState.BALANCING)
-        ));
+                new ConditionalCommand(
+                    transitionCommand(DrivetrainState.BALANCING),
+                    transitionCommand(DrivetrainState.IDLE), 
+                    () -> true)
+                )
+        );
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
                 new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
-                transitionCommand(DrivetrainState.X_SHAPE)
+                new ConditionalCommand(
+                    transitionCommand(DrivetrainState.X_SHAPE), 
+                    transitionCommand(DrivetrainState.IDLE),
+                    () -> !isFlag(DrivetrainState.DONT_BALANCE)
+                )
         ));
     }
 
@@ -361,7 +369,16 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     public enum DrivetrainState {
-        UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE, DOCKING, BALANCING
+        UNDETERMINED, 
+        X_SHAPE, 
+        FIELD_ORIENTED_TELEOP_DRIVE, 
+        BOT_ORIENTED_TELEOP_DRIVE, 
+        TRAJECTORY, 
+        IDLE, 
+        DOCKING, 
+        BALANCING,
+
+        DONT_BALANCE
     }
 
     public enum SpeedMode {
