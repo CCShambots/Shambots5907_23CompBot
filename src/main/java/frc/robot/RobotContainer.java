@@ -239,12 +239,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Red routes
     routes.putAll(Map.of(
-      RED_SCORE_RIGHT, new RedScoreRight(this),
-      RED_SCORE_BALANCE_RIGHT, new RedScoreBalanceRight(this),
-      RED_SCORE_BALANCE_CENTER, new RedScoreBalanceCenter(this),
-      RED_SCORE_LEFT, new RedScoreLeft(this),
-      RED_NEW_AUTO, new RedNewAuto(this),
-      RED_SCORE_PICKUP_BALANCE_RIGHT, new RedScorePickupBalanceRight(this)
+      RED_PICKUP_RIGHT, new RedPickupRight(this),
+      RED_BALANCE_CENTER, new RedBalanceCenter(this),
+      RED_LEFT, new RedScoreLeft(this),
+      // RED_NEW_AUTO, new RedNewAuto(this),
+      RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
     ));
 
     //Blue routes
@@ -486,7 +485,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_SCORE_RIGHT, RED_SCORE_BALANCE_RIGHT, RED_SCORE_BALANCE_CENTER, RED_SCORE_LEFT, RED_NEW_AUTO, RED_SCORE_PICKUP_BALANCE_RIGHT,
+    RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
     BLUE_SCORE_LEFT, BLUE_SCORE_BALANCE_LEFT, BLUE_SCORE_BALANCE_CENTER, BLUE_SCORE_RIGHT
   }
 }

@@ -14,7 +14,7 @@ public class ScoreFirstElementCommand extends SequentialCommandGroup{
             rc.arm().transitionCommand(ArmMode.PRIMED),
             new WaitCommand(1),
             rc.arm().transitionCommand(ArmMode.HIGH_CUBE),
-            new WaitCommand(0.5),
+            new WaitCommand(0.7),
             rc.arm().openClaw()
         );
     }

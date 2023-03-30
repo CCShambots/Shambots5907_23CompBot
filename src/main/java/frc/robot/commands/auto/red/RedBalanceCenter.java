@@ -15,9 +15,9 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
-public class RedScoreBalanceCenter extends SequentialCommandGroup {
+public class RedBalanceCenter extends SequentialCommandGroup {
 
-    public RedScoreBalanceCenter(RobotContainer rc) {
+    public RedBalanceCenter(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 
