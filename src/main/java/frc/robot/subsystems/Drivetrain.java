@@ -98,6 +98,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 })
         );
 
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
+
         addOmniTransition(
                 DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE,
                 new InstantCommand(() -> setFieldRelative(true))
@@ -133,36 +137,40 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 getDefaultTeleopDriveCommand()
         );
 
+        registerAutoBalanceCommands();
+    }
+
+    private void registerAutoBalanceCommands() {
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
-                new InstantCommand(() -> setFieldRelative(true)),
-                new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
-                new ConditionalCommand(
-                    transitionCommand(DrivetrainState.BALANCING),
-                    transitionCommand(DrivetrainState.IDLE), 
-                    () -> true)
+                        new InstantCommand(() -> setFieldRelative(true)),
+                        new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
+                        new ConditionalCommand(
+                                transitionCommand(DrivetrainState.BALANCING),
+                                transitionCommand(DrivetrainState.IDLE),
+                                () -> true)
                 )
         );
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
                 new ConditionalCommand(
-                    transitionCommand(DrivetrainState.X_SHAPE), 
-                    transitionCommand(DrivetrainState.IDLE),
-                    () -> !isFlag(DrivetrainState.DONT_BALANCE)
+                        transitionCommand(DrivetrainState.X_SHAPE),
+                        transitionCommand(DrivetrainState.IDLE),
+                        () -> !isFlag(DrivetrainState.DONT_BALANCE)
                 )
         ));
 
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
                 setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, 1),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1),
                 new InstantCommand(this::clearFlags),
                 setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
                 setFlagCommand(DrivetrainState.BALANCING_GROUND),
                 new ParallelRaceGroup(
-                    new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
-                    new WaitCommand(3)
+                        new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
+                        new WaitCommand(3)
                 ),
                 new InstantCommand(this::clearFlags),
                 setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
@@ -385,6 +393,47 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         builder.addDoubleProperty("pitch", () -> getPitch(), null);
         builder.addDoubleProperty("roll", () -> getRoll(), null);
+
+
+        builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
+            AutoBalance.DOCK_THRESHOLD = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("balance-no-angle-check-time", () -> AutoBalance.NO_ANGLE_CHECK_TIME, (d) -> {
+            AutoBalance.NO_ANGLE_CHECK_TIME = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addIntegerProperty("balance-buffer-size", () -> AutoBalance.AUTO_BALANCE_BUFFER_SIZE, (d) -> {
+            AutoBalance.AUTO_BALANCE_BUFFER_SIZE = (int) d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("balance-p", () -> AutoBalance.AUTO_BALANCE_GAINS.p, (d) -> {
+            AutoBalance.AUTO_BALANCE_GAINS.p = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("balance-i", () -> AutoBalance.AUTO_BALANCE_GAINS.i, (d) -> {
+            AutoBalance.AUTO_BALANCE_GAINS.i = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("balance-d", () -> AutoBalance.AUTO_BALANCE_GAINS.d, (d) -> {
+            AutoBalance.AUTO_BALANCE_GAINS.d = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("balance-speed", () -> AutoBalance.AUTO_BALANCE_SPEED, (d) -> {
+            AutoBalance.AUTO_BALANCE_SPEED = d;
+            registerAutoBalanceCommands();
+        });
+
+        builder.addDoubleProperty("dock-speed", () -> AutoBalance.DOCK_SPEED, (d) -> {
+            AutoBalance.DOCK_SPEED = d;
+            registerAutoBalanceCommands();
+        });
     }
 
     @Override

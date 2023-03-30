@@ -296,6 +296,26 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
+    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> dt().setPositiveDockDirection(false)),
+            dt().transitionCommand(DrivetrainState.DOCKING)
+    ));
+
+    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> dt().setPositiveDockDirection(true)),
+            dt().transitionCommand(DrivetrainState.DOCKING)
+    ));
+
+    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> dt().setPositiveDockDirection(false)),
+            dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+    ));
+
+    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> dt().setPositiveDockDirection(true)),
+            dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+    ));
+
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 
     //Turbo logic
@@ -356,7 +376,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
-
 
   }
 

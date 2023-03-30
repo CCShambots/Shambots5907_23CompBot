@@ -12,7 +12,7 @@ public class DockChargingStationCommand extends CommandBase {
     private final IntSupplier directionSupplier;
     private final Drivetrain dt;
 
-    private double dockThreshold = 20;
+    private double dockThreshold = Constants.SwerveDrivetrain.AutoBalance.DOCK_THRESHOLD;
 
     public DockChargingStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
 
@@ -34,7 +34,7 @@ public class DockChargingStationCommand extends CommandBase {
     @Override
     public void execute() {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(Constants.SwerveDrivetrain.DOCK_SPEED * direction, 0, 0), 
+            new ChassisSpeeds(Constants.SwerveDrivetrain.AutoBalance.DOCK_SPEED * direction, 0, 0),
             dt.getCurrentAngle());
         dt.drive(speeds, false);
     }

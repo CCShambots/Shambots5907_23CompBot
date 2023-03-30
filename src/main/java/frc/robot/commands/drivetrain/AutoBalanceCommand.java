@@ -39,7 +39,7 @@ public class AutoBalanceCommand extends CommandBase {
     }
 
     public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
-        this(dt, directionSupplier, pidGains, bufferSize, 2);
+        this(dt, directionSupplier, pidGains, bufferSize, Constants.SwerveDrivetrain.AutoBalance.NO_ANGLE_CHECK_TIME);
     }
 
     private void defineMods() {
@@ -76,7 +76,7 @@ public class AutoBalanceCommand extends CommandBase {
         if(timer.get() < time) pidOutput = 1;
 
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-                Constants.SwerveDrivetrain.AUTO_BALANCE_SPEED * direction * pidOutput,
+                Constants.SwerveDrivetrain.AutoBalance.AUTO_BALANCE_SPEED * direction * pidOutput,
                 0,
                 0
         ), dt.getCurrentAngle());
