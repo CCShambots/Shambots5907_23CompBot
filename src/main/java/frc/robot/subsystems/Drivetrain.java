@@ -144,6 +144,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                     () -> !isFlag(DrivetrainState.DONT_BALANCE)
                 )
         ));
+
+        registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, 1),
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AUTO_BALANCE_GAINS, AUTO_BALANCE_BUFFER_SIZE),
+                transitionCommand(DrivetrainState.DOCKING)
+        ));
     }
 
     private DriveCommand getDefaultTeleopDriveCommand() {
@@ -377,6 +385,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         IDLE, 
         DOCKING, 
         BALANCING,
+        DRIVING_OVER_CHARGE_STATION,
 
         DONT_BALANCE
     }
