@@ -296,12 +296,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
-    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+    leftStick.topLeft().onTrue(new SequentialCommandGroup(
             new InstantCommand(() -> dt().setPositiveDockDirection(false)),
             dt().transitionCommand(DrivetrainState.DOCKING)
     ));
 
-    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+    leftStick.topRight().onTrue(new SequentialCommandGroup(
             new InstantCommand(() -> dt().setPositiveDockDirection(true)),
             dt().transitionCommand(DrivetrainState.DOCKING)
     ));
@@ -311,7 +311,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
     ));
 
-    rightStick.topLeft().onTrue(new SequentialCommandGroup(
+    rightStick.topRight().onTrue(new SequentialCommandGroup(
             new InstantCommand(() -> dt().setPositiveDockDirection(true)),
             dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
     ));
