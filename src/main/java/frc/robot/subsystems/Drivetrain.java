@@ -395,45 +395,45 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         builder.addDoubleProperty("roll", () -> getRoll(), null);
 
 
-        builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
-            AutoBalance.DOCK_THRESHOLD = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
+        //     AutoBalance.DOCK_THRESHOLD = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("balance-no-angle-check-time", () -> AutoBalance.NO_ANGLE_CHECK_TIME, (d) -> {
-            AutoBalance.NO_ANGLE_CHECK_TIME = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("balance-no-angle-check-time", () -> AutoBalance.NO_ANGLE_CHECK_TIME, (d) -> {
+        //     AutoBalance.NO_ANGLE_CHECK_TIME = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addIntegerProperty("balance-buffer-size", () -> AutoBalance.AUTO_BALANCE_BUFFER_SIZE, (d) -> {
-            AutoBalance.AUTO_BALANCE_BUFFER_SIZE = (int) d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addIntegerProperty("balance-buffer-size", () -> AutoBalance.AUTO_BALANCE_BUFFER_SIZE, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_BUFFER_SIZE = (int) d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("balance-p", () -> AutoBalance.AUTO_BALANCE_GAINS.p, (d) -> {
-            AutoBalance.AUTO_BALANCE_GAINS.p = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("balance-p", () -> AutoBalance.AUTO_BALANCE_GAINS.p, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.p = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("balance-i", () -> AutoBalance.AUTO_BALANCE_GAINS.i, (d) -> {
-            AutoBalance.AUTO_BALANCE_GAINS.i = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("balance-i", () -> AutoBalance.AUTO_BALANCE_GAINS.i, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.i = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("balance-d", () -> AutoBalance.AUTO_BALANCE_GAINS.d, (d) -> {
-            AutoBalance.AUTO_BALANCE_GAINS.d = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("balance-d", () -> AutoBalance.AUTO_BALANCE_GAINS.d, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.d = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("balance-speed", () -> AutoBalance.AUTO_BALANCE_SPEED, (d) -> {
-            AutoBalance.AUTO_BALANCE_SPEED = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("balance-speed", () -> AutoBalance.AUTO_BALANCE_SPEED, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_SPEED = d;
+        //     registerAutoBalanceCommands();
+        // });
 
-        builder.addDoubleProperty("dock-speed", () -> AutoBalance.DOCK_SPEED, (d) -> {
-            AutoBalance.DOCK_SPEED = d;
-            registerAutoBalanceCommands();
-        });
+        // builder.addDoubleProperty("dock-speed", () -> AutoBalance.DOCK_SPEED, (d) -> {
+        //     AutoBalance.DOCK_SPEED = d;
+        //     registerAutoBalanceCommands();
+        // });
     }
 
     @Override

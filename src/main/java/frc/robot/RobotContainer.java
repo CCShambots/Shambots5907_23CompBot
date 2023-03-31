@@ -296,25 +296,25 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
-    leftStick.topLeft().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> dt().setPositiveDockDirection(false)),
-            dt().transitionCommand(DrivetrainState.DOCKING)
-    ));
+    // leftStick.topLeft().onTrue(new SequentialCommandGroup(
+    //         new InstantCommand(() -> dt().setPositiveDockDirection(false)),
+    //         dt().transitionCommand(DrivetrainState.DOCKING)
+    // ));
 
-    leftStick.topRight().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> dt().setPositiveDockDirection(true)),
-            dt().transitionCommand(DrivetrainState.DOCKING)
-    ));
+    // leftStick.topRight().onTrue(new SequentialCommandGroup(
+    //         new InstantCommand(() -> dt().setPositiveDockDirection(true)),
+    //         dt().transitionCommand(DrivetrainState.DOCKING)
+    // ));
 
-    rightStick.topLeft().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> dt().setPositiveDockDirection(false)),
-            dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
-    ));
+    // rightStick.topLeft().onTrue(new SequentialCommandGroup(
+    //         new InstantCommand(() -> dt().setPositiveDockDirection(false)),
+    //         dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+    // ));
 
-    rightStick.topRight().onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> dt().setPositiveDockDirection(true)),
-            dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
-    ));
+    // rightStick.topRight().onTrue(new SequentialCommandGroup(
+    //         new InstantCommand(() -> dt().setPositiveDockDirection(true)),
+    //         dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+    // ));
 
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 
