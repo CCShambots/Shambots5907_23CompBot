@@ -71,9 +71,9 @@ public final class Constants {
   public static final class SwerveDrivetrain {
     public static final class AutoBalance {
       public static PIDGains AUTO_BALANCE_GAINS = new PIDGains(
-              0.025,
+              0.024,
               0,
-              0.015
+              0.011
       );
 
       public static double DOCK_THRESHOLD = 20;
