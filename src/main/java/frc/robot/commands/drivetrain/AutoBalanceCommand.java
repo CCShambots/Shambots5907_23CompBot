@@ -70,7 +70,6 @@ public class AutoBalanceCommand extends CommandBase {
         buff.remove(buff.size() - 1);
         buff.add(0, Math.abs(getCumulativeAngle()));
 
-        // SmartDashboard.putNumber("cumulative angle", getCumulativeAngle());
         double pidOutput = Math.max(Math.min(1, pid.calculate(getCumulativeAngle(), 0)), -1);
 
         if(timer.get() < time) pidOutput = 1;
