@@ -163,7 +163,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
                 setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 4),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 2.25),
                 new InstantCommand(this::clearFlags),
                 setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
