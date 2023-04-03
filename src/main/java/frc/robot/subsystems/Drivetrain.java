@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
+import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
@@ -163,17 +164,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
                 setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 4),
-                new InstantCommand(this::clearFlags),
-                setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
-                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
-                setFlagCommand(DrivetrainState.BALANCING_GROUND),
-                new ParallelRaceGroup(
-                        new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
-                        new WaitCommand(3)
-                ),
-                new InstantCommand(this::clearFlags),
-                setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
+                new DriveOverChargeStationCommand(this, () -> positiveDockDirection ? -1 : 1),
                 transitionCommand(DrivetrainState.DOCKING)
         ));
     }
