@@ -94,6 +94,8 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    robotContainer.scheduleEndgameBuzz();
   }
 
   /** This function is called periodically during operator control. */

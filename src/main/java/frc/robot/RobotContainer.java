@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -38,6 +39,7 @@ import java.util.Map;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
+import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
@@ -163,11 +165,19 @@ public class RobotContainer {
     operatorCont.rightStick().onTrue(l.transitionCommand(LightState.UPRIGHT_CONE));
 
     new Trigger(this::lowVoltage)
-            .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 1)))
-            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0)))
+            .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
+            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)))
             .debounce(2);
 
     SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
+  }
+
+  public void scheduleEndgameBuzz() {
+    new WaitCommand(100).andThen(
+            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)),
+            new WaitCommand(5),
+            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0))
+    ).schedule();
   }
 
   public Command getAutonomousCommand() {
