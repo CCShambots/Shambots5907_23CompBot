@@ -68,9 +68,6 @@ public class Robot extends TimedRobot {
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
 
     robotContainer.scheduleEndgameBuzz();
     //Send the grid interface into indicate so that I can update things quickly from autonomous

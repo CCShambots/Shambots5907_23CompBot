@@ -384,11 +384,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
     new Trigger(this::lowVoltage)
+            .debounce(2)
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
-            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)))
-            .debounce(2);
+            .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-    SmartDashboard.putData(new InstantCommand(() -> Constants.pullAllianceFromFMS()));
   }
 
   private void handleManualTurretRequest() {
@@ -417,7 +416,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public void scheduleEndgameBuzz() {
-    new WaitCommand(5).andThen( //100
+    new WaitCommand(100).andThen(
             new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)),
             new WaitCommand(5),
             new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0))
