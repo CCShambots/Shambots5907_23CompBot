@@ -85,6 +85,8 @@ public final class Constants {
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
       public static int AUTO_BALANCE_BUFFER_SIZE = 25;
+
+      public static int DRIVE_OVER_BUFFER_SIZE = 100;
     }
 
     // Distance between centers of right and left wheels on robot in meters
