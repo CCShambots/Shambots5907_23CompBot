@@ -4,9 +4,12 @@ import com.ctre.phoenix.led.Animation;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
+import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.Candle.CANdleEX;
 import frc.robot.ShamLib.SMF.StateMachine;
 
+import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Lights.*;
 import static frc.robot.Constants.Lights.CONE_RGB;
 import static frc.robot.subsystems.Lights.LightState.*;
@@ -38,6 +41,9 @@ public class Lights extends StateMachine<Lights.LightState> {
         addAnimationTransition(SOFT_STOP);
         addAnimationTransition(SCORING);
 
+        addOmniTransition(LightState.HAVE_CONE_WANT_CUBE, () -> candle.setLEDs(Constants.Lights.HAVE_CONE_WANT_CUBE));
+        addOmniTransition(LightState.HAVE_CUBE_WANT_CONE, () -> candle.setLEDs(Constants.Lights.HAVE_CUBE_WANT_CONE));
+
         registerStateCommand(ENABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
         registerStateCommand(DISABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
     }
@@ -48,8 +54,10 @@ public class Lights extends StateMachine<Lights.LightState> {
         SCORING(SCORING_ANIMATION), //The arm is going to score a game element
         GAME_PIECE_GRABBED(null), //A game piece has been grabbed and is inside the bot
         CONE(null), //The arm will grab a cone next
+        HAVE_CONE_WANT_CUBE(null),
         INTAKE_CONE(INTAKE_CONE_ANIMATION),
         CUBE(null), //The arm will grab a cube next
+        HAVE_CUBE_WANT_CONE(null),
         INTAKE_CUBE(INTAKE_CUBE_ANIMATION),
         ENABLE_PROX(null),
         DISABLE_PROX(null),
@@ -63,6 +71,33 @@ public class Lights extends StateMachine<Lights.LightState> {
 
     private void addAnimationTransition(LightState state) {
         addOmniTransition(state, new InstantCommand(() -> candle.animate(state.animation)));
+    }
+
+    /**
+     * Whether the lights can display information about the next game element
+     */
+    public boolean canDisplayInfo() {
+        return getState() != ENABLE_PROX && getState() != DISABLE_PROX;
+    }
+
+    /**
+     * Determine the next state of the lights based on the states of the robot
+     * @param wanted the element we want to pick up next
+     * @param have the element we are currently holding
+     * @return the state to send the lights to
+     */
+    public LightState getStateFromElements(ElementType wanted, ElementType have) {
+        if(have == Cone) {
+            if(wanted == Cube) {
+                return LightState.HAVE_CONE_WANT_CUBE;
+            } else return CONE;
+        }else if(have == Cube) {
+            if(wanted == Cone) {
+                return LightState.HAVE_CUBE_WANT_CONE;
+            } else return CUBE;
+         } else {
+            return wanted == Cone ? CONE : CUBE;
+        }
     }
 
     @Override

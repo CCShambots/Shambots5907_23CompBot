@@ -15,10 +15,10 @@ import static java.lang.Math.round;
 
 public class ArmTrajectory {
 
-    private ArmKinematics kinematics;
-    private double time;
+    private final ArmKinematics kinematics;
+    private final double time;
 
-    private Map<Integer, ArmState> states = new HashMap<>(); //List of states at various steps along the trajectory (in 20 ms intervals)
+    private final Map<Integer, ArmState> states = new HashMap<>(); //List of states at various steps along the trajectory (in 20 ms intervals)
 
 
     public ArmTrajectory(ArmKinematics kinematics, ArmState currentArmState, Pose3d endPose, double time) {

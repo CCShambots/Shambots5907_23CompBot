@@ -13,14 +13,14 @@ import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import static frc.robot.Constants.Claw.*;
 
 public class Claw extends StateMachine<Claw.State> {
-    DoubleSolenoid solenoid = new DoubleSolenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID_1, SOLENOID_ID_2);
+    final DoubleSolenoid solenoid = new DoubleSolenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID_1, SOLENOID_ID_2);
 
-    Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
+    final Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
 
     private State prevState = State.UNDETERMINED;
 
-    private ProxSensor prox = new ProxSensor(PROX_PORT);
-    private Timer timer = new Timer();
+    private final ProxSensor prox = new ProxSensor(PROX_PORT);
+    private final Timer timer = new Timer();
     private boolean proxEnabled = true;
 
     public Claw() {
