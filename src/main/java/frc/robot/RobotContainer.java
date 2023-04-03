@@ -173,7 +173,7 @@ public class RobotContainer {
   }
 
   public void scheduleEndgameBuzz() {
-    new WaitCommand(100).andThen(
+    new WaitCommand(5).andThen( //100
             new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)),
             new WaitCommand(5),
             new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0))
