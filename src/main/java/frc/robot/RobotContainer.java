@@ -368,7 +368,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.rightStick().onTrue(new InstantCommand(() -> {
       currentLightState = LightState.CUBE;
-  }));
+    }));
 
     operatorCont.leftTrigger(0.8)
             .and(operatorCont.rightTrigger(0.8))
