@@ -1,28 +1,32 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
+import frc.robot.Constants;
+import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
+import frc.robot.util.grid.GridElement;
 
+import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.*;
 import static frc.robot.subsystems.ClawVision.VisionState.*;
 
 public class ClawVision extends StateMachine<ClawVision.VisionState> {
-    private final Limelight ll = new Limelight("limelight-arm");
+    private final Limelight ll = new Limelight("limelight-claw");
 
     public ClawVision() {
         super("Vision", UNDETERMINED, VisionState.class);
 
         addOmniTransition(CONE_DETECTOR, () -> setPipeline(CONE_DETECTOR));
         addOmniTransition(CUBE_DETECTOR, () -> setPipeline(CUBE_DETECTOR));
-        addOmniTransition(CONE_ANGLE, () -> setPipeline(CONE_ANGLE));
+        addOmniTransition(ELEMENT_TYPE, () -> setPipeline(ELEMENT_TYPE));
     }
 
     public enum VisionState {
         UNDETERMINED(CONE_DETECTOR_PIPELINE),
         CONE_DETECTOR(CONE_DETECTOR_PIPELINE),
         CUBE_DETECTOR(CUBE_DETECTOR_PIPELINE),
-        CONE_ANGLE(CONE_ORIENTATION_PIPELINE);
+        ELEMENT_TYPE(ELEMENT_TYPE_PIPELINE);
 
         public final int pipelineID;
         VisionState(int pipelineID) {
@@ -30,25 +34,41 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
         }
     }
 
+    @Override
+    protected void update() {
+        GridElement.Type gridType = Constants.gridInterface.getNextElement().getType();
+
+        if(gridType == GridElement.Type.Both && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
+        if(gridType == GridElement.Type.Cone && getState() != CONE_DETECTOR) requestTransition(CONE_DETECTOR);
+        if(gridType == GridElement.Type.Cube && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
+    }
+
     /**
      * Get the angle offset of a game element detected by the limelight
      * @return the rotation offset
      */
     public Rotation2d getGameElementOffset() {
-        return ll.getXOffset(); //TODO: Figure out how this actually works with the vision model
+        return ll.getXOffset();
     }
 
-    /**
-     * Get the cone angle from the limelight
-     * @return the cone angle
-     */
-    public Rotation2d getConeAngle() {
-        return ll.getConeAngle();
+    public boolean hasTarget() {
+        return ll.hasTarget();
+    }
+    
+    public ElementType getCurrentElementType() {
+        switch(ll.getCurrentElement()){
+            case "cone":
+                return Cone;
+            case "cube":
+                return ElementType.Cube;
+            default:
+                return ElementType.None;
+        }
     }
 
     /**
      * Set the pipeline of the base LL
-     * @param state
+     * @param state the state to go to
      */
     private void setPipeline(VisionState state) {
         ll.setPipeline(state.pipelineID);

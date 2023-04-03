@@ -1,33 +1,34 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.swerve.DriveCommand;
-import frc.robot.ShamLib.swerve.ModuleInfo;
-import frc.robot.ShamLib.swerve.SwerveDrive;
+import frc.robot.ShamLib.swerve.*;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.pathplanner.lib.PathPlanner;
-import frc.robot.ShamLib.swerve.TrajectoryBuilder;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 
@@ -54,25 +55,27 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         this.llPose = llPoseSupplier;
         this.llHasPose = llHasPose;
 
+        getOdoPose = this::getPose;
+
         drive = new SwerveDrive(
                 PIGEON_ID,
                 DRIVE_GAINS,
                 TURN_GAINS,
-                MAX_LINEAR_SPEED,
-                MAX_LINEAR_ACCELERATION,
+                STANDARD_LINEAR_SPEED,
+                STANDARD_LINEAR_ACCELERATION,
                 MAX_TURN_SPEED,
                 MAX_TURN_ACCEL,
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                false,
+                false, //TODO: Disable before comp
                 "drivetrain",
                 "",
-                Constants.CURRENT_LIMIT,
-                ModuleInfo.getMK4IL1Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
-                ModuleInfo.getMK4IL1Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
-                ModuleInfo.getMK4IL1Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], true),
-                ModuleInfo.getMK4IL1Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], true)
+                Constants.getCurrentLimit(),
+                ModuleInfo.getMK4IL2Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
+                ModuleInfo.getMK4IL2Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
+                ModuleInfo.getMK4IL2Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
+                ModuleInfo.getMK4IL2Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], false)
         );
 
         defineTransitions();
@@ -80,6 +83,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     private void defineTransitions() {
+        addTransition(DrivetrainState.IDLE, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
+
         addOmniTransition(
                 DrivetrainState.X_SHAPE,
                 new InstantCommand(() -> setModuleStates(X_SHAPE_ARRAY))
@@ -92,6 +97,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                     stopModules();
                 })
         );
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
 
         addOmniTransition(
                 DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE,
@@ -108,6 +117,13 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         addTransition(DrivetrainState.IDLE, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.TRAJECTORY, DrivetrainState.DOCKING);
         addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
+
+        addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+        addTransition(DrivetrainState.DOCKING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+        addTransition(DrivetrainState.BALANCING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+
+        // addTransition(DrivetrainState.GOING_OVER_CHARGE_STATION, DrivetrainState.DOCKING);
+        addOmniTransition(DrivetrainState.DOCKING);
     }
 
     private void defineStateCommands() {
@@ -121,14 +137,44 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 getDefaultTeleopDriveCommand()
         );
 
+        registerAutoBalanceCommands();
+    }
+
+    private void registerAutoBalanceCommands() {
         registerStateCommand(DrivetrainState.DOCKING, new SequentialCommandGroup(
-                new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
-                transitionCommand(DrivetrainState.BALANCING)
-        ));
+                        new InstantCommand(() -> setFieldRelative(true)),
+                        new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
+                        new ConditionalCommand(
+                                transitionCommand(DrivetrainState.BALANCING),
+                                transitionCommand(DrivetrainState.IDLE),
+                                () -> true)
+                )
+        );
 
         registerStateCommand(DrivetrainState.BALANCING, new SequentialCommandGroup(
-            new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1),
-            transitionCommand(DrivetrainState.X_SHAPE)
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? 1 : -1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
+                new ConditionalCommand(
+                        transitionCommand(DrivetrainState.X_SHAPE),
+                        transitionCommand(DrivetrainState.IDLE),
+                        () -> !isFlag(DrivetrainState.DONT_BALANCE)
+                )
+        ));
+
+        registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
+                setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 2.25),
+                new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
+                setFlagCommand(DrivetrainState.BALANCING_GROUND),
+                new ParallelRaceGroup(
+                        new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
+                        new WaitCommand(3)
+                ),
+                new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
+                transitionCommand(DrivetrainState.DOCKING)
         ));
     }
 
@@ -138,14 +184,23 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 x,
                 y,
                 theta,
-                MAX_LINEAR_SPEED,
-                MAX_LINEAR_ACCELERATION,
-                MAX_ROTATION,
-                MAX_ROT_ACCEL,
                 Constants.ControllerConversions.DEADBAND,
                 Constants.ControllerConversions.conversionFunction,
                 true,
-                this
+                this,
+                new SwerveSpeedLimits(
+                        STANDARD_LINEAR_SPEED,
+                        STANDARD_LINEAR_ACCELERATION,
+                        STANDARD_ROTATION,
+                        STANDARD_ROT_ACCEL
+                ),
+                new SwerveSpeedLimits(
+                        MAX_LINEAR_SPEED,
+                        MAX_LINEAR_ACCELERATION,
+                        MAX_ROTATION,
+                        MAX_ROT_ACCEL
+                )
+
         );
     }
 
@@ -179,7 +234,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.updateField2dObject();
 
         //Only integrate vision measurement if the limelight has a target
-        if(llHasPose.getAsBoolean()) {
+        if(getState() == DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE && llHasPose.getAsBoolean()) {
             drive.addVisionMeasurement(llPose.get().toPose2d());
         }
     }
@@ -187,6 +242,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
         drive.drive(speeds, allowHoldAngleChange);
     }
+
+    //TODO: remove
+    public Field2d getField() {return drive.getField();}
 
     /**
      *
@@ -239,6 +297,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.resetGyro(angle);
     }
 
+    public Command resetGyroCommand(Rotation2d angle) {
+        return new InstantCommand(() -> drive.resetGyro(angle));
+    }
+
     public void resetGyro() {
         drive.resetGyro();
     }
@@ -252,12 +314,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
 
         drive.resetGyro(rotation);
-        // drive.resetRotationOffset(rotation);
-        drive.drive(new ChassisSpeeds(0, 0, 1), true);
+        drive.fixHoldAngle();
 
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
-
-        new WaitCommand(134).andThen(transitionCommand(DrivetrainState.X_SHAPE)).schedule();
     }
 
     @Override
@@ -287,28 +346,128 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         return new InstantCommand(() -> setPositiveDockDirection(value));
     }
 
+
+    public Pose2d getPose() {
+        return drive.getPose();
+    }
+    
+    public void registerMisalignedSwerveTriggers(EventLoop loop) {
+        for(SwerveModule module : drive.getModules()) {
+            loop.bind(() -> {
+                    if(module.isModuleMisaligned() && !isEnabled()) {
+                        new RealignModuleCommand(module).schedule();
+                    }
+                }
+            );  
+        }    
+    }
+    
+    public void setSpeedMode(SpeedMode mode) {
+        drive.setSpeedMode(mode.ordinal());
+    }
+
+    public ChassisSpeeds getTargetChassisSpeed() {
+        return drive.getTargetChassisSpeeds();
+    }
+
+    /**
+     * Get the current target linear speed of the chassis
+     * @return target speed (in m/s)
+     */
+    public double getTargetLinearSpeed() {
+        ChassisSpeeds target = getTargetChassisSpeed();
+        return Math.hypot(target.vxMetersPerSecond, target.vyMetersPerSecond);
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
         builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
 
+        builder.addDoubleProperty("total angles", () -> Math.abs(getPitch()) + Math.abs(getRoll()), null);
+
+        builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
+        
+        builder.addDoubleProperty("linear-speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
+
         builder.addDoubleProperty("pitch", () -> getPitch(), null);
         builder.addDoubleProperty("roll", () -> getRoll(), null);
+
+
+        // builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
+        //     AutoBalance.DOCK_THRESHOLD = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("balance-no-angle-check-time", () -> AutoBalance.NO_ANGLE_CHECK_TIME, (d) -> {
+        //     AutoBalance.NO_ANGLE_CHECK_TIME = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addIntegerProperty("balance-buffer-size", () -> AutoBalance.AUTO_BALANCE_BUFFER_SIZE, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_BUFFER_SIZE = (int) d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("balance-p", () -> AutoBalance.AUTO_BALANCE_GAINS.p, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.p = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("balance-i", () -> AutoBalance.AUTO_BALANCE_GAINS.i, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.i = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("balance-d", () -> AutoBalance.AUTO_BALANCE_GAINS.d, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_GAINS.d = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("balance-speed", () -> AutoBalance.AUTO_BALANCE_SPEED, (d) -> {
+        //     AutoBalance.AUTO_BALANCE_SPEED = d;
+        //     registerAutoBalanceCommands();
+        // });
+
+        // builder.addDoubleProperty("dock-speed", () -> AutoBalance.DOCK_SPEED, (d) -> {
+        //     AutoBalance.DOCK_SPEED = d;
+        //     registerAutoBalanceCommands();
+        // });
     }
 
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            "field", drive.getField(),
-            "module-1", drive.getModules().get(0),
-            "module-2", drive.getModules().get(1),
-            "module-3", drive.getModules().get(2),
-            "module-4", drive.getModules().get(3)
+            "field", drive.getField()
+            // "module-1", drive.getModules().get(0)
+            // "module-2", drive.getModules().get(1),
+            // "module-3", drive.getModules().get(2),
+            // "module-4", drive.getModules().get(3)
         );
     }
 
     public enum DrivetrainState {
-        UNDETERMINED, X_SHAPE, FIELD_ORIENTED_TELEOP_DRIVE, BOT_ORIENTED_TELEOP_DRIVE, TRAJECTORY, IDLE, DOCKING, BALANCING
+        UNDETERMINED, 
+        X_SHAPE, 
+        FIELD_ORIENTED_TELEOP_DRIVE, 
+        BOT_ORIENTED_TELEOP_DRIVE, 
+        TRAJECTORY, 
+        IDLE, 
+        DOCKING, 
+        BALANCING,
+        DRIVING_OVER_CHARGE_STATION,
+
+        DONT_BALANCE,
+
+        BALANCING_GROUND,
+        BEFORE_CHARGE_STATION,
+        GOING_OVER_CHARGE_STATION,
+        OFF_CHARGE_STATION
+    }
+
+    public enum SpeedMode {
+        NORMAL,
+        TURBO
     }
 }

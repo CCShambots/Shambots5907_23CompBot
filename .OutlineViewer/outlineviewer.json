@@ -3,8 +3,16 @@
     "mode": "Client (NT4)",
     "serverTeam": "5907"
   },
-  "Retained Values": {
+  "Transitory Values": {
     "open": false
+  },
+  "retained": {
+    "CameraPublisher": {
+      "open": true
+    },
+    "grid-ui": {
+      "open": true
+    }
   },
   "transitory": {
     "SmartDashboard": {
@@ -13,8 +21,7 @@
         "shoulder": {
           "open": true
         }
-      },
-      "open": true
+      }
     }
   }
 }
