@@ -2,10 +2,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
 import frc.robot.Constants;
+import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
 import frc.robot.util.grid.GridElement;
 
+import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.*;
 import static frc.robot.subsystems.ClawVision.VisionState.*;
 
@@ -17,12 +19,14 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
 
         addOmniTransition(CONE_DETECTOR, () -> setPipeline(CONE_DETECTOR));
         addOmniTransition(CUBE_DETECTOR, () -> setPipeline(CUBE_DETECTOR));
+        addOmniTransition(ELEMENT_TYPE, () -> setPipeline(ELEMENT_TYPE));
     }
 
     public enum VisionState {
         UNDETERMINED(CONE_DETECTOR_PIPELINE),
         CONE_DETECTOR(CONE_DETECTOR_PIPELINE),
-        CUBE_DETECTOR(CUBE_DETECTOR_PIPELINE);
+        CUBE_DETECTOR(CUBE_DETECTOR_PIPELINE),
+        ELEMENT_TYPE(ELEMENT_TYPE_PIPELINE);
 
         public final int pipelineID;
         VisionState(int pipelineID) {
@@ -50,18 +54,21 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     public boolean hasTarget() {
         return ll.hasTarget();
     }
-
-    /**
-     * Get the cone angle from the limelight
-     * @return the cone angle
-     */
-    public Rotation2d getConeAngle() {
-        return ll.getConeAngle();
+    
+    public ElementType getCurrentElementType() {
+        switch(ll.getCurrentElement()){
+            case "cone":
+                return Cone;
+            case "cube":
+                return ElementType.Cube;
+            default:
+                return ElementType.None;
+        }
     }
 
     /**
      * Set the pipeline of the base LL
-     * @param state
+     * @param state the state to go to
      */
     private void setPipeline(VisionState state) {
         ll.setPipeline(state.pipelineID);

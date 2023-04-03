@@ -203,7 +203,7 @@ public final class Constants {
     //Claw
     public static final int CONE_DETECTOR_PIPELINE = 0;
     public static final int CUBE_DETECTOR_PIPELINE = 1;
-    public static final int CONE_ORIENTATION_PIPELINE = 2;
+    public static final int ELEMENT_TYPE_PIPELINE = 2;
   }
 
   public static class Arm {
@@ -374,6 +374,10 @@ public final class Constants {
     motor.getConfigurator().refresh(config);
     config.CurrentLimits = getCurrentLimit();
     motor.getConfigurator().apply(config);
+  }
+
+  public static enum ElementType {
+      Cube, Cone, None
   }
   
   public static void reInstantiateGridUI(Alliance alliance) {
