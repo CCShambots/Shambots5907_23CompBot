@@ -236,6 +236,9 @@ public final class Constants {
     public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
     public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
 
+    public static final double SHOULDER_FAST_VEL = toRadians(300); //Radians/sec
+    public static final double SHOULDER_FAST_ACCEL = toRadians(300); //Radians/sec^2
+
     //Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians

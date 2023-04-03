@@ -438,6 +438,15 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         return new InstantCommand(this::setArmNormalSpeed);
     }
 
+    public void setArmFastSpeed() {
+        shoulderPID.setConstraints(new TrapezoidProfile.Constraints(SHOULDER_FAST_VEL, SHOULDER_FAST_ACCEL));
+        wristPID.setConstraints(new TrapezoidProfile.Constraints(WRIST_VEL, WRIST_ACCEL));
+    }
+
+    public Command setArmFastSpeedCommand() {
+        return new InstantCommand(this::setArmFastSpeed);
+    }
+
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
 

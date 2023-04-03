@@ -377,6 +377,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
     operatorCont.pov(270).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
 
+    leftStick.topLeft().onTrue(arm.setArmFastSpeedCommand());
+    leftStick.topRight().onTrue(arm.setArmNormalSpeedCommand());
   }
 
   private void handleManualTurretRequest() {
