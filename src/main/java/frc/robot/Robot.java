@@ -1,106 +1,80 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
-import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 
-/**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
- */
+
 public class Robot extends TimedRobot {
-  private Command autonomousCommand;
   private RobotContainer robotContainer;
-  private EventLoop checkModulesLoop = new EventLoop();
-  
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+  private final EventLoop checkModulesLoop = new EventLoop();
+
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer(checkModulesLoop);
+
+    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-    PathPlannerServer.startServer(5811); //TODO: enable when debugging again
+    // PathPlannerServer.startServer(5811); //TODO: disable before comp
 
+    //Run the module control loops every 5 ms
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
 
-    addPeriodic(() -> {checkModulesLoop.poll();}, 10);
+    //Check the alliance from FMS when the bot turns on
+    Constants.pullAllianceFromFMS(robotContainer);
 
-    Constants.pullAllianceFromFMS();
+    //Update the event loop for misaligned modules once every 10 seconds
+    addPeriodic(checkModulesLoop::poll, 10);
   }
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    //TODO: Remove
+    robotContainer.updateTarget();
+
+    //Update the grid interface to make sure scored elements make it to the webpage
+    Constants.gridInterface.update();
    }
 
-  /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    //Make sure all subsystems are disabled
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
   }
 
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    //Start all the subsystems in autonomous mode
     SubsystemManagerFactory.getInstance().notifyAutonomousStart();
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
   }
 
-  /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
   }
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
-    if (autonomousCommand != null) {
-      autonomousCommand.cancel();
-    }
+    //Send the grid interface into indicate so that I can update things quickly from autonomous
+    Constants.gridInterface.indicateMode();
+
+    //Send the grid automatically back to override mode after a few seconds of teleop
+    new WaitCommand(6).andThen(new InstantCommand(Constants.gridInterface::overrideMode));
   }
 
-  /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
 
@@ -108,17 +82,17 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    robotContainer.turret().setTarget((Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE);
+    // robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
 
-  /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
 
-  /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {}
 
-  /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
 }

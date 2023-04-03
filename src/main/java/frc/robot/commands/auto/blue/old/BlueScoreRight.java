@@ -1,4 +1,4 @@
-package frc.robot.commands.auto.red;
+package frc.robot.commands.auto.blue.old;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -8,16 +8,16 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
-public class RedScoreRight extends SequentialCommandGroup {
+public class BlueScoreRight extends SequentialCommandGroup {
 
-    public RedScoreRight(RobotContainer rc) {
+    public BlueScoreRight(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 rc.arm().transitionCommand(Arm.ArmMode.HIGH_CUBE),
                 new WaitCommand(2),
                 rc.arm().openClaw(),
                 new ParallelCommandGroup(
-                    rc.runTraj("red-pickup-right", true),
+                    rc.runTraj("blue-score-right", true),
                     new SequentialCommandGroup(
                             new WaitCommand(1),
                             rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED)

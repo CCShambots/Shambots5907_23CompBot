@@ -1,5 +1,4 @@
-package frc.robot.commands.auto.red;
-
+package frc.robot.commands.auto.blue.old;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -9,9 +8,9 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 
-public class RedScoreBalanceCenter extends SequentialCommandGroup {
+public class BlueScoreBalanceCenter extends SequentialCommandGroup {
 
-    public RedScoreBalanceCenter(RobotContainer rc) {
+    public BlueScoreBalanceCenter(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 rc.arm().transitionCommand(Arm.ArmMode.HIGH_CUBE),
@@ -20,7 +19,7 @@ public class RedScoreBalanceCenter extends SequentialCommandGroup {
                 new InstantCommand(() -> rc.arm().setShoulderTarget(Math.toRadians(75))),
                 new WaitCommand(1.5),
                 new ParallelCommandGroup(
-                        rc.runTraj("red-dock-center", true),
+                        rc.runTraj("blue-dock-center", true),
                         new SequentialCommandGroup(
                                 rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED),
                                 new WaitCommand(3)
