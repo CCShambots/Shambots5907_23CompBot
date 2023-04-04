@@ -10,7 +10,7 @@ public class GridElement {
     private final int col;
     private final Type type;
 
-    private Translation3d location;
+    private final Translation3d location;
 
     GridElement(int row, int col, Translation3d location) {
         this.row = row;

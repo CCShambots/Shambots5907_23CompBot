@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
@@ -115,6 +116,10 @@ public class Turret extends StateMachine<Turret.TurretState> {
         setTarget(getTurretAngleToPoint(target).getRadians());
     }
 
+    public Command calculateFF(Trigger increment, BooleanSupplier interrupt) {
+        return turret.calculateKV(TURRET_GAINS.getS(), 0.05, increment, interrupt);
+    }
+
     /**
      * Get the angle the turret would need to face to be facing towards a point in field space
      * @param target the target position in field space
@@ -167,6 +172,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
     protected void additionalSendableData(SendableBuilder builder) {
         builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
         builder.addDoubleProperty("target", () -> toDegrees(getTurretTarget()), null);
+        builder.addDoubleProperty("absolute", () -> turretPotentiometer.get(), null);
+        builder.addDoubleProperty("relative", () -> toDegrees(turret.getEncoderPosition()), null);
         builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -  toDegrees((getTurretAngle()))), null);
         builder.addBooleanProperty("is busy", () -> isBusy(), null);
     }

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
+import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.*;
@@ -164,7 +165,17 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
                 setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
-                new DriveOverChargeStationCommand(this, () -> positiveDockDirection ? -1 : 1),
+                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 2.25),
+                new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
+                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
+                setFlagCommand(DrivetrainState.BALANCING_GROUND),
+                new ParallelRaceGroup(
+                        new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
+                        new WaitCommand(3)
+                ),
+                new InstantCommand(this::clearFlags),
+                setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
                 transitionCommand(DrivetrainState.DOCKING)
         ));
     }
@@ -193,6 +204,28 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 )
 
         );
+    }
+
+    public void enableTeleopAutobalanceControls(CommandFlightStick left, CommandFlightStick right) {
+         left.topLeft().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(false)),
+                 transitionCommand(DrivetrainState.DOCKING)
+         ));
+
+        left.topRight().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(true)),
+                 transitionCommand(DrivetrainState.DOCKING)
+         ));
+
+         right.topLeft().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(false)),
+                 transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+         ));
+
+        right.topRight().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(true)),
+                 transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+         ));
     }
 
     public double getPitch() {

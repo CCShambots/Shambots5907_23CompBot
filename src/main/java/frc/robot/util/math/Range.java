@@ -4,9 +4,9 @@ import static java.lang.Math.toRadians;
 
 public class Range {
 
-    private double min;
-    private double max;
-    private boolean inclusive;
+    private final double min;
+    private final double max;
+    private final boolean inclusive;
 
     public Range(double num1, double num2, boolean inclusive) {
         min = Math.min(num1, num2);

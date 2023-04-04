@@ -249,7 +249,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Runnable runControlLoops() {
         return () -> {
-            if (isEnabled()) {
+            if (isEnabled() && getState() != SOFT_STOP) {
                 //Wrist code
                 double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
                 double wristFFOutput = wristFF.calculate(wristPID.getSetpoint().position + shoulderEncoder.getRadians(), wristPID.getSetpoint().velocity);

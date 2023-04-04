@@ -22,6 +22,7 @@ public class BlueBalanceCenter extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
                         new WaitCommand(1).andThen(
+                                rc.arm().setArmNormalSpeedCommand(),
                                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
                                 rc.arm().waitForState(ArmMode.STOWED),
                                 new WaitCommand(2),
