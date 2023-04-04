@@ -288,22 +288,23 @@ public final class Constants {
     //Turret hardawre details
     public static final int TURRET_ID = 21;
     public static final double TURRET_INPUT_TO_OUTPUT =
-            (1.0/ 25.0) *
+                    (1.0/ 15.0) *
                     (10.0 / 140.0) *
                     2 * PI //To radians
             ; //Rotations --> Radians
     public static final int TURRET_POT_PORT = 0; //Analog port
     public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = -252.9; //Degrees
+    public static final double TURRET_ENCODER_OFFSET = -247.9; //Degrees //-246.5
     public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 300; //1000
+    public static final double TURRET_MAX_ACCEL = 400; //1000
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
     public static final double TURRET_START_ANGLE  = toRadians(-90);
 
-    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+    // public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.5, 0.113);
 
 
     public static final double MANUAL_CONTROL_VELOCITY = 15; //Deg / sec
