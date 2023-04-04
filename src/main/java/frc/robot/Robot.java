@@ -18,10 +18,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     robotContainer = new RobotContainer(checkModulesLoop);
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
+    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-    // PathPlannerServer.startServer(5811); //TODO: disable before comp
+    // PathPlannerServer.startServer(5811);
 
     //Run the module control loops every 5 ms
     addPeriodic(robotContainer.runArmControlLoops(), 0.005);
@@ -68,6 +68,8 @@ public class Robot extends TimedRobot {
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
+
+    robotContainer.scheduleEndgameBuzz();
     //Send the grid interface into indicate so that I can update things quickly from autonomous
     Constants.gridInterface.indicateMode();
 

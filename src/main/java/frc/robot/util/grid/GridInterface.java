@@ -14,8 +14,8 @@ import static frc.robot.util.grid.GridJsonReader.*;
 public class GridInterface {
 
     private Grid grid;
-    private NetworkTable table = NetworkTableInstance.getDefault().getTable("grid-ui");
-    private List<GridElement> elementsToSend = new ArrayList<>(); //list of elements that have been placed to send to the ds
+    private final NetworkTable table = NetworkTableInstance.getDefault().getTable("grid-ui");
+    private final List<GridElement> elementsToSend = new ArrayList<>(); //list of elements that have been placed to send to the ds
 
     public GridInterface(Alliance alliance) {
         grid = alliance == Alliance.Red ? getRedGrid() : getBlueGrid();

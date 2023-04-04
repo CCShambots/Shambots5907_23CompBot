@@ -1,7 +1,7 @@
 package frc.robot.util.grid;
 
 public class GridOutput {
-    private Grid grid;
+    private final Grid grid;
 
     public GridOutput(Grid grid) {
         this.grid = grid;

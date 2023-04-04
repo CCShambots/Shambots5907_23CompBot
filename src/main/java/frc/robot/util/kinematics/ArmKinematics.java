@@ -6,11 +6,11 @@ import static java.lang.Math.*;
 
 public class ArmKinematics {
 
-    private double baseToTurret;
-    private double turretToArm;
-    private double armToWrist;
+    private final double baseToTurret;
+    private final double turretToArm;
+    private final double armToWrist;
 
-    private double wristToEndEffector;
+    private final double wristToEndEffector;
 
     public ArmKinematics(double baseToTurret, double elevatorToArm, double armToWrist, double wristToEndEffector) {
         this.baseToTurret = baseToTurret;

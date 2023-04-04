@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ProxSensor implements Sendable {
-    private DigitalInput input;
+    private final DigitalInput input;
 
     public ProxSensor(int pin) {
         input = new DigitalInput(pin);
