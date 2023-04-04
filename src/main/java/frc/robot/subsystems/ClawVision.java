@@ -15,7 +15,7 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     private final Limelight ll = new Limelight("limelight-claw");
 
     public ClawVision() {
-        super("Vision", UNDETERMINED, VisionState.class);
+        super("Claw Vision", UNDETERMINED, VisionState.class);
 
         addOmniTransition(CONE_DETECTOR, () -> setPipeline(CONE_DETECTOR));
         addOmniTransition(CUBE_DETECTOR, () -> setPipeline(CUBE_DETECTOR));
@@ -36,11 +36,11 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
 
     @Override
     protected void update() {
-        GridElement.Type gridType = Constants.gridInterface.getNextElement().getType();
+        // GridElement.Type gridType = Constants.gridInterface.getNextElement().getType();
 
-        if(gridType == GridElement.Type.Both && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
-        if(gridType == GridElement.Type.Cone && getState() != CONE_DETECTOR) requestTransition(CONE_DETECTOR);
-        if(gridType == GridElement.Type.Cube && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
+        // if(gridType == GridElement.Type.Both && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
+        // if(gridType == GridElement.Type.Cone && getState() != CONE_DETECTOR) requestTransition(CONE_DETECTOR);
+        // if(gridType == GridElement.Type.Cube && getState() != CUBE_DETECTOR) requestTransition(CUBE_DETECTOR);
     }
 
     /**
@@ -60,9 +60,9 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
             case 1:
                 return Cone;
             case 2:
-                return ElementType.Cube;
+                return Cube;
             default:
-                return ElementType.None;
+                return None;
         }
     }
 

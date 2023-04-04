@@ -87,6 +87,9 @@ public class Lights extends StateMachine<Lights.LightState> {
      * @return the state to send the lights to
      */
     public LightState getStateFromElements(ElementType wanted, ElementType have) {
+
+        System.out.println("wanted: " + wanted.toString() + ", have: " + have.toString());
+
         if(have == Cone) {
             if(wanted == Cube) {
                 return LightState.HAVE_CONE_WANT_CUBE;

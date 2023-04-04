@@ -353,15 +353,15 @@ public final class Constants {
             new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final MultipleColorSegments HAVE_CONE_WANT_CUBE = new MultipleColorSegments(8,
-            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
-            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 2),
-            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4)
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CUBE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
     );
 
     public static final MultipleColorSegments HAVE_CUBE_WANT_CONE = new MultipleColorSegments(8,
-            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
-            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 2),
-            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4)
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CONE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
     );
 
     public static final Animation SOFT_STOP_ANIMATION =

@@ -185,7 +185,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
       LightState correctState = lights.getStateFromElements(nextElement, clawVision.getCurrentElementType());
-
+      
       if (lights.getState() != correctState && lights.canDisplayInfo()){
         lights.requestTransition(correctState);
       }
