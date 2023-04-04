@@ -21,6 +21,7 @@ import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
@@ -55,7 +56,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         new TrapezoidProfile.Constraints(WRIST_VEL, WRIST_ACCEL), 0.005);
     private double wristTarget = toRadians(0);
 
-    private final ClawVision clawVision = new ClawVision();
     private final Claw claw = new Claw();
 
     private ArmState currentArmState = STOWED_POS;
@@ -66,7 +66,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         configureHardware();
 
-        addChildSubsystem(clawVision);
         addChildSubsystem(claw);
 
         defineTransitions();
@@ -86,6 +85,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         return new InstantCommand(() -> {
             claw.requestTransition(ClawState.CLOSED);
         });
+    }
+
+    public ClawState getClawState() {
+        return claw.getState();
     }
 
     public Command enableClawProx() {
