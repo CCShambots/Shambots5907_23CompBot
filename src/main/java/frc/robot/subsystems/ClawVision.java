@@ -1,11 +1,12 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
-import frc.robot.Constants;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
-import frc.robot.util.grid.GridElement;
+import frc.robot.subsystems.Claw.ClawState;
+
+import java.util.function.Supplier;
 
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.*;
@@ -13,9 +14,12 @@ import static frc.robot.subsystems.ClawVision.VisionState.*;
 
 public class ClawVision extends StateMachine<ClawVision.VisionState> {
     private final Limelight ll = new Limelight("limelight-claw");
+    private final Supplier<ClawState> clawStateSupplier;
 
-    public ClawVision() {
+    public ClawVision(Supplier<ClawState> clawStateSupplier) {
         super("Claw Vision", UNDETERMINED, VisionState.class);
+
+        this.clawStateSupplier = clawStateSupplier;
 
         addOmniTransition(CONE_DETECTOR, () -> setPipeline(CONE_DETECTOR));
         addOmniTransition(CUBE_DETECTOR, () -> setPipeline(CUBE_DETECTOR));
@@ -56,14 +60,16 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     }
     
     public ElementType getCurrentElementType() {
-        switch(ll.getCurrentElement()){
-            case 1:
-                return Cone;
-            case 2:
-                return Cube;
-            default:
-                return None;
-        }
+        if(clawStateSupplier.get() == ClawState.CLOSED) {
+            switch (ll.getCurrentElement()) {
+                case 1:
+                    return Cone;
+                case 2:
+                    return Cube;
+                default:
+                    return None;
+            }
+        } else return None;
     }
 
     /**

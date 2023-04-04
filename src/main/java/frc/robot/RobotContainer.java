@@ -75,7 +75,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     arm = new Arm();
     lights = new Lights();
-    clawVision = new ClawVision();
+    clawVision = new ClawVision(arm::getClawState);
 
     turret = new Turret(
             operatorCont.x(),

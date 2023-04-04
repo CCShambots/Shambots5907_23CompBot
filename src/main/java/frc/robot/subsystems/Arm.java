@@ -15,12 +15,13 @@ import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.arm.ExtendArmCommand;
-import frc.robot.subsystems.Claw.State;
+import frc.robot.subsystems.Claw.ClawState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
@@ -57,7 +58,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         new TrapezoidProfile.Constraints(WRIST_VEL, WRIST_ACCEL), 0.005);
     private double wristTarget = toRadians(0);
 
-    private final ClawVision clawVision = new ClawVision();
     private final Claw claw = new Claw();
 
     private ArmState currentArmState = STOWED_POS;
@@ -68,7 +68,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         configureHardware();
 
-        addChildSubsystem(clawVision);
         addChildSubsystem(claw);
 
         defineTransitions();
@@ -80,14 +79,18 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Command openClaw() {
         return new InstantCommand(() -> {
-            claw.requestTransition(State.OPENED);
+            claw.requestTransition(ClawState.OPENED);
         });
     }
 
     public Command closeClaw() {
         return new InstantCommand(() -> {
-            claw.requestTransition(State.CLOSED);
+            claw.requestTransition(ClawState.CLOSED);
         });
+    }
+
+    public ClawState getClawState() {
+        return claw.getState();
     }
 
     public Command enableClawProx() {
@@ -122,7 +125,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(STOWED, SEEKING_POSE);
         addTransition(SEEKING_POSE, AT_POSE);
 
-        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(State.OPENED));
+        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(ClawState.OPENED));
         addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
 
         addTransition(STOWED, SEEKING_HIGH);

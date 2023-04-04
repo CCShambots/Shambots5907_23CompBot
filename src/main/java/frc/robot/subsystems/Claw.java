@@ -12,19 +12,19 @@ import frc.robot.util.ProxSensor;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import static frc.robot.Constants.Claw.*;
 
-public class Claw extends StateMachine<Claw.State> {
+public class Claw extends StateMachine<Claw.ClawState> {
     final DoubleSolenoid solenoid = new DoubleSolenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID_1, SOLENOID_ID_2);
 
     final Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
 
-    private State prevState = State.UNDETERMINED;
+    private ClawState prevState = ClawState.UNDETERMINED;
 
     private final ProxSensor prox = new ProxSensor(PROX_PORT);
     private final Timer timer = new Timer();
     private boolean proxEnabled = true;
 
     public Claw() {
-        super("Claw", State.UNDETERMINED, State.class);
+        super("Claw", ClawState.UNDETERMINED, ClawState.class);
 
         compressor.enableDigital();
 
@@ -34,35 +34,35 @@ public class Claw extends StateMachine<Claw.State> {
     }
 
     private void defineTransitions() {
-        addOmniTransition(State.CLOSED, () -> {
+        addOmniTransition(ClawState.CLOSED, () -> {
             solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
-            prevState = State.CLOSED;
+            prevState = ClawState.CLOSED;
         });
-        addOmniTransition(State.OPENED, () -> {
+        addOmniTransition(ClawState.OPENED, () -> {
             solenoid.set(SOLENOID_CLAW_OPEN_VALUE);
-            prevState = State.OPENED;
+            prevState = ClawState.OPENED;
             timer.reset();
             timer.start();
         });
     }
 
     private void registerStateCommands() {
-        registerStateCommand(State.OPENED, new RunCommand(() -> {
-            if(proxEnabled && prox.isActivated() && timer.get() > 1) requestTransition(State.CLOSED);
+        registerStateCommand(ClawState.OPENED, new RunCommand(() -> {
+            if(proxEnabled && prox.isActivated() && timer.get() > 1) requestTransition(ClawState.CLOSED);
         }));
     }
 
     @Override
     protected void determineSelf() {
-        if(prevState == State.UNDETERMINED) {
+        if(prevState == ClawState.UNDETERMINED) {
             DoubleSolenoid.Value solenoidValue = solenoid.get();
             if(solenoidValue == kOff) {
                 solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
-                setState(State.CLOSED);
+                setState(ClawState.CLOSED);
             } else if(solenoidValue == SOLENOID_CLAW_OPEN_VALUE) {
-                setState(State.OPENED);
+                setState(ClawState.OPENED);
             } else {
-                setState(State.CLOSED);
+                setState(ClawState.CLOSED);
             }
         } else {
             setState(prevState);
@@ -87,7 +87,7 @@ public class Claw extends StateMachine<Claw.State> {
         return value == kForward ? kReverse : kForward;
     }
 
-    public enum State {
+    public enum ClawState {
         UNDETERMINED, OPENED, CLOSED
     }
 }
