@@ -15,7 +15,7 @@ import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.arm.ExtendArmCommand;
-import frc.robot.subsystems.Claw.State;
+import frc.robot.subsystems.Claw.ClawState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
@@ -78,13 +78,13 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Command openClaw() {
         return new InstantCommand(() -> {
-            claw.requestTransition(State.OPENED);
+            claw.requestTransition(ClawState.OPENED);
         });
     }
 
     public Command closeClaw() {
         return new InstantCommand(() -> {
-            claw.requestTransition(State.CLOSED);
+            claw.requestTransition(ClawState.CLOSED);
         });
     }
 
@@ -120,7 +120,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(STOWED, SEEKING_POSE);
         addTransition(SEEKING_POSE, AT_POSE);
 
-        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(State.OPENED));
+        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(ClawState.OPENED));
         addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
 
         addTransition(STOWED, SEEKING_HIGH);
