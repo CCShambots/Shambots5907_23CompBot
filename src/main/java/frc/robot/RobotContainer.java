@@ -142,6 +142,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
+  private void defineTriggers() {
+    new Trigger(() -> isFlag(State.TURRET_STARTUP_MISALIGNMENT))
+            .onTrue(lights.transitionCommand(LightState.SOFT_STOP))
+            .onFalse(lights.transitionCommand(LightState.IDLE));
+  }
+
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
@@ -465,6 +471,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return turret;
   }
 
+
   //TODO: Remove
   public void updateTarget() {
     drivetrain.getField().getObject("target").setPose(new Pose2d(gridInterface.getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
@@ -504,7 +511,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public enum State {
     INTAKING, SCORING, BALANCING, DISABLED, AUTONOMOUS, UNDETERMINED, TRAVELING, BRAKE, TESTING,
 
-    MANUAL_CONTROL, CONE
+    MANUAL_CONTROL, CONE, TURRET_STARTUP_MISALIGNMENT
   }
 
 

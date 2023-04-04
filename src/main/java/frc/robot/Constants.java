@@ -46,7 +46,7 @@ public final class Constants {
     public static final Trigger STOP = new Trigger(() -> true);
   }
 
-
+  public static boolean HAS_BEEN_ENABLED = false;
   public static final double VOLTAGE_WARNING = 9;
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
