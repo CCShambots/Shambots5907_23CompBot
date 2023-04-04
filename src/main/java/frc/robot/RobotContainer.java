@@ -12,11 +12,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.AutonomousLoader;
@@ -142,6 +137,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     defineStateCommands();
 
     configureBindings();
+
+    operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
   private void defineTransitions() {
@@ -376,11 +373,20 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public void scheduleEndgameBuzz() {
-    new WaitCommand(100).andThen(
-            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)),
-            new WaitCommand(5),
-            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0))
+    new WaitCommand(103.8).andThen(
+            rumbleLoop(),     
+            rumbleLoop(),     
+            rumbleLoop()  
     ).schedule();
+  }
+
+  private Command rumbleLoop() {
+    return new SequentialCommandGroup(
+            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)),
+            new WaitCommand(0.25),
+            new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)),
+            new WaitCommand(0.15)
+    );
   }
 
   public Command getAutonomousCommand() {
@@ -471,6 +477,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onDisable() {
     setState(State.DISABLED);
+
+    operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
   @Override
