@@ -4,6 +4,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Drivetrain.DrivetrainState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +41,14 @@ public class DriveOverChargeStationCommand extends CommandBase {
                 0
         ), dt.getCurrentAngle());
 
+        if(getCumulativeAngle() < 2 && !dt.isFlag(DrivetrainState.HIT_ZERO)) {
+            dt.setFlag(DrivetrainState.HIT_ZERO);
+        }
+        
         dt.drive(speeds, false);
+
+        buff.remove(buff.size() - 1);
+        buff.add(0, Math.abs(getCumulativeAngle()));
     }
 
     @Override

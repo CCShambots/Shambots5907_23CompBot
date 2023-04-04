@@ -22,6 +22,8 @@ import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
 import static frc.robot.Constants.Arm.*;
@@ -232,7 +234,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         wrist.configure(Brake, CounterClockwise_Positive);
         applyCurrentLimit(wrist);
-
     }
 
     public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {
@@ -253,15 +254,19 @@ public class Arm extends StateMachine<Arm.ArmMode> {
                 //Wrist code
                 double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
                 double wristFFOutput = wristFF.calculate(wristPID.getSetpoint().position + shoulderEncoder.getRadians(), wristPID.getSetpoint().velocity);
-
                 
-                wrist.setVoltage(wristPIDOutput + wristFFOutput);
+                double wristOutput = wristPIDOutput + wristFFOutput;
+
+                wrist.setVoltage(wristOutput);
                 
                 //Shoulder code
                 double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
                 double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
                 
-                shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);
+                double shoulderOutput = shoulderPIDOutput + shoulderFFOutput;
+
+                shoulder.setVoltage(shoulderOutput);
+
             }
         };
     }

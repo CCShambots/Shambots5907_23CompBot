@@ -165,18 +165,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         registerStateCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION, new SequentialCommandGroup(
                 setFlagCommand(DrivetrainState.BEFORE_CHARGE_STATION),
                 new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1),
-                new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, 1, 2.25),
-                new InstantCommand(this::clearFlags),
-                setFlagCommand(DrivetrainState.GOING_OVER_CHARGE_STATION),
-                new DockChargingStationCommand(this, () -> positiveDockDirection ? -1 : 1, 12), //TODO: change angle possibly
-                setFlagCommand(DrivetrainState.BALANCING_GROUND),
-                new ParallelRaceGroup(
-                        new AutoBalanceCommand(this, () -> positiveDockDirection ? -1 : 1, AutoBalance.AUTO_BALANCE_GAINS, AutoBalance.AUTO_BALANCE_BUFFER_SIZE),
-                        new WaitCommand(3)
-                ),
-                new InstantCommand(this::clearFlags),
-                setFlagCommand(DrivetrainState.OFF_CHARGE_STATION),
-                transitionCommand(DrivetrainState.DOCKING)
+                new DriveOverChargeStationCommand(this, () -> positiveDockDirection ? -1 : 1),
+                transitionCommand(DrivetrainState.IDLE)
         ));
     }
 
@@ -265,6 +255,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
         drive.drive(speeds, allowHoldAngleChange);
+    }
+
+    public void drive(ChassisSpeeds speeds) {
+        drive.drive(speeds, false);
     }
 
     //TODO: remove
@@ -483,6 +477,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         DRIVING_OVER_CHARGE_STATION,
 
         DONT_BALANCE,
+        HIT_ZERO,
 
         BALANCING_GROUND,
         BEFORE_CHARGE_STATION,

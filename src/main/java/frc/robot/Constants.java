@@ -88,6 +88,8 @@ public final class Constants {
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
       public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
+
+      public static final int DRIVE_OVER_BUFFER_SIZE = 40; //40
     }
 
     // Distance between centers of right and left wheels on robot in meters
@@ -243,7 +245,7 @@ public final class Constants {
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
-    public static final double WRIST_ENCODER_OFFSET = 100.8; //Degrees
+    public static final double WRIST_ENCODER_OFFSET = -81.1; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_VEL = toRadians(160); //Radians/sec
     public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2

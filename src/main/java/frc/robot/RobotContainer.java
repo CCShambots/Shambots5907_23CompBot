@@ -25,6 +25,7 @@ import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
+import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
@@ -370,6 +371,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     else {
       requestTransition(s);
     }
+  }
+
+  public Command setTurretToIntake() {
+    return new ParallelCommandGroup(
+      turret.transitionCommand(TurretState.INTAKING),
+      clawVision.transitionCommand(VisionState.CONE_DETECTOR)
+    );
   }
 
   public void scheduleEndgameBuzz() {

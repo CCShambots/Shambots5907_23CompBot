@@ -38,6 +38,9 @@ public class Turret extends StateMachine<Turret.TurretState> {
     private final BooleanSupplier clawHasTarget;
     private final DoubleSupplier clawVisionOffset;
 
+    private boolean enforceStartAngle = false;
+    private double startAngle = 0;
+
     public Turret(BooleanSupplier towardSupplier, BooleanSupplier awaySupplier, BooleanSupplier clawHasTarget, DoubleSupplier clawVisionOffset, BooleanSupplier leftSupplier, BooleanSupplier rightSupplier) {
         super("turret", UNDETERMINED, TurretState.class);
 
@@ -154,6 +157,15 @@ public class Turret extends StateMachine<Turret.TurretState> {
         return getErorr() > TURRET_ALLOWED_ERROR;
     }
 
+    public Command setStartAngle(double angle) {
+        return new InstantCommand(
+             () -> {
+                enforceStartAngle = true;
+                startAngle = angle;
+             }
+        );
+    }
+
     /**
      * Set the target of the turret
      * @param target target angle (in radians)
@@ -166,6 +178,15 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
     public Command goToAngle(double target) {
         return new InstantCommand(() -> setTarget(target));
+    }
+
+    
+
+    @Override
+    protected void onTeleopStart() {
+        if(enforceStartAngle) {
+            setTarget(startAngle);
+        }
     }
 
     @Override
