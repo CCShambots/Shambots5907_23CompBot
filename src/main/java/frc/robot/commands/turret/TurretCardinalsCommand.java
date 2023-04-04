@@ -16,9 +16,9 @@ import static java.lang.Math.PI;
 
 public class TurretCardinalsCommand extends CommandBase {
 
-    private Turret t;
-    private BooleanSupplier towardSupplier;
-    private BooleanSupplier awaySupplier;
+    private final Turret t;
+    private final BooleanSupplier towardSupplier;
+    private final BooleanSupplier awaySupplier;
 
     private boolean prevToward;
     private boolean prevAway;

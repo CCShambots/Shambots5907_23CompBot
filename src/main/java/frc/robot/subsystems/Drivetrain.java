@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
+import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.*;
@@ -202,6 +203,28 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 )
 
         );
+    }
+
+    public void enableTeleopAutobalanceControls(CommandFlightStick left, CommandFlightStick right) {
+         left.topLeft().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(false)),
+                 transitionCommand(DrivetrainState.DOCKING)
+         ));
+
+        left.topRight().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(true)),
+                 transitionCommand(DrivetrainState.DOCKING)
+         ));
+
+         right.topLeft().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(false)),
+                 transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+         ));
+
+        right.topRight().onTrue(new SequentialCommandGroup(
+                 new InstantCommand(() -> setPositiveDockDirection(true)),
+                 transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION)
+         ));
     }
 
     public double getPitch() {

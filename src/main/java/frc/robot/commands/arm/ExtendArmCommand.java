@@ -7,8 +7,8 @@ import frc.robot.util.kinematics.ArmState;
 
 public class ExtendArmCommand extends CommandBase {
 
-    private Arm a;
-    private ArmState target;
+    private final Arm a;
+    private final ArmState target;
 
     private boolean elevatorSet;
 

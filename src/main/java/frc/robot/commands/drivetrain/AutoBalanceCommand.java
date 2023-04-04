@@ -16,7 +16,7 @@ public class AutoBalanceCommand extends CommandBase {
     private final IntSupplier directionSupplier;
     private final Drivetrain dt;
     
-    private int bufferSize;
+    private final int bufferSize;
 
     private final PIDController pid;
 
@@ -24,7 +24,7 @@ public class AutoBalanceCommand extends CommandBase {
 
     private int rMod, pMod;
 
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private final double time;
 
     public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize, double time) {

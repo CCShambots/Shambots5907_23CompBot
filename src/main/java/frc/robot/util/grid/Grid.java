@@ -3,7 +3,7 @@ package frc.robot.util.grid;
 import java.util.List;
 
 public class Grid {
-    private GridElement[][] elements;
+    private final GridElement[][] elements;
 
     Grid(List<GridElement> elementsArray) {
         this.elements = parseElementsToArray(elementsArray);

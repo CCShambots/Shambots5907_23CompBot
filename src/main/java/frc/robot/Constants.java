@@ -15,6 +15,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.ShamLib.Candle.MultipleColorSegments;
+import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
@@ -39,16 +41,16 @@ import static java.lang.Math.toRadians;
 
 public final class Constants {
   public static final class Testing {
-    public static Trigger RAISE = new Trigger(() -> false);
-    public static Trigger LOWER = new Trigger(() -> false);
-    public static Trigger STOP = new Trigger(() -> true);
+    public static final Trigger RAISE = new Trigger(() -> false);
+    public static final Trigger LOWER = new Trigger(() -> false);
+    public static final Trigger STOP = new Trigger(() -> true);
   }
 
 
   public static final double VOLTAGE_WARNING = 9;
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
-  public static GridInterface gridInterface = new GridInterface(alliance);
+  public static final GridInterface gridInterface = new GridInterface(alliance);
   public static boolean gridReinstantiated = true;
 
   public static final class Claw {
@@ -71,21 +73,21 @@ public final class Constants {
 
   public static final class SwerveDrivetrain {
     public static final class AutoBalance {
-      public static PIDGains AUTO_BALANCE_GAINS = new PIDGains(
+      public static final PIDGains AUTO_BALANCE_GAINS = new PIDGains(
               0.024,
               0,
               0.011
       );
 
-      public static double DOCK_THRESHOLD = 20;
+      public static final double DOCK_THRESHOLD = 20;
 
-      public static double NO_ANGLE_CHECK_TIME = 2;
+      public static final double NO_ANGLE_CHECK_TIME = 2;
 
-      public static double AUTO_BALANCE_SPEED = 0.6;
-      public static double DOCK_SPEED = 1.2;
+      public static final double AUTO_BALANCE_SPEED = 0.6;
+      public static final double DOCK_SPEED = 1.2;
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
-      public static int AUTO_BALANCE_BUFFER_SIZE = 25;
+      public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
     }
 
     // Distance between centers of right and left wheels on robot in meters
@@ -196,7 +198,7 @@ public final class Constants {
   }
 
   public static final class Vision {
-    public static Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-7.549165), 0, inchesToMeters(8.585326+1.44), new Rotation3d());
+    public static final Pose3d BASE_LIMELIGHT_POSE = new Pose3d(inchesToMeters(-7.549165), 0, inchesToMeters(8.585326+1.44), new Rotation3d());
 
     //Base
     public static final int APRIL_TAG_PIPELINE = 0;
@@ -287,7 +289,7 @@ public final class Constants {
     //Turret hardawre details
     public static final int TURRET_ID = 21;
     public static final double TURRET_INPUT_TO_OUTPUT =
-            (1.0/ 25.0) *
+                    (1.0/ 15.0) *
                     (10.0 / 140.0) *
                     2 * PI //To radians
             ; //Rotations --> Radians
@@ -295,18 +297,19 @@ public final class Constants {
     public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = -247.9; //Degrees //-246.5
     public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 300; //1000
+    public static final double TURRET_MAX_ACCEL = 400; //1000
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
     public static final double TURRET_START_ANGLE  = toRadians(-90);
 
-    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+    // public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.5, 0.113);
 
 
-    public static double MANUAL_CONTROL_VELOCITY = 15; //Deg / sec
-    public static double MANUAL_CONTROL_BUMP = toRadians(2);
+    public static final double MANUAL_CONTROL_VELOCITY = 15; //Deg / sec
+    public static final double MANUAL_CONTROL_BUMP = toRadians(2);
  
     public static final double TURRET_ALLOWED_ERROR = toRadians(2);
 
@@ -326,12 +329,13 @@ public final class Constants {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
     public static final int NUM_LIGHTS = 308;
+    public static final int NUM_LIGHTS_WITHOUT_CANDLE = NUM_LIGHTS - 8;
 
     public static final double BOUNCE_SPEED = 0.75;
     public static final double BLINK_SPEED = .075;
 
     public static final Animation DISABLED_ANIMATION =
-            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS, Front, 7);
+            new LarsonAnimation(0, 0, 255, 0, BOUNCE_SPEED, NUM_LIGHTS_WITHOUT_CANDLE, Front, 7, 8);
 
     public static final RGB IDLE_RGB = new RGB(0, 0, 255);
 
@@ -348,6 +352,18 @@ public final class Constants {
 
     public static final Animation INTAKE_CUBE_ANIMATION =
             new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LIGHTS);
+
+    public static final MultipleColorSegments HAVE_CONE_WANT_CUBE = new MultipleColorSegments(8,
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CUBE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
+    );
+
+    public static final MultipleColorSegments HAVE_CUBE_WANT_CONE = new MultipleColorSegments(8,
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CONE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
+    );
 
     public static final Animation SOFT_STOP_ANIMATION =
             new StrobeAnimation(255, 0, 0, 0, BLINK_SPEED, NUM_LIGHTS);
