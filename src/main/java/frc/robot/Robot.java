@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     robotContainer = new RobotContainer(checkModulesLoop);
 
-    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
+    SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
     // PathPlannerServer.startServer(5811);

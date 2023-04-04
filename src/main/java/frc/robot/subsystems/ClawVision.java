@@ -57,9 +57,9 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     
     public ElementType getCurrentElementType() {
         switch(ll.getCurrentElement()){
-            case "cone":
+            case 1:
                 return Cone;
-            case "cube":
+            case 2:
                 return ElementType.Cube;
             default:
                 return ElementType.None;
