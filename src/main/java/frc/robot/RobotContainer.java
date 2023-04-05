@@ -100,23 +100,21 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Load the trajectories into the hashmap
     loadPaths(
-        "red-pickup-right",
-        "red-dock-right",
         "red-go-score-right",
-        "red-balance-right",
         "red-go-balance-right",
-        "blue-dock-left",
-        "blue-pickup-left",
-        "blue-score-right"
+        "red-return-left",
+
+        "blue-go-score-left",
+        "blue-go-balance-left",
+        "blue-return-right"
     );
 
-    loadPaths(1.25, 1, "red-back-off-right");
+    loadPaths(2, 4, "red-back-off-right");
     loadPaths(1.25, 1, "red-get-element-right");
-    loadPaths(2, 2, "red-go-balance-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
     
+    loadPaths(2, 4, "blue-back-off-left");
     loadPaths(1.25, 1, "blue-get-element-left");
-    loadPaths(2, 2, "blue-go-balance-left");
     loadPaths(0.75, 0.75, "blue-pickup-right");
 
     autoLoader = instantiateAutoLoader();
@@ -231,10 +229,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Red routes
     routes.putAll(Map.of(
-      RED_PICKUP_RIGHT, new RedPickupRight(this),
-      RED_BALANCE_CENTER, new RedBalanceCenter(this),
-      RED_PICKUP_LEFT, new RedPickupLeft(this),
-      RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
+            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
+            // RED_PICKUP_BALANCE_CENTER, new RedPickupBalanceCenter(this),
+            RED_BALANCE_CENTER, new RedBalanceCenter(this),
+            RED_PICKUP_LEFT, new RedPickupLeft(this),
+            RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
     ));
 
     //Blue routes
@@ -344,11 +343,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-    leftStick.topLeft().onTrue(baseVision.transitionCommand(BaseVision.BaseVisionState.APRILTAG).alongWith(turret.transitionCommand(TurretState.CARDINALS)));
-    leftStick.topRight().onTrue(
-      baseVision.transitionCommand(BaseVision.BaseVisionState.RETROREFLECTIVE).alongWith(
-        turret.transitionCommand(TurretState.LIMELIGHT_SCORING)
-      ));
+
   }
 
   public ArmMode getHighScoreModeFromVision() {
@@ -528,7 +523,17 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_PICKUP_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
-    BLUE_PICKUP_BALANCE_LEFT, BLUE_PICKUP_LEFT, BLUE_BALANCE_CENTER, BLUE_PICKUP_RIGHT
+    RED_TWO_SCORE_RIGHT, 
+    RED_BALANCE_RIGHT, 
+    RED_PICKUP_BALANCE_CENTER, 
+    RED_BALANCE_CENTER,
+    RED_PICKUP_LEFT, 
+    RED_NEW_AUTO, 
+    RED_PICKUP_BALANCE_RIGHT,
+
+    BLUE_PICKUP_BALANCE_LEFT, 
+    BLUE_PICKUP_LEFT, 
+    BLUE_BALANCE_CENTER, 
+    BLUE_PICKUP_RIGHT
   }
 }

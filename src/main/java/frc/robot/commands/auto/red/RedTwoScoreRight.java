@@ -10,50 +10,43 @@ import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Turret.TurretState;
-import frc.robot.subsystems.Turret;
 
-import static java.lang.Math.toRadians;
+public class RedTwoScoreRight extends SequentialCommandGroup {
 
-public class RedPickupBalanceRight extends SequentialCommandGroup {
-
-    public RedPickupBalanceRight(RobotContainer rc) {
+    public RedTwoScoreRight(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
-
                 new BonkShot(rc),
-
+                
                 rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
-
                 new ParallelCommandGroup(
                         rc.runTraj("red-get-element-right", true),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.5),
-                                rc.turret().goToAngle(toRadians(90)),
+                                rc.turret().goToAngle(Math.toRadians(90)),
                                 rc.arm().setArmSlowSpeedCommand(),
                                 rc.arm().transitionCommand(Arm.ArmMode.SEEKING_PICKUP_GROUND),
                                 new WaitCommand(1.5),
-                                rc.turret().transitionCommand(Turret.TurretState.INTAKING),
+                                rc.turret().transitionCommand(TurretState.INTAKING),
                                 rc.arm().openClaw()
                         )
                 ),
                 rc.dt().waitForState(DrivetrainState.IDLE),
                 rc.arm().closeClaw(),
                 new WaitCommand(0.5),
-                rc.arm().setArmNormalSpeedCommand(),
+                rc.arm().transitionCommand(ArmMode.SEEKING_HIGH),
                 rc.turret().transitionCommand(TurretState.IDLE),
-                rc.turret().goToAngle(toRadians(90)),
-                new ParallelCommandGroup(
-                    rc.arm().transitionCommand(ArmMode.SEEKING_PRIMED),
-                    rc.runTraj("red-go-balance-right")
-                ),
-                rc.arm().setArmSlowSpeedCommand(),
+                rc.turret().goToAngle(Math.toRadians(-90)),
+                // rc.arm().setArmNormalSpeedCommand(),
+                rc.runTraj("red-go-score-right"),
                 rc.dt().waitForState(DrivetrainState.IDLE),
-                rc.dt().transitionCommand(DrivetrainState.DOCKING),
-                rc.dt().waitForState(DrivetrainState.BALANCING),
-                rc.turret().goToAngle(toRadians(-90)), 
+                rc.arm().openClaw(),
+                new WaitCommand(0.5),
+                rc.runTraj("red-back-off-right"),
+                new WaitCommand(1),
+                rc.arm().setArmNormalSpeedCommand(),
                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
-                rc.dt().waitForState(DrivetrainState.X_SHAPE),
-                rc.arm().setArmNormalSpeedCommand()
+                rc.turret().setStartAngle(Math.toRadians(90))
         );
     }
 }

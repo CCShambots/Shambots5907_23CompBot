@@ -248,7 +248,7 @@ public final class Constants {
     public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
 
     public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
-    public static final double SHOULDER_FAST_ACCEL = toRadians(450); //Radians/sec^2
+    public static final double SHOULDER_FAST_ACCEL = toRadians(500); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
@@ -308,7 +308,7 @@ public final class Constants {
     public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = 258.4; //Degrees //-247.9
     public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 300; //1000
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);

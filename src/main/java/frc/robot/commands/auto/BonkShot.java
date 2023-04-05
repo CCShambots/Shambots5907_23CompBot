@@ -9,6 +9,7 @@ public class BonkShot extends SequentialCommandGroup{
 
     public BonkShot(RobotContainer rc) {
         addCommands(
+            new WaitCommand(0.5),        
             rc.arm().setArmFastSpeedCommand(),
             rc.arm().transitionCommand(ArmMode.LOW_SCORE),
             new WaitCommand(0.5),

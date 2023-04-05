@@ -1,4 +1,4 @@
-package frc.robot.commands.auto.red;
+package frc.robot.commands.auto.blue;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -11,21 +11,21 @@ import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Turret.TurretState;
 
-public class RedPickupRight extends SequentialCommandGroup {
+public class BlueTwoScoreLeft extends SequentialCommandGroup {
 
-    public RedPickupRight(RobotContainer rc) {
+    public BlueTwoScoreLeft(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
                 new BonkShot(rc),
-
+                
+                rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
                 new ParallelCommandGroup(
-                        rc.runTraj("red-get-element-right", true),
+                        rc.runTraj("blue-get-element-left", true),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.5),
-                                rc.turret().goToAngle(Math.toRadians(90)),
+                                rc.turret().goToAngle(Math.toRadians(-90)),
                                 rc.arm().setArmSlowSpeedCommand(),
                                 rc.arm().transitionCommand(Arm.ArmMode.SEEKING_PICKUP_GROUND),
-                                rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
                                 new WaitCommand(1.5),
                                 rc.turret().transitionCommand(TurretState.INTAKING),
                                 rc.arm().openClaw()
@@ -36,16 +36,17 @@ public class RedPickupRight extends SequentialCommandGroup {
                 new WaitCommand(0.5),
                 rc.arm().transitionCommand(ArmMode.SEEKING_HIGH),
                 rc.turret().transitionCommand(TurretState.IDLE),
-                rc.turret().goToAngle(Math.toRadians(-90)),
+                rc.turret().goToAngle(Math.toRadians(90)),
                 // rc.arm().setArmNormalSpeedCommand(),
-                rc.runTraj("red-go-score-right"),
+                rc.runTraj("blue-go-score-left"),
                 rc.dt().waitForState(DrivetrainState.IDLE),
                 rc.arm().openClaw(),
-                rc.runTraj("red-back-off-right"),
+                new WaitCommand(0.5),
+                rc.runTraj("blue-back-off-left"),
                 new WaitCommand(1),
                 rc.arm().setArmNormalSpeedCommand(),
                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
-                rc.turret().setStartAngle(Math.toRadians(90))
+                rc.turret().setStartAngle(Math.toRadians(-90))
         );
     }
 }

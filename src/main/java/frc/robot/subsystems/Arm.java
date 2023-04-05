@@ -21,9 +21,6 @@ import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
 import static com.ctre.phoenixpro.signals.InvertedValue.*;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.*;

@@ -102,6 +102,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
 
     robotContainer.turret().setTarget((Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE);
+    robotContainer.dt().setAllModules(Constants.SwerveDrivetrain.STOPPED_STATE);
     // robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
 

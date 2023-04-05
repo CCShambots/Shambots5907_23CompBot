@@ -5,9 +5,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
-import frc.robot.commands.auto.ScoreFirstElementCommand;
+import frc.robot.commands.auto.BonkShot;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
+import frc.robot.subsystems.Turret.TurretState;
 
 public class BlueBalanceCenter extends SequentialCommandGroup {
 
@@ -16,7 +17,7 @@ public class BlueBalanceCenter extends SequentialCommandGroup {
                 rc.waitForReady(),
                 rc.dt().resetGyroCommand(new Rotation2d()),
 
-                new ScoreFirstElementCommand(rc),
+                new BonkShot(rc),
 
                 rc.dt().setPositiveDockDirectionCommand(false),
                 new ParallelCommandGroup(
@@ -28,7 +29,12 @@ public class BlueBalanceCenter extends SequentialCommandGroup {
                                 new WaitCommand(2),
                                 rc.turret().goToAngle(Math.toRadians(-90))
                         )
-                )
+                ), 
+                rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
+                rc.dt().waitForState(DrivetrainState.IDLE),
+                rc.dt().transitionCommand(DrivetrainState.DOCKING),
+                rc.dt().waitForState(DrivetrainState.BALANCING),
+                rc.turret().transitionCommand(TurretState.IDLE)
         );
     }
 }
