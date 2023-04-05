@@ -60,16 +60,21 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     }
     
     public ElementType getCurrentElementType() {
-        if(clawStateSupplier.get() == ClawState.CLOSED) {
-            switch (ll.getCurrentElement()) {
-                case 1:
-                    return Cone;
-                case 2:
-                    return Cube;
-                default:
-                    return None;
-            }
-        } else return None;
+        try {
+            if(clawStateSupplier.get() == ClawState.CLOSED) {
+                switch (ll.getCurrentElement()) {
+                    case 1:
+                        return Cone;
+                    case 2:
+                        return Cube;
+                    default:
+                        return None;
+                }
+            } else return None;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return None;
+        }
     }
 
     /**

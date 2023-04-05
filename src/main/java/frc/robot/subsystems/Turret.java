@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -22,6 +21,8 @@ import java.util.function.DoubleSupplier;
 import static com.ctre.phoenixpro.signals.InvertedValue.Clockwise_Positive;
 import static com.ctre.phoenixpro.signals.NeutralModeValue.Coast;
 import static frc.robot.Constants.Turret.*;
+import static frc.robot.Constants.Vision.BASE_HAS_TARGET_SUPPLIER;
+import static frc.robot.Constants.Vision.BASE_X_OFFSET_SUPPLIER;
 import static frc.robot.subsystems.Turret.TurretState.*;
 import static java.lang.Math.*;
 import static java.lang.Math.toDegrees;
@@ -35,13 +36,20 @@ public class Turret extends StateMachine<Turret.TurretState> {
     private final BooleanSupplier awaySupplier;
     private final BooleanSupplier leftSupplier;
     private final BooleanSupplier rightSupplier;
+
     private final BooleanSupplier clawHasTarget;
     private final DoubleSupplier clawVisionOffset;
+
 
     private boolean enforceStartAngle = false;
     private double startAngle = 0;
 
-    public Turret(BooleanSupplier towardSupplier, BooleanSupplier awaySupplier, BooleanSupplier clawHasTarget, DoubleSupplier clawVisionOffset, BooleanSupplier leftSupplier, BooleanSupplier rightSupplier) {
+    public Turret(BooleanSupplier towardSupplier,
+                  BooleanSupplier awaySupplier,
+                  BooleanSupplier clawHasTarget,
+                  DoubleSupplier clawVisionOffset,
+                  BooleanSupplier leftSupplier,
+                  BooleanSupplier rightSupplier) {
         super("turret", UNDETERMINED, TurretState.class);
 
         this.towardSupplier = towardSupplier;
@@ -67,6 +75,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
         addOmniTransition(CARDINALS, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
         addOmniTransition(MANUAL_CONTROL, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
 
+        addOmniTransition(LIMELIGHT_SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+
         addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
     }
 
@@ -84,16 +94,26 @@ public class Turret extends StateMachine<Turret.TurretState> {
                     double mult = AIMING_LUT.getClosest(clawOffset);
 
                     if(Math.abs(clawOffset) < 3) {
-                        SmartDashboard.putNumber("mult", mult);
-                        SmartDashboard.putNumber("clawOffset-with-mult", toDegrees(mult * clawOffset));
-                        
+
                         setTarget(getTurretAngle() + mult * clawVisionOffset.getAsDouble());
                     }
                    
                 }
 
-                SmartDashboard.putBoolean("turret busy", isBusy());
         }));
+
+        registerStateCommand(LIMELIGHT_SCORING, new RunCommand(() -> {
+            if(!isBusy() && BASE_HAS_TARGET_SUPPLIER.getAsBoolean()) {
+                double baseOffset = BASE_X_OFFSET_SUPPLIER.getAsDouble();
+
+                double mult = AIMING_LUT.getClosest(baseOffset);
+
+                if(Math.abs(baseOffset) < 3) {
+                    setTarget(getTurretAngle() + mult * BASE_X_OFFSET_SUPPLIER.getAsDouble());
+                }
+            }
+        }));
+
 
         registerStateCommand(MANUAL_CONTROL, new NewTurretManualControlCommand(this, leftSupplier, rightSupplier));
     }
@@ -103,6 +123,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
         IDLE,
         CARDINALS,
         SCORING,
+        LIMELIGHT_SCORING,
         INTAKING,
         SOFT_STOP,
         MANUAL_CONTROL
@@ -194,6 +215,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
     protected void onTeleopStart() {
         if(enforceStartAngle) {
             setTarget(startAngle);
+            enforceStartAngle = false;
         }
     }
 

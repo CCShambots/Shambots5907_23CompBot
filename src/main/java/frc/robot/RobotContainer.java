@@ -5,7 +5,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -21,6 +20,7 @@ import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
 import frc.robot.commands.auto.blue.BluePickupLeft;
 import frc.robot.commands.auto.blue.BluePickupRight;
+import frc.robot.commands.auto.blue.BlueTwoScoreLeft;
 import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
@@ -101,22 +101,21 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Load the trajectories into the hashmap
     loadPaths(
-        "red-pickup-right",
-        "red-dock-right",
         "red-go-score-right",
-        "red-balance-right",
         "red-go-balance-right",
-        "blue-dock-left",
-        "blue-pickup-left",
-        "blue-score-right"
+        "red-return-left",
+
+        "blue-go-score-left",
+        "blue-go-balance-left",
+        "blue-return-right"
     );
 
+    loadPaths(2, 4, "red-back-off-right");
     loadPaths(1.25, 1, "red-get-element-right");
-    loadPaths(2, 2, "red-go-balance-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
     
+    loadPaths(2, 4, "blue-back-off-left");
     loadPaths(1.25, 1, "blue-get-element-left");
-    loadPaths(2, 2, "blue-go-balance-left");
     loadPaths(0.75, 0.75, "blue-pickup-right");
 
     autoLoader = instantiateAutoLoader();
@@ -127,12 +126,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(arm);
     addChildSubsystem(lights);
     addChildSubsystem(clawVision);
+    addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
-    //TODO: Remove
+    // TODO: Remove
     // SmartDashboard.putData("drivetrain", drivetrain);
-    // SmartDashboard.putData("arm", arm);
+    // SmartDashboard.putData("field", drivetrain.getField());
+    SmartDashboard.putData("arm", arm);
+    SmartDashboard.putData("base vision", baseVision);
     SmartDashboard.putData("turret", turret);
+    SmartDashboard.putData("claw", arm.claw());
 
     defineTransitions();
     defineStateCommands();
@@ -174,8 +177,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            new InstantCommand(() -> arm.requestTransition(currentScoreMode)),
-            turret.transitionCommand(Turret.TurretState.SCORING)
+            new InstantCommand(() -> arm.requestTransition(currentScoreMode))
+            // turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
     //TODO: REMOVE ALL TESTING STUFF
@@ -233,18 +236,19 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Red routes
     routes.putAll(Map.of(
-      RED_PICKUP_RIGHT, new RedPickupRight(this),
-      RED_BALANCE_CENTER, new RedBalanceCenter(this),
-      RED_PICKUP_LEFT, new RedPickupLeft(this),
-      RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
+            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
+            // RED_PICKUP_BALANCE_CENTER, new RedPickupBalanceCenter(this),
+            RED_BALANCE_CENTER, new RedBalanceCenter(this),
+            RED_PICKUP_LEFT, new RedPickupLeft(this),
+            RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
     ));
 
     //Blue routes
     routes.putAll(Map.of(
-            BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
-            BLUE_PICKUP_LEFT, new BluePickupLeft(this),
-            BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
-            BLUE_PICKUP_RIGHT, new BluePickupRight(this) 
+      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
+      BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
+      BLUE_PICKUP_RIGHT, new BluePickupRight(this),
+      BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this)
       )
     );
 
@@ -346,6 +350,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
+
   }
 
   public ArmMode getHighScoreModeFromVision() {
@@ -372,7 +377,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       }
       else {
         setFlag(State.MANUAL_CONTROL);
-        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+        // turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
       }
     }
     else {
@@ -472,6 +477,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return turret;
   }
 
+  public BaseVision bv() {return baseVision;}
+  public ClawVision cv() {return clawVision;}
+  
   public Lights lights() {
     return lights;
   }
@@ -522,7 +530,18 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
-    RED_PICKUP_RIGHT, RED_BALANCE_RIGHT, RED_BALANCE_CENTER, RED_PICKUP_LEFT, RED_NEW_AUTO, RED_PICKUP_BALANCE_RIGHT,
-    BLUE_PICKUP_BALANCE_LEFT, BLUE_PICKUP_LEFT, BLUE_BALANCE_CENTER, BLUE_PICKUP_RIGHT
+
+    RED_TWO_SCORE_RIGHT, 
+    RED_BALANCE_RIGHT, 
+    RED_PICKUP_BALANCE_CENTER, 
+    RED_BALANCE_CENTER,
+    RED_PICKUP_LEFT, 
+    RED_NEW_AUTO, 
+    RED_PICKUP_BALANCE_RIGHT,
+
+    BLUE_PICKUP_BALANCE_LEFT, 
+    BLUE_TWO_SCORE_LEFT, 
+    BLUE_BALANCE_CENTER, 
+    BLUE_PICKUP_RIGHT
   }
 }

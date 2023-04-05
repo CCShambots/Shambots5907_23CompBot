@@ -73,6 +73,7 @@ public class Claw extends StateMachine<Claw.ClawState> {
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
 //        builder.addStringProperty("solenoid", () -> solenoid.get().name(), null);
+            builder.addBooleanProperty("prox", () -> prox.isActivated(), null);
     }
 
     public void enableProx() {

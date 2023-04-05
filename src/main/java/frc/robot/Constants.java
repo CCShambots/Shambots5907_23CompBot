@@ -20,6 +20,8 @@ import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import com.ctre.phoenix.led.*;
@@ -204,6 +206,10 @@ public final class Constants {
 
     //Base
     public static final int APRIL_TAG_PIPELINE = 0;
+    public static final int RETRO_PIPELINE = 1;
+
+    public static DoubleSupplier BASE_X_OFFSET_SUPPLIER;
+    public static BooleanSupplier BASE_HAS_TARGET_SUPPLIER;
 
     //Claw
     public static final int CONE_DETECTOR_PIPELINE = 0;
@@ -240,6 +246,9 @@ public final class Constants {
 
     public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
     public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
+
+    public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
+    public static final double SHOULDER_FAST_ACCEL = toRadians(500); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
@@ -279,8 +288,8 @@ public final class Constants {
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
     public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-114), 0);
-    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(48), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(20), toRadians(24), 0);
+    public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(46), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(14), toRadians(25), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-75), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
@@ -299,7 +308,7 @@ public final class Constants {
     public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = 258.4; //Degrees //-247.9
     public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 400; //1000
+    public static final double TURRET_MAX_ACCEL = 300; //1000
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);

@@ -14,19 +14,44 @@
             "open": true
           }
         },
-        "drivetrain": {
-          "open": true
-        },
         "open": true
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
+      "/LiveWindow/Ungrouped/Pigeon 2 [1]": "Gyro",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [11]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [12]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [13]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [14]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [15]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [16]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [17]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [18]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [21]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [22]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [23]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX (Pro) [24]": "Motor Controller",
       "/Shuffleboard/Drive/Auto Route": "String Chooser",
       "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
-      "/SmartDashboard/Robot": "Subsystem"
+      "/SmartDashboard/Robot": "Subsystem",
+      "/SmartDashboard/field": "Field2d",
+      "/SmartDashboard/turret": "Subsystem"
     },
     "windows": {
       "/SmartDashboard///Robot/Drivetrain/field": {
@@ -180,7 +205,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <3>": {
       "plots": [
@@ -252,7 +280,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <4>": {
       "plots": [
@@ -270,7 +301,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }
