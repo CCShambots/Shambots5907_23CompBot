@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.RobotContainer.State;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.subsystems.Lights.LightState;
 
 
 public class Robot extends TimedRobot {
@@ -48,14 +50,26 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     //Make sure all subsystems are disabled
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
+
+    robotContainer.lights().enable();
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (!Constants.HAS_BEEN_ENABLED && robotContainer.turret().getMinimumAbsoluteErrorToStartingPos() > 3) {
+      robotContainer.setFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
+      robotContainer.lights().requestTransition(LightState.SOFT_STOP);
+    }
+    else {
+      robotContainer.clearFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
+      robotContainer.lights().requestTransition(LightState.DISABLED);
+    }
+  }
 
   @Override
   public void autonomousInit() {
     //Start all the subsystems in autonomous mode
+    Constants.HAS_BEEN_ENABLED = true;
     SubsystemManagerFactory.getInstance().notifyAutonomousStart();
   }
 
@@ -65,6 +79,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    Constants.HAS_BEEN_ENABLED = true;
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
@@ -82,6 +97,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    Constants.HAS_BEEN_ENABLED = true;
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
@@ -93,7 +109,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {}
 
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    Constants.HAS_BEEN_ENABLED = true;
+  }
 
   @Override
   public void simulationPeriodic() {}
