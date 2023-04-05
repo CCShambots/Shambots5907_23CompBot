@@ -95,7 +95,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
                     if(Math.abs(clawOffset) < 3) {
 
-                        setTarget(getTurretAngle() + mult * clawVisionOffset.getAsDouble());
+                        setTarget(getRelativeAngle() + mult * clawVisionOffset.getAsDouble());
                     }
                    
                 }
@@ -109,7 +109,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
                 double mult = AIMING_LUT.getClosest(baseOffset);
 
                 if(Math.abs(baseOffset) < 3) {
-                    setTarget(getTurretAngle() + mult * BASE_X_OFFSET_SUPPLIER.getAsDouble());
+                    setTarget(getRelativeAngle() + mult * BASE_X_OFFSET_SUPPLIER.getAsDouble());
                 }
             }
         }));
@@ -160,6 +160,10 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
     public double getTurretAngle() {
         return toRadians(turretPotentiometer.get());
+    }
+
+    public double getRelativeAngle() {
+        return turret.getEncoderPosition();
     }
 
     public double getTurretTarget() {

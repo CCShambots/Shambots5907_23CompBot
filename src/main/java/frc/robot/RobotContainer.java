@@ -221,10 +221,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().contains(alliance.name().toLowerCase()))
             .withPosition(4, 2).withSize(2, 2);
 
-    driveTab.add("ZERO TURRET BASED ON ALLIANCE", reZeroTurret()).withPosition(7, 3).withSize(3, 2);
+    driveTab.add("ZERO TURRET BASED ON ALLIANCE", reZeroTurret()).withPosition(2, 2).withSize(1, 1);
+    driveTab.addNumber("turret absolute", () -> Math.toDegrees(turret.getTurretAngle())).withPosition(1, 2).withSize(1, 1);
+    driveTab.addNumber("turret relative", () -> Math.toDegrees(turret.getRelativeAngle())).withPosition(0, 2).withSize(1, 1);
   }
 
-  private Command reZeroTurret() {
+  private InstantCommand reZeroTurret() {
     return new WhileDisabledInstantCommand(() -> turret.resetAngle(Math.toRadians(alliance.equals(Red) ? -90 : 90)));
   }
 
@@ -350,7 +352,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-
+    
   }
 
   public ArmMode getHighScoreModeFromVision() {
