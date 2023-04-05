@@ -157,6 +157,10 @@ public class Turret extends StateMachine<Turret.TurretState> {
         return min(abs(deg - 90), abs(deg + 90));
     }
 
+    public void resetAngle(double angle /*radians*/) {
+        turret.resetPosition(angle);
+    }
+
     public boolean isBusy() {
         return getErorr() > TURRET_ALLOWED_ERROR;
     }

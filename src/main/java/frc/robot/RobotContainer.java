@@ -217,6 +217,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().contains(alliance.name().toLowerCase()))
             .withPosition(4, 2).withSize(2, 2);
+
+    driveTab.add("ZERO TURRET BASED ON ALLIANCE", reZeroTurret()).withPosition(7, 3).withSize(3, 2);
+  }
+
+  private Command reZeroTurret() {
+    return new WhileDisabledInstantCommand(() -> turret.resetAngle(Math.toRadians(alliance.equals(Red) ? -90 : 90)));
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
