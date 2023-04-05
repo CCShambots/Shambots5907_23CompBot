@@ -233,7 +233,7 @@ public final class Constants {
     public static final int SHOULDER_ID = 23;
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/30.0) * (10.0 / 33.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
-    public static final double SHOULDER_ENCODER_OFFSET = -67.7; //Degrees
+    public static final double SHOULDER_ENCODER_OFFSET = -63.5; //Degrees -67.7
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
     public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
     public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
@@ -245,7 +245,7 @@ public final class Constants {
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
-    public static final double WRIST_ENCODER_OFFSET = -81.1; //Degrees
+    public static final double WRIST_ENCODER_OFFSET = -83.2; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_VEL = toRadians(160); //Radians/sec
     public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
@@ -296,8 +296,8 @@ public final class Constants {
                     2 * PI //To radians
             ; //Rotations --> Radians
     public static final int TURRET_POT_PORT = 0; //Analog port
-    public static final double TURRET_POT_RATIO = 514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = -247.9; //Degrees //-246.5
+    public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
+    public static final double TURRET_ENCODER_OFFSET = 258.4; //Degrees //-247.9
     public static final double TURRET_MAX_VEL = 400; //1000
     public static final double TURRET_MAX_ACCEL = 400; //1000
     public static final double TURRET_SLOW_VEL = 100;
@@ -356,15 +356,17 @@ public final class Constants {
             new StrobeAnimation(144, 22, 153, 0, BLINK_SPEED, NUM_LIGHTS);
 
     public static final MultipleColorSegments HAVE_CONE_WANT_CUBE = new MultipleColorSegments(8,
-            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
-            new RGBSegmentInfo(CUBE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
-            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4)
     );
 
     public static final MultipleColorSegments HAVE_CUBE_WANT_CONE = new MultipleColorSegments(8,
-            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5),
-            new RGBSegmentInfo(CONE_RGB, 3 * NUM_LIGHTS_WITHOUT_CANDLE / 5),
-            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 5)
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CONE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4),
+            new RGBSegmentInfo(CUBE_RGB, NUM_LIGHTS_WITHOUT_CANDLE / 4)
     );
 
     public static final Animation SOFT_STOP_ANIMATION =
