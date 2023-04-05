@@ -5,6 +5,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
@@ -18,7 +19,7 @@ public class RedPickupBalanceCenter extends SequentialCommandGroup {
                 rc.waitForReady(),
                 rc.dt().resetGyroCommand(new Rotation2d()),
                 
-                new BonkShot(rc),
+                new ScoreFirstElementCommand(rc),
                 
                 rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
                 rc.arm().openClaw(),

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
@@ -18,7 +19,7 @@ public class BluePickupBalanceLeft extends SequentialCommandGroup {
         addCommands(
             rc.waitForReady(),
 
-            new BonkShot(rc),
+            new ScoreFirstElementCommand(rc),
 
             rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
 

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ElementType;
 import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
@@ -19,7 +20,7 @@ public class RedPickupLeft extends SequentialCommandGroup {
     public RedPickupLeft(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
-                new BonkShot(rc),
+                new ScoreFirstElementCommand(rc),
 
                 rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
                 new ParallelCommandGroup(

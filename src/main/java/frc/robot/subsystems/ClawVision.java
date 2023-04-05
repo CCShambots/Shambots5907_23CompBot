@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
@@ -96,6 +97,10 @@ public class ClawVision extends StateMachine<ClawVision.VisionState> {
     protected void determineSelf() {
         ll.setPipeline(UNDETERMINED.pipelineID);
         setState(CONE_DETECTOR);
+    }
+
+    public Command ScoreFirstElementCommand(VisionState coneDetector) {
+        return null;
     }
 
 }

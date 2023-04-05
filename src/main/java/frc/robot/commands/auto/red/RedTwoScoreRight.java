@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
@@ -16,7 +17,7 @@ public class RedTwoScoreRight extends SequentialCommandGroup {
     public RedTwoScoreRight(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
-                new BonkShot(rc),
+                new ScoreFirstElementCommand(rc),
                 
                 rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
                 new ParallelCommandGroup(
@@ -43,7 +44,7 @@ public class RedTwoScoreRight extends SequentialCommandGroup {
                 rc.arm().openClaw(),
                 new WaitCommand(0.5),
                 rc.runTraj("red-back-off-right"),
-                new WaitCommand(1),
+                new WaitCommand(0.5),
                 rc.arm().setArmNormalSpeedCommand(),
                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
                 rc.turret().setStartAngle(Math.toRadians(90))
