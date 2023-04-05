@@ -20,6 +20,7 @@ import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
 import frc.robot.commands.auto.blue.BluePickupLeft;
 import frc.robot.commands.auto.blue.BluePickupRight;
+import frc.robot.commands.auto.blue.BlueTwoScoreLeft;
 import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
@@ -238,10 +239,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Blue routes
     routes.putAll(Map.of(
-            BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
-            BLUE_PICKUP_LEFT, new BluePickupLeft(this),
-            BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
-            BLUE_PICKUP_RIGHT, new BluePickupRight(this) 
+      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
+      BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
+      BLUE_PICKUP_RIGHT, new BluePickupRight(this),
+      BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this)
       )
     );
 
@@ -523,6 +524,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public enum AutoRoutes {
     NOTHING,
+
     RED_TWO_SCORE_RIGHT, 
     RED_BALANCE_RIGHT, 
     RED_PICKUP_BALANCE_CENTER, 
@@ -532,7 +534,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     RED_PICKUP_BALANCE_RIGHT,
 
     BLUE_PICKUP_BALANCE_LEFT, 
-    BLUE_PICKUP_LEFT, 
+    BLUE_TWO_SCORE_LEFT, 
     BLUE_BALANCE_CENTER, 
     BLUE_PICKUP_RIGHT
   }

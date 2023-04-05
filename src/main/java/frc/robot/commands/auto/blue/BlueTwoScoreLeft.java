@@ -26,7 +26,7 @@ public class BlueTwoScoreLeft extends SequentialCommandGroup {
                                 rc.turret().goToAngle(Math.toRadians(-90)),
                                 rc.arm().setArmSlowSpeedCommand(),
                                 rc.arm().transitionCommand(Arm.ArmMode.SEEKING_PICKUP_GROUND),
-                                new WaitCommand(1.5),
+                                new WaitCommand(2),
                                 rc.turret().transitionCommand(TurretState.INTAKING),
                                 rc.arm().openClaw()
                         )

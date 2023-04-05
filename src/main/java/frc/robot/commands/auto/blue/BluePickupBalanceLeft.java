@@ -29,7 +29,7 @@ public class BluePickupBalanceLeft extends SequentialCommandGroup {
                             rc.turret().goToAngle(toRadians(-90)),
                             rc.arm().setArmSlowSpeedCommand(),
                             rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
-                            new WaitCommand(1.5),
+                            new WaitCommand(2),
                             rc.turret().transitionCommand(TurretState.INTAKING),
                             rc.arm().openClaw()
                     )
@@ -42,10 +42,11 @@ public class BluePickupBalanceLeft extends SequentialCommandGroup {
             rc.turret().goToAngle(toRadians(-90)),
             new ParallelCommandGroup(
                 rc.arm().transitionCommand(ArmMode.SEEKING_PRIMED),
-                rc.runTraj("blue-go-balance-left ")
+                rc.runTraj("blue-go-balance-left")
             ),
             rc.arm().setArmSlowSpeedCommand(),
             rc.dt().waitForState(DrivetrainState.IDLE),
+            rc.dt().setPositiveDockDirectionCommand(false),
             rc.dt().transitionCommand(DrivetrainState.DOCKING),
             rc.dt().waitForState(DrivetrainState.BALANCING),
             rc.turret().goToAngle(toRadians(90)), 
