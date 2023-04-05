@@ -8,6 +8,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.Candle.CANdleEX;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.commands.WhileDisabledInstantCommand;
 
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Lights.*;
@@ -70,7 +71,7 @@ public class Lights extends StateMachine<Lights.LightState> {
     }
 
     private void addAnimationTransition(LightState state) {
-        addOmniTransition(state, new InstantCommand(() -> candle.animate(state.animation)));
+        addOmniTransition(state, new WhileDisabledInstantCommand(() -> candle.animate(state.animation)));
     }
 
     /**

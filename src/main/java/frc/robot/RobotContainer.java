@@ -142,11 +142,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
-  private void defineTriggers() {
-    new Trigger(() -> isFlag(State.TURRET_STARTUP_MISALIGNMENT))
-            .onTrue(lights.transitionCommand(LightState.SOFT_STOP))
-            .onFalse(lights.transitionCommand(LightState.IDLE));
-  }
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
@@ -469,6 +464,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public Turret turret() {
     return turret;
+  }
+
+  public Lights lights() {
+    return lights;
   }
 
 
