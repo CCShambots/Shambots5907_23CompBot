@@ -2,13 +2,17 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-public class BaseVision {
+import static frc.robot.Constants.Vision.*;
+
+public class BaseVision extends StateMachine<BaseVision.BaseVisionState>{
 
     private final Limelight ll = new Limelight("limelight-base");
     private final Pose3d initialCameraPose;
@@ -20,9 +24,18 @@ public class BaseVision {
      * @param turretAngleSupplier supplier for the angle of the turret
      */
     public BaseVision(Pose3d initialCameraPose, Supplier<Rotation2d> turretAngleSupplier) {
+
+        super("Base Vision", BaseVisionState.UNDETERMINED, BaseVisionState.class);
+
         this.initialCameraPose = initialCameraPose;
 
         this.turretAngleSupplier = turretAngleSupplier;
+
+        BASE_HAS_TARGET_SUPPLIER = getLLHasTargetSupplier();
+        BASE_X_OFFSET_SUPPLIER = getXOffsetSupplier();
+
+        addOmniTransition(BaseVisionState.APRILTAG, new InstantCommand(() -> ll.setPipeline(APRIL_TAG_PIPELINE)));
+        addOmniTransition(BaseVisionState.RETROREFLECTIVE, new InstantCommand(() -> ll.setPipeline(RETRO_PIPELINE)));
     }
 
     /**
@@ -60,6 +73,25 @@ public class BaseVision {
 
     public BooleanSupplier getLLHasTargetSupplier() {
         return ll::hasTarget;
+    }
+
+    public DoubleSupplier getXOffsetSupplier() {
+        return () -> ll.getXOffset().getRadians();
+    }
+
+    @Override
+    protected void onTeleopStart() {
+        transitionCommand(BaseVisionState.APRILTAG);
+    }
+
+    @Override
+    protected void determineSelf() {
+        ll.setPipeline(APRIL_TAG_PIPELINE);
+        setState(BaseVisionState.APRILTAG);
+    }
+
+    public enum BaseVisionState {
+        UNDETERMINED, APRILTAG, RETROREFLECTIVE
     }
 
 

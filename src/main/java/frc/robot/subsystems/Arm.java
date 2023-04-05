@@ -135,6 +135,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
 
         addTransition(PICKUP_GROUND, SEEKING_STOWED, new InstantCommand(() -> setWristTarget(toRadians(-45))));
+        addTransition(HIGH, SEEKING_STOWED, () -> setWristTarget(toRadians(-45)));
 
         addTransition(STOWED, SEEKING_PICKUP_GROUND);
         addTransition(HIGH, SEEKING_PICKUP_GROUND);
@@ -256,19 +257,15 @@ public class Arm extends StateMachine<Arm.ArmMode> {
             if (isEnabled() && getState() != SOFT_STOP) {
                 //Wrist code
                 double wristPIDOutput = wristPID.calculate(wristEncoder.getRadians(), wristTarget);
-                double wristFFOutput = wristFF.calculate(wristPID.getSetpoint().position + shoulderEncoder.getRadians(), wristPID.getSetpoint().velocity);
-                
-                double wristOutput = wristPIDOutput + wristFFOutput;
+                double wristFFOutput = wristFF.calculate(wristPID.getSetpoint().position + shoulderEncoder.getRadians(), wristPID.getSetpoint().velocity);                
 
-                wrist.setVoltage(wristOutput);
+                wrist.setVoltage(wristPIDOutput+wristFFOutput);
                 
                 //Shoulder code
                 double shoulderPIDOutput = shoulderPID.calculate(getShoulderAngle(), shoulderTarget);
                 double shoulderFFOutput = shoulderFF.calculate(shoulderPID.getSetpoint().position,  shoulderPID.getSetpoint().velocity);
                 
-                double shoulderOutput = shoulderPIDOutput + shoulderFFOutput;
-
-                shoulder.setVoltage(shoulderOutput);
+                shoulder.setVoltage(shoulderPIDOutput + shoulderFFOutput);
 
             }
         };
@@ -484,12 +481,12 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
         builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
 
-        builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
-        builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
-        builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
-        builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
-        builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
-        builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
+        // builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
+        // builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);
+        // builder.addDoubleProperty("armpose/z", () -> getArmPose().getZ(), null);
+        // builder.addDoubleProperty("armpose/roll", () -> -getArmPose().getRotation().getX(), null);
+        // builder.addDoubleProperty("armpose/pitch", () -> -getArmPose().getRotation().getY(), null);
+        // builder.addDoubleProperty("armpose/yaw", () -> getArmPose().getRotation().getZ(), null);
     }
 
 

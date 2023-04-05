@@ -20,6 +20,8 @@ import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import com.ctre.phoenix.led.*;
@@ -204,6 +206,10 @@ public final class Constants {
 
     //Base
     public static final int APRIL_TAG_PIPELINE = 0;
+    public static final int RETRO_PIPELINE = 1;
+
+    public static DoubleSupplier BASE_X_OFFSET_SUPPLIER;
+    public static BooleanSupplier BASE_HAS_TARGET_SUPPLIER;
 
     //Claw
     public static final int CONE_DETECTOR_PIPELINE = 0;
@@ -241,8 +247,8 @@ public final class Constants {
     public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
     public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
 
-    public static final double SHOULDER_FAST_VEL = toRadians(300); //Radians/sec
-    public static final double SHOULDER_FAST_ACCEL = toRadians(300); //Radians/sec^2
+    public static final double SHOULDER_FAST_VEL = toRadians(360); //Radians/sec
+    public static final double SHOULDER_FAST_ACCEL = toRadians(360); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;

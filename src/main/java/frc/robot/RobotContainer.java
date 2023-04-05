@@ -127,12 +127,15 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(arm);
     addChildSubsystem(lights);
     addChildSubsystem(clawVision);
+    addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
     // TODO: Remove
-    // SmartDashboard.putData("drivetrain", drivetrain);
+    SmartDashboard.putData("drivetrain", drivetrain);
+    SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
-    // SmartDashboard.putData("turret", turret);
+    SmartDashboard.putData("base vision", baseVision);
+    SmartDashboard.putData("turret", turret);
 
     defineTransitions();
     defineStateCommands();
@@ -173,8 +176,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addTransition(State.TRAVELING, State.SCORING, new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            new InstantCommand(() -> arm.requestTransition(currentScoreMode)),
-            turret.transitionCommand(Turret.TurretState.SCORING)
+            new InstantCommand(() -> arm.requestTransition(currentScoreMode))
+            // turret.transitionCommand(Turret.TurretState.SCORING)
     ));
 
     //TODO: REMOVE ALL TESTING STUFF
@@ -339,9 +342,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-    leftStick.topLeft().onTrue(arm.setArmFastSpeedCommand());
-    leftStick.topRight().onTrue(arm.setArmNormalSpeedCommand());
-
+    leftStick.topLeft().onTrue(baseVision.transitionCommand(BaseVision.BaseVisionState.APRILTAG));
+    leftStick.topRight().onTrue(
+      baseVision.transitionCommand(BaseVision.BaseVisionState.RETROREFLECTIVE).alongWith(
+        turret.transitionCommand(TurretState.LIMELIGHT_SCORING)
+      ));
   }
 
   public ArmMode getHighScoreModeFromVision() {
@@ -467,6 +472,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public Turret turret() {
     return turret;
   }
+
+  public BaseVision bv() {return baseVision;}
 
   //TODO: Remove
   public void updateTarget() {

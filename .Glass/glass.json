@@ -14,9 +14,6 @@
             "open": true
           }
         },
-        "drivetrain": {
-          "open": true
-        },
         "open": true
       }
     },
@@ -53,6 +50,7 @@
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
       "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
       "/SmartDashboard/Robot": "Subsystem",
+      "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/turret": "Subsystem"
     },
     "windows": {
@@ -207,7 +205,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <3>": {
       "plots": [
@@ -279,7 +280,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <4>": {
       "plots": [
@@ -297,7 +301,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }
