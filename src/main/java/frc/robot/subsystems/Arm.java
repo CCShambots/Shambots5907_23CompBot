@@ -125,6 +125,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(STOWED, SEEKING_POSE);
         addTransition(SEEKING_POSE, AT_POSE);
 
+        addTransition(PICKUP_GROUND, SEEKING_HIGH);
+
         addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(ClawState.OPENED));
         addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
 
@@ -364,6 +366,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         //Make sure no I buildup or anything insane happens
         wristPID.reset(getWristAngle());
         shoulderPID.reset(getShoulderAngle());
+        setElevatorTarget(getElevatorHeight());
 
         setArmNormalSpeed();
     }
@@ -383,6 +386,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
                 getWristAngle()
         );
     }
+
+    public Claw claw() {return claw;}
 
     public double getElevatorHeight() {
         return elevator.getEncoderPosition();

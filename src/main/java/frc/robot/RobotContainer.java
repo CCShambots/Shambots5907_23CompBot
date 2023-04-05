@@ -5,7 +5,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -111,6 +110,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "blue-score-right"
     );
 
+    loadPaths(1.25, 1, "red-back-off-right");
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(2, 2, "red-go-balance-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
@@ -131,11 +131,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(turret);
 
     // TODO: Remove
-    SmartDashboard.putData("drivetrain", drivetrain);
-    SmartDashboard.putData("field", drivetrain.getField());
+    // SmartDashboard.putData("drivetrain", drivetrain);
+    // SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
     SmartDashboard.putData("base vision", baseVision);
     SmartDashboard.putData("turret", turret);
+    SmartDashboard.putData("claw", arm.claw());
 
     defineTransitions();
     defineStateCommands();
@@ -343,7 +344,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-    leftStick.topLeft().onTrue(baseVision.transitionCommand(BaseVision.BaseVisionState.APRILTAG));
+    leftStick.topLeft().onTrue(baseVision.transitionCommand(BaseVision.BaseVisionState.APRILTAG).alongWith(turret.transitionCommand(TurretState.CARDINALS)));
     leftStick.topRight().onTrue(
       baseVision.transitionCommand(BaseVision.BaseVisionState.RETROREFLECTIVE).alongWith(
         turret.transitionCommand(TurretState.LIMELIGHT_SCORING)
@@ -374,7 +375,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       }
       else {
         setFlag(State.MANUAL_CONTROL);
-        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+        // turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
       }
     }
     else {
@@ -475,6 +476,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public BaseVision bv() {return baseVision;}
+  public ClawVision cv() {return clawVision;}
   
   public Lights lights() {
     return lights;
