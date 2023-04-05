@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -64,6 +65,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
   private Constants.ElementType nextElement = Cone;
+  private boolean trustElementVision = true;
 
   //Declare autonomous loader
   private final AutonomousLoader<AutoRoutes> autoLoader;
@@ -192,7 +194,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineStateCommands() {
     registerStateCommand(State.TRAVELING, new RunCommand(() -> {
-      LightState correctState = lights.getStateFromElements(nextElement, clawVision.getCurrentElementType());
+      //Set the element that we have to be what we want next in case the vision fails
+      ElementType have = trustElementVision ? clawVision.getCurrentElementType() : nextElement;
+      LightState correctState = lights.getStateFromElements(nextElement, have);
       
       if (lights.getState() != correctState && lights.canDisplayInfo()){
         lights.requestTransition(correctState);
@@ -200,7 +204,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     }));
 
     registerStateCommand(State.INTAKING, new RunCommand(() -> {
-      LightState correctState = lights.getStateFromElements(nextElement, clawVision.getCurrentElementType());
+      //Set the element that we have to be what we want next in case the vision fails
+      ElementType have = trustElementVision ? clawVision.getCurrentElementType() : nextElement;
+      LightState correctState = lights.getStateFromElements(nextElement, have);
 
       if(correctState == LightState.CONE) correctState = LightState.INTAKE_CONE;
       else if(correctState == LightState.CUBE) correctState = LightState.INTAKE_CUBE;
@@ -214,20 +220,27 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void initializeDriveTab() {
     ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
-    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(4, 0).withSize(2, 2);
+    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(3, 0).withSize(2, 2);
     driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
-    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(7,2).withSize(2, 2);
-    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(7,0).withSize(2, 2);
+    driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(5,2).withSize(2, 2);
+    driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(5,0).withSize(2, 2);
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().contains(alliance.name().toLowerCase()))
-            .withPosition(4, 2).withSize(2, 2);
+            .withPosition(3, 2).withSize(2, 2);
 
     driveTab.add("ZERO TURRET BASED ON ALLIANCE", reZeroTurret()).withPosition(2, 2).withSize(1, 1);
     driveTab.addNumber("turret absolute", () -> Math.toDegrees(turret.getTurretAngle())).withPosition(1, 2).withSize(1, 1);
     driveTab.addNumber("turret relative", () -> Math.toDegrees(turret.getRelativeAngle())).withPosition(0, 2).withSize(1, 1);
+  
+    driveTab.add("TOGGLE ELEMENT VISION", toggleElementVision()).withPosition(7, 0).withSize(2, 2);
+    driveTab.addBoolean("ELEMENT VISION", () -> trustElementVision).withPosition(7,2).withSize(2, 2);
   }
 
   private InstantCommand reZeroTurret() {
     return new WhileDisabledInstantCommand(() -> turret.resetAngle(Math.toRadians(alliance.equals(Red) ? -90 : 90)));
+  }
+
+  private InstantCommand toggleElementVision() {
+    return new WhileDisabledInstantCommand(() -> trustElementVision = !trustElementVision);
   }
 
   private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
@@ -317,7 +330,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     }));
 
     operatorCont.pov(90).onTrue(new InstantCommand(() -> {
-      currentScoreMode = getHighScoreModeFromVision();
+      currentScoreMode = getHighScoreMode();
       handleManualRequest(State.SCORING, TurretState.SCORING);
     }));
 
@@ -328,12 +341,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     operatorCont.leftBumper().onTrue(arm.openClaw());
     operatorCont.rightBumper().onTrue(arm.closeClaw());
 
-    new Trigger(() -> operatorCont.getLeftX() > 0.8)
-            .or(() -> operatorCont.getRightX() > 0.8)
+    new Trigger(() -> operatorCont.getLeftX() > 0.9)
+            .or(() -> operatorCont.getRightX() > 0.9)
             .onTrue(arm.enableClawProx().alongWith(lights.transitionCommand(LightState.ENABLE_PROX)));
 
-    new Trigger(() -> operatorCont.getLeftX() < -0.8)
-            .or(() -> operatorCont.getRightX() < -0.8)
+    new Trigger(() -> operatorCont.getLeftX() < -0.9)
+            .or(() -> operatorCont.getRightX() < -0.9)
             .onTrue(arm.disableClawProx().alongWith(lights.transitionCommand(LightState.DISABLE_PROX)));
 
     operatorCont.leftStick().onTrue(new InstantCommand(() -> nextElement = Cone));
@@ -355,11 +368,19 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     
   }
 
-  public ArmMode getHighScoreModeFromVision() {
-    if(clawVision.getState() == ClawVision.VisionState.ELEMENT_TYPE
-            && clawVision.getCurrentElementType() == Constants.ElementType.Cube) {
-      return ArmMode.HIGH_CUBE;
-    } else return ArmMode.SEEKING_HIGH;
+  public ArmMode getHighScoreMode() {
+    if(trustElementVision) {
+      if(clawVision.getState() == ClawVision.VisionState.ELEMENT_TYPE
+              && clawVision.getCurrentElementType() == Constants.ElementType.Cube) {
+        return ArmMode.HIGH_CUBE;
+      } else return ArmMode.SEEKING_HIGH;
+    } else {
+      if(nextElement == Cone) {
+        return ArmMode.SEEKING_HIGH;
+      } else {
+        return ArmMode.HIGH_CUBE;
+      }
+    }
   }
 
   private void handleManualTurretRequest() {
@@ -379,7 +400,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       }
       else {
         setFlag(State.MANUAL_CONTROL);
-        // turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
       }
     }
     else {

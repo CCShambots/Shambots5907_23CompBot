@@ -287,10 +287,10 @@ public final class Constants {
     
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-114), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-111), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(46), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(14), toRadians(25), 0);
-    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(70), toRadians(-75), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(14), toRadians(27), 0);
+    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
     public static final ArmState PRIMED_POS = new ArmState(0, 0, toRadians(90), toRadians(-90), 0);
