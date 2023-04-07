@@ -177,7 +177,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
     }
 
     public void pullAbsoluteAngle() {
-        // turret.resetPosition(turretPotentiometer.get() * (PI / 180));
+        turret.resetPosition(turretPotentiometer.get() * (PI / 180));
     }
     public double getMinimumAbsoluteErrorToStartingPos() {
         double deg = toDegrees(turretPotentiometer.get() * (PI / 180));

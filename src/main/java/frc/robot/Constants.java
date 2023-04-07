@@ -307,7 +307,7 @@ public final class Constants {
             ; //Rotations --> Radians
     public static final int TURRET_POT_PORT = 0; //Analog port
     public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = 0; //Degrees //-247.9
+    public static final double TURRET_ENCODER_OFFSET = 261; //Degrees //-247.9
     public static final double TURRET_MAX_VEL = 400; //1000
     public static final double TURRET_MAX_ACCEL = 300; //1000
     public static final double TURRET_SLOW_VEL = 100;
