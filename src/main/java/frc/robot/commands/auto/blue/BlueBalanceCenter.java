@@ -31,8 +31,9 @@ public class BlueBalanceCenter extends SequentialCommandGroup {
                                 rc.turret().goToAngle(Math.toRadians(-90))
                         )
                 ), 
-                rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
+                // rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
                 rc.dt().waitForState(DrivetrainState.IDLE),
+                new WaitCommand(1),
                 rc.dt().transitionCommand(DrivetrainState.DOCKING),
                 rc.dt().waitForState(DrivetrainState.BALANCING),
                 rc.turret().transitionCommand(TurretState.IDLE)

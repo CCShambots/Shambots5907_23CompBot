@@ -15,7 +15,7 @@ public class RedBalanceCenter extends SequentialCommandGroup {
     public RedBalanceCenter(RobotContainer rc) {
         addCommands(
                 rc.waitForReady(),
-                rc.dt().resetGyroCommand(new Rotation2d()),
+                rc.dt().resetGyroCommand(new Rotation2d(Math.toRadians(180))),
 
                 new ScoreFirstElementCommand(rc),
 
@@ -26,11 +26,12 @@ public class RedBalanceCenter extends SequentialCommandGroup {
                                 rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED),
                                 rc.arm().waitForState(ArmMode.STOWED),
                                 new WaitCommand(2),
-                                rc.turret().goToAngle(Math.toRadians(90))
+                                rc.turret().goToAngle(Math.toRadians(-90))
                         )
                 ), 
-                rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
+                // rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
                 rc.dt().waitForState(DrivetrainState.IDLE),
+                new WaitCommand(1),
                 rc.dt().transitionCommand(DrivetrainState.DOCKING),
                 rc.dt().waitForState(DrivetrainState.BALANCING),
                 rc.turret().transitionCommand(TurretState.IDLE)
