@@ -88,7 +88,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             operatorCont.pov(90)
     );
 
-    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getTurretAngle()));
+    baseVision = new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getRelativeAngle()));
 
     drivetrain = new Drivetrain(
           () -> -leftStick.getY(),
@@ -135,9 +135,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     // SmartDashboard.putData("drivetrain", drivetrain);
     // SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
-    SmartDashboard.putData("base vision", baseVision);
+    // SmartDashboard.putData("base vision", baseVision);
     SmartDashboard.putData("turret", turret);
-    SmartDashboard.putData("claw", arm.claw());
+    // SmartDashboard.putData("claw", arm.claw());
 
     defineTransitions();
     defineStateCommands();
@@ -216,6 +216,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       }
     }));
 
+    // rightStick.topRight().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
+    // rightStick.topLeft().onTrue(drivetrain.setPositiveDockDirectionCommand(false));
+
   }
 
   private void initializeDriveTab() {
@@ -227,7 +230,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().contains(alliance.name().toLowerCase()))
             .withPosition(3, 2).withSize(2, 2);
 
-    driveTab.add("ZERO TURRET BASED ON ALLIANCE", reZeroTurret()).withPosition(2, 2).withSize(1, 1);
+    driveTab.add("+90", zeroTurret(Math.toRadians(90))).withPosition(2, 1).withSize(1, 1);
+    driveTab.add("-90", zeroTurret(Math.toRadians(-90))).withPosition(2, 2).withSize(1, 1);
     driveTab.addNumber("turret absolute", () -> Math.toDegrees(turret.getTurretAngle())).withPosition(1, 2).withSize(1, 1);
     driveTab.addNumber("turret relative", () -> Math.toDegrees(turret.getRelativeAngle())).withPosition(0, 2).withSize(1, 1);
   
@@ -237,6 +241,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private InstantCommand reZeroTurret() {
     return new WhileDisabledInstantCommand(() -> turret.resetAngle(Math.toRadians(alliance.equals(Red) ? -90 : 90)));
+  }
+
+  private InstantCommand zeroTurret(double angle) {
+    return new WhileDisabledInstantCommand(() -> {
+      turret.resetAngle(angle);
+      Constants.TURRET_ZEROED = true;
+    });
   }
 
   private InstantCommand toggleElementVision() {

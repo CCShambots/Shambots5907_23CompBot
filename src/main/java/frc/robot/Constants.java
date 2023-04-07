@@ -49,6 +49,7 @@ public final class Constants {
   }
 
   public static boolean HAS_BEEN_ENABLED = false;
+  public static boolean TURRET_ZEROED = false;
   public static final double VOLTAGE_WARNING = 9;
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance = false; //Flag to indicate that the drivers have manually set the allianc
@@ -81,7 +82,7 @@ public final class Constants {
               0.011
       );
 
-      public static final double DOCK_THRESHOLD = 20;
+      public static final double DOCK_THRESHOLD = 15;
 
       public static final double NO_ANGLE_CHECK_TIME = 2;
 
@@ -89,7 +90,7 @@ public final class Constants {
       public static final double DOCK_SPEED = 1.2;
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
-      public static final int AUTO_BALANCE_BUFFER_SIZE = 25;
+      public static final int AUTO_BALANCE_BUFFER_SIZE = 13;
 
       public static final int DRIVE_OVER_BUFFER_SIZE = 40; //40
     }
@@ -286,10 +287,10 @@ public final class Constants {
     public static final double SHOULDER_REQUIRED_STOWED_HEIGHT = toRadians(30); //The height that the shoulder has to be at before the shoulder doesn't need to move
     
     //Arm setpoints
-    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-147), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(101), toRadians(-111), 0);
+    public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-137), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(94), toRadians(-109), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(46), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(14), toRadians(27), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(19), toRadians(21), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
@@ -306,7 +307,7 @@ public final class Constants {
             ; //Rotations --> Radians
     public static final int TURRET_POT_PORT = 0; //Analog port
     public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
-    public static final double TURRET_ENCODER_OFFSET = 258.4; //Degrees //-247.9
+    public static final double TURRET_ENCODER_OFFSET = 0; //Degrees //-247.9
     public static final double TURRET_MAX_VEL = 400; //1000
     public static final double TURRET_MAX_ACCEL = 300; //1000
     public static final double TURRET_SLOW_VEL = 100;

@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (!Constants.HAS_BEEN_ENABLED && robotContainer.turret().getMinimumAbsoluteErrorToStartingPos() > 3) {
+    if (!Constants.HAS_BEEN_ENABLED && !Constants.TURRET_ZEROED) {
       robotContainer.setFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
       robotContainer.lights().requestTransition(LightState.SOFT_STOP);
     }
@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    robotContainer.turret().setTarget((Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE);
+    // robotContainer.turret().setTarget((Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE);
     robotContainer.dt().setAllModules(Constants.SwerveDrivetrain.STOPPED_STATE);
     // robotContainer.requestTransition(RobotContainer.State.TESTING);
   }
