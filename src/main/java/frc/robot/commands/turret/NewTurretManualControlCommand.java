@@ -26,8 +26,9 @@ public class NewTurretManualControlCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        prevLeft = false;
-        prevRight = false;
+        //Set these to true to require me to release the button and repress before the turret bumps at all
+        prevLeft = true;
+        prevRight = true;
     }
 
 

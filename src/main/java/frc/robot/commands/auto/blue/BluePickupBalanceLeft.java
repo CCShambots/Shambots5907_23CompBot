@@ -1,10 +1,11 @@
 package frc.robot.commands.auto.blue;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
-import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
@@ -13,9 +14,12 @@ import frc.robot.subsystems.Turret.TurretState;
 
 import static java.lang.Math.toRadians;
 
-public class BluePickupBalanceLeft extends SequentialCommandGroup {
+public class BluePickupBalanceLeft extends BaseAutoRoute {
 
     public BluePickupBalanceLeft(RobotContainer rc) {
+
+        super(Alliance.Blue);
+
         addCommands(
             rc.waitForReady(),
 

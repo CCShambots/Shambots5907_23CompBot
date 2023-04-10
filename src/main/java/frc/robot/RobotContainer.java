@@ -3,7 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -17,9 +17,10 @@ import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.commands.auto.BaseAutoRoute;
+import frc.robot.commands.auto.NothingRoute;
 import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
-import frc.robot.commands.auto.blue.BluePickupLeft;
 import frc.robot.commands.auto.blue.BluePickupRight;
 import frc.robot.commands.auto.blue.BlueTwoScoreLeft;
 import frc.robot.commands.auto.red.*;
@@ -41,7 +42,6 @@ import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.SwerveDrivetrain.MIN_TURBO_SPEED;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
-import static frc.robot.Constants.gridInterface;
 import static frc.robot.RobotContainer.AutoRoutes.*;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
@@ -68,7 +68,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private boolean trustElementVision = true;
 
   //Declare autonomous loader
-  private final AutonomousLoader<AutoRoutes> autoLoader;
+  private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
 
   private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
 
@@ -115,6 +115,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(2, 4, "red-back-off-right");
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
+
+    //Three score :)
+    loadPaths(1.25, 1, "red-first-score-right");
+    loadPaths(1.25, 1, "red-second-score-right");
+    loadPaths(1.25, 1, "red-third-score-right");
+    loadPaths(1.25, 1, "red-get-second-element-right");
     
     loadPaths(2, 4, "blue-back-off-left");
     loadPaths(1.25, 1, "blue-get-element-left");
@@ -131,7 +137,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
-    // TODO: Remove
     // SmartDashboard.putData("drivetrain", drivetrain);
     // SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
@@ -227,7 +232,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
     driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(5,2).withSize(2, 2);
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(5,0).withSize(2, 2);
-    driveTab.addBoolean("Matching Auto", () -> autoLoader.getSendableChooser().getSelected().toString().toLowerCase().contains(alliance.name().toLowerCase()))
+    driveTab.addBoolean("Matching Auto", () -> getAutonomousCommand().getAlliance() == Constants.alliance)
             .withPosition(3, 2).withSize(2, 2);
 
     driveTab.add("+90", zeroTurret(Math.toRadians(90))).withPosition(2, 1).withSize(1, 1);
@@ -254,11 +259,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return new WhileDisabledInstantCommand(() -> trustElementVision = !trustElementVision);
   }
 
-  private AutonomousLoader<AutoRoutes> instantiateAutoLoader() {
-    final AutonomousLoader<AutoRoutes> autoLoader;
+  private AutonomousLoader<BaseAutoRoute, AutoRoutes> instantiateAutoLoader() {
+    final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
 
     //Put new auto routes here
-    Map<AutoRoutes, Command> routes = new HashMap<>();
+    Map<AutoRoutes, BaseAutoRoute> routes = new HashMap<>();
 
     //Red routes
     routes.putAll(Map.of(
@@ -280,10 +285,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Route to do nothing just in case everything has gone wrong
     routes.put(
-            NOTHING, new InstantCommand()
+            NOTHING, new NothingRoute()
     );
 
-    autoLoader = new AutonomousLoader<>(routes);
+    autoLoader = new AutonomousLoader<BaseAutoRoute, AutoRoutes>(routes);
 
     return autoLoader;
   }
@@ -297,7 +302,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     );
   }
 
-  private InstantCommand syncAlliance() {
+  public InstantCommand syncAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
               Constants.pullAllianceFromFMS(this);
@@ -443,7 +448,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     );
   }
 
-  public Command getAutonomousCommand() {
+  public BaseAutoRoute getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
 
@@ -518,11 +523,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return lights;
   }
 
-
-  //TODO: Remove
-  public void updateTarget() {
-    drivetrain.getField().getObject("target").setPose(new Pose2d(gridInterface.getNextElement().getLocation().toTranslation2d(), new Rotation2d()));
-  }
 
   public Command waitForReady() {
     return new WaitUntilCommand(() ->

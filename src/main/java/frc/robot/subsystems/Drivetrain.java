@@ -68,7 +68,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                false, //TODO: Disable before comp
+                Constants.AT_COMP,
                 "drivetrain",
                 "",
                 Constants.getCurrentLimit(),

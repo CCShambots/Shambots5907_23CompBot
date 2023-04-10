@@ -42,6 +42,9 @@ import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
 public final class Constants {
+
+  public static boolean AT_COMP = false; //TODO: Make this true for compe
+
   public static final class Testing {
     public static final Trigger RAISE = new Trigger(() -> false);
     public static final Trigger LOWER = new Trigger(() -> false);
@@ -335,6 +338,10 @@ public final class Constants {
         add(toRadians(0.0), 1.0);
 
     }};
+
+    public static double getTurretStartAngleFromAlliance() {
+      return (Constants.alliance == Alliance.Red ? 1 : -1) * Constants.Turret.TURRET_START_ANGLE;
+    }
   }
 
   public static class Lights {

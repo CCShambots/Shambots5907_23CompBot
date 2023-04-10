@@ -1,17 +1,22 @@
 package frc.robot.commands.auto.blue;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Turret.TurretState;
 
-public class BluePickupLeft extends SequentialCommandGroup {
+public class BluePickupLeft extends BaseAutoRoute {
 
     public BluePickupLeft(RobotContainer rc) {
+
+        super(Alliance.Blue);
+
         addCommands(
                 rc.waitForReady(),
                 new ScoreFirstElementCommand(rc),

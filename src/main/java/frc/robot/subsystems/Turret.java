@@ -14,7 +14,6 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
-import frc.robot.commands.turret.TurretManualControlCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;

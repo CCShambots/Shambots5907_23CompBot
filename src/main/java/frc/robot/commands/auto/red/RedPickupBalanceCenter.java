@@ -2,9 +2,10 @@ package frc.robot.commands.auto.red;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
-import frc.robot.commands.auto.BonkShot;
+import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.ArmMode;
@@ -12,9 +13,12 @@ import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Turret.TurretState;
 
-public class RedPickupBalanceCenter extends SequentialCommandGroup {
+public class RedPickupBalanceCenter extends BaseAutoRoute {
 
     public RedPickupBalanceCenter(RobotContainer rc) {
+
+        super(Alliance.Red);
+
         addCommands(
                 rc.waitForReady(),
                 rc.dt().resetGyroCommand(new Rotation2d()),
