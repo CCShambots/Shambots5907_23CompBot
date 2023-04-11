@@ -91,6 +91,7 @@ public final class Constants {
 
       public static final double AUTO_BALANCE_SPEED = 0.6;
       public static final double DOCK_SPEED = 1.2;
+      public static final double DRIVE_OVER_SPEED = 1.2;
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
       public static final int AUTO_BALANCE_BUFFER_SIZE = 13;

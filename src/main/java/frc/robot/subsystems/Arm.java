@@ -114,6 +114,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         addTransition(STOWED, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
         addTransition(STOWED, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
+        addTransition(PRIMED, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
         addTransition(NEW_GROUND_INTERMEDIATE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
         addTransition(NEW_GROUND_PICKUP, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(LOW_SCORE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));

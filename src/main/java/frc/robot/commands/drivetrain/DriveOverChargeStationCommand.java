@@ -20,6 +20,8 @@ public class DriveOverChargeStationCommand extends CommandBase {
 
     private final IntSupplier directionSupplier;
 
+    // private boolean initialPos = true;
+
     private int direction;
 
     public DriveOverChargeStationCommand(Drivetrain dt, IntSupplier directionSupplier) {
@@ -31,19 +33,21 @@ public class DriveOverChargeStationCommand extends CommandBase {
     public void initialize() {
         buff = new ArrayList<>(Collections.nCopies(DRIVE_OVER_BUFFER_SIZE, getCumulativeAngle()));
         direction = (int) Math.signum(directionSupplier.getAsInt());
+
+        // initialPos = dt.getPitch() + dt.getRoll() > 0;
     }
 
     @Override
     public void execute() {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-                Constants.SwerveDrivetrain.AutoBalance.AUTO_BALANCE_SPEED * direction,
+                Constants.SwerveDrivetrain.AutoBalance.DRIVE_OVER_SPEED * direction,
                 0,
                 0
         ), dt.getCurrentAngle());
 
-        if(getCumulativeAngle() < 2 && !dt.isFlag(DrivetrainState.HIT_ZERO)) {
-            dt.setFlag(DrivetrainState.HIT_ZERO);
-        }
+        // if(getCumulativeAngle() > 0 != initialPos && !dt.isFlag(DrivetrainState.HIT_ZERO)) {
+        //     dt.setFlag(DrivetrainState.HIT_ZERO);
+        // }
         
         dt.drive(speeds, false);
 
@@ -64,6 +68,6 @@ public class DriveOverChargeStationCommand extends CommandBase {
     public boolean isFinished() {
         Optional<Double> v = buff.stream().max(Comparator.naturalOrder());
 
-        return v.isPresent() && v.get() < 2;
+        return v.isPresent() && v.get() < 3;
     }
 }

@@ -106,6 +106,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         "red-go-score-right",
         "red-go-balance-right",
         "red-return-left",
+        "red-balance-center",
 
         "blue-go-score-left",
         "blue-go-balance-left",
@@ -115,6 +116,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(2, 4, "red-back-off-right");
     loadPaths(1.25, 1, "red-get-element-right");
     loadPaths(0.75, 0.75, "red-pickup-left");
+
+    //Left two score
+    loadPaths(2, 1, "red-get-element-left");
+    loadPaths(3, 2, "red-score-element-left");
 
     //Three score :)
     loadPaths(2, 3, "red-first-score-right");
@@ -137,7 +142,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
-    // SmartDashboard.putData("drivetrain", drivetrain);
+    SmartDashboard.putData("drivetrain", drivetrain);
     // SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
     // SmartDashboard.putData("base vision", baseVision);
@@ -272,7 +277,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             RED_BALANCE_CENTER, new RedBalanceCenter(this),
             RED_PICKUP_LEFT, new RedPickupLeft(this),
             RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
-            RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this)
+            RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this),
+            RED_TWO_SCORE_LEFT, new RedTwoLeft(this)
     ));
 
     //Blue routes
@@ -579,6 +585,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     RED_NEW_AUTO, 
     RED_PICKUP_BALANCE_RIGHT,
     RED_THREE_SCORE_RIGHT,
+    RED_TWO_SCORE_LEFT,
 
     BLUE_PICKUP_BALANCE_LEFT, 
     BLUE_TWO_SCORE_LEFT, 
