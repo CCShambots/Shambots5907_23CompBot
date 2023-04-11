@@ -117,10 +117,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(0.75, 0.75, "red-pickup-left");
 
     //Three score :)
-    loadPaths(1.5, 3, "red-first-score-right");
-    loadPaths(3, 2, "red-second-score-right");
-    loadPaths(3, 1.5, "red-get-second-element-right");
-    loadPaths(3, 2, "red-third-score-right");
+    loadPaths(2, 3, "red-first-score-right");
+    loadPaths(4, 2, "red-second-score-right");
+    loadPaths(3, 2, "red-get-second-element-right");
+    loadPaths(4, 2, "red-third-score-right");
     
     loadPaths(2, 4, "blue-back-off-left");
     loadPaths(1.25, 1, "blue-get-element-left");
