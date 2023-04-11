@@ -112,6 +112,13 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(SEEKING_PRIMED, PRIMED);
         addOmniTransition(SEEKING_PICKUP_GROUND);
 
+        addTransition(STOWED, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
+        addTransition(STOWED, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
+        addTransition(NEW_GROUND_INTERMEDIATE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
+        addTransition(NEW_GROUND_PICKUP, LOW_SCORE, () -> goToArmState(LOW_POS));
+        addTransition(LOW_SCORE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
+        addTransition(LOW_SCORE, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
+
         addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(PRIMED, LOW_SCORE, () -> goToArmState(LOW_POS));
         addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
@@ -212,6 +219,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         SEEKING_STOWED, STOWED,
         SEEKING_PICKUP_DOUBLE, PICKUP_DOUBLE,
         SEEKING_PICKUP_GROUND, PICKUP_GROUND,
+        NEW_GROUND_PICKUP, NEW_GROUND_INTERMEDIATE,
         LOW_SCORE, MID_SCORE,
         SEEKING_HIGH, HIGH,
         HIGH_CUBE,

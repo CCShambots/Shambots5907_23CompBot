@@ -117,10 +117,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(0.75, 0.75, "red-pickup-left");
 
     //Three score :)
-    loadPaths(1.25, 1, "red-first-score-right");
-    loadPaths(1.25, 1, "red-second-score-right");
-    loadPaths(1.25, 1, "red-third-score-right");
-    loadPaths(1.25, 1, "red-get-second-element-right");
+    loadPaths(1.5, 3, "red-first-score-right");
+    loadPaths(3, 2, "red-second-score-right");
+    loadPaths(3, 1.5, "red-get-second-element-right");
+    loadPaths(3, 2, "red-third-score-right");
     
     loadPaths(2, 4, "blue-back-off-left");
     loadPaths(1.25, 1, "blue-get-element-left");
@@ -271,7 +271,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             // RED_PICKUP_BALANCE_CENTER, new RedPickupBalanceCenter(this),
             RED_BALANCE_CENTER, new RedBalanceCenter(this),
             RED_PICKUP_LEFT, new RedPickupLeft(this),
-            RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this)
+            RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
+            RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this)
     ));
 
     //Blue routes
@@ -381,7 +382,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-    
+  //  rightStick.topRight().onTrue(arm.transitionCommand(ArmMode.NEW_GROUND_PICKUP));
+  //  rightStick.topLeft().onTrue(arm.setArmSlowSpeedCommand());
   }
 
   public ArmMode getHighScoreMode() {
@@ -500,6 +502,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return runTraj(paths().get(traj));
   }
 
+  public Command runTrajWithEvents(String traj, Map<String, Command> eventMap) {
+    return drivetrain.runTrajectoryWithEvents(paths().get(traj), eventMap);
+  }
+
   public Command runTraj(String traj, boolean resetPose) {
     return runTraj(paths().get(traj), resetPose);
   }
@@ -572,6 +578,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     RED_PICKUP_LEFT, 
     RED_NEW_AUTO, 
     RED_PICKUP_BALANCE_RIGHT,
+    RED_THREE_SCORE_RIGHT,
 
     BLUE_PICKUP_BALANCE_LEFT, 
     BLUE_TWO_SCORE_LEFT, 

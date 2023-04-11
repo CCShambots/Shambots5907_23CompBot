@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -287,6 +288,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     public Command runTrajectory(PathPlannerTrajectory trajectory, DrivetrainState endState) {
         return runTrajectory(trajectory, false, endState);
+    }
+
+    public Command runTrajectoryWithEvents(PathPlannerTrajectory traj, Map<String, Command> eventMap) {
+            return new FollowPathWithEvents(
+                runTrajectory(traj, DrivetrainState.IDLE),
+                traj.getMarkers(),
+                eventMap
+        );
     }
 
     public TrajectoryBuilder getTrajectoryBuilder() {

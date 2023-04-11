@@ -271,12 +271,12 @@ public final class Constants {
     public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
 
-    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0);
+    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0.6);
     public static final double SHOULDER_KS = 0.1;
     public static final double SHOULDER_KG = 0;
     public static final double SHOULDER_KV = 2.6;
 
-    public static final PIDGains WRIST_GAINS = new PIDGains(5, 0, .25); 
+    public static final PIDGains WRIST_GAINS = new PIDGains(4.5, 0, 0.25); 
     public static final double WRIST_KS = 0.25;
     public static final double WRIST_KG = 0.3;
     public static final double WRIST_KV = 0.9; //1.4
@@ -296,6 +296,8 @@ public final class Constants {
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(19), toRadians(21), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
+    public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(25), toRadians(-108));
+    public static final ArmState NEW_INTERMEDIATE_GROUND_PICKUP_POS = new ArmState(0, toRadians(35), toRadians(-108));
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
     public static final ArmState PRIMED_POS = new ArmState(0, 0, toRadians(90), toRadians(-90), 0);
 }
