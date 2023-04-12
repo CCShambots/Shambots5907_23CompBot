@@ -1,1 +1,9 @@
-{}
+{
+  "download": {
+    "localDir": "C:\\Users\\barta\\Desktop\\FRC Logs",
+    "serverTeam": "5907"
+  },
+  "output": {
+    "outputFolder": "C:\\Users\\barta\\Desktop\\FRC Logs"
+  }
+}

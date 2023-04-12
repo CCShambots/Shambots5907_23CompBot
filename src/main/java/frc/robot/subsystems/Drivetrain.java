@@ -341,6 +341,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         drive.resetGyro(rotation);
         drive.fixHoldAngle();
 
+        drive.resetOdometryPose(drive.getPose());
+
         requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
     }
 
@@ -406,18 +408,20 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
+        // builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
-        builder.addDoubleProperty("hold angle", () -> drive.getHoldAngle().getDegrees(), null);
 
         builder.addDoubleProperty("total angles", () -> Math.abs(getPitch()) + Math.abs(getRoll()), null);
 
-        builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
+        // builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
         
         builder.addDoubleProperty("linear-speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
+        builder.addDoubleProperty("angular-speed", () -> drive.getChassisSpeeds().omegaRadiansPerSecond, null);
 
-        builder.addDoubleProperty("pitch", () -> getPitch(), null);
-        builder.addDoubleProperty("roll", () -> getRoll(), null);
+        builder.addDoubleArrayProperty("pose", () -> poseToArray(getPose()), null );
+
+        // builder.addDoubleProperty("pitch", () -> getPitch(), null);
+        // builder.addDoubleProperty("roll", () -> getRoll(), null);
 
 
         // builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
@@ -461,10 +465,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         // });
     }
 
+    private double[] poseToArray(Pose2d pose) {
+        return new double[]{pose.getX(), pose.getY(), pose.getRotation().getRadians()};
+    }
+
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            "field", drive.getField()
+            // "field", drive.getField()
             // "module-1", drive.getModules().get(0)
             // "module-2", drive.getModules().get(1),
             // "module-3", drive.getModules().get(2),

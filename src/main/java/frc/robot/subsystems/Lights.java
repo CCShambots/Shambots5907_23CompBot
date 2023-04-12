@@ -7,8 +7,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.Candle.CANdleEX;
-import frc.robot.ShamLib.Candle.PulseSpeedUpCommand;
-import frc.robot.ShamLib.Candle.RGB;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.commands.WhileDisabledInstantCommand;
 
@@ -22,8 +20,6 @@ public class Lights extends StateMachine<Lights.LightState> {
 
     private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LIGHTS);
     private LightState prevState = CONE;
-
-    private boolean exitingAuto = false;
 
     public Lights() {
         super("Lights", DISABLED, LightState.class);

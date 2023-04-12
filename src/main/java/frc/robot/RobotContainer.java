@@ -153,11 +153,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(turret);
 
     SmartDashboard.putData("drivetrain", drivetrain);
-    // SmartDashboard.putData("field", drivetrain.getField());
     SmartDashboard.putData("arm", arm);
-    // SmartDashboard.putData("base vision", baseVision);
     SmartDashboard.putData("turret", turret);
-    // SmartDashboard.putData("claw", arm.claw());
+    SmartDashboard.putData("claw", arm.claw());
 
     defineTransitions();
     defineStateCommands();

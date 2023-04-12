@@ -468,29 +468,30 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         // builder.addDoubleProperty("elevator/output", () -> Units.metersToInches(getElevatorHeight()), null);
         builder.addDoubleProperty("elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
-        // builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
+        builder.addDoubleProperty("elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
         // builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
 
-        builder.addDoubleProperty("shoulder/velo", () -> toDegrees(shoulder.getEncoderVelocity()), null);
+        // builder.addDoubleProperty("shoulder/velo", () -> toDegrees(shoulder.getEncoderVelocity()), null);
         // builder.addDoubleProperty("shoulder/angle", () -> toDegrees(shoulder.getEncoderPosition()), null);
-        // builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
+        builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
         // builder.addDoubleProperty("shoulder/error", () -> getError(toDegrees(shoulder.getEncoderVelocity()), toDegrees(getShoulderTarget())), null);
         builder.addDoubleProperty("shoulder/absolute", shoulderEncoder::getDegrees, null);
 
-        builder.addDoubleProperty("shoulder/velocity_error", () -> toDegrees(shoulderPID.getVelocityError()), null);
-        builder.addDoubleProperty("shoulder/position_error", () -> toDegrees(shoulderPID.getPositionError()), null);
-        builder.addDoubleProperty("shoulder/absolute", shoulderEncoder::getDegrees, null);
+        // builder.addDoubleProperty("shoulder/velocity_error", () -> toDegrees(shoulderPID.getVelocityError()), null);
+        // builder.addDoubleProperty("shoulder/position_error", () -> toDegrees(shoulderPID.getPositionError()), null);
+        // builder.addDoubleProperty("shoulder/absolute", shoulderEncoder::getDegrees, null);
 
-        builder.addDoubleProperty("shoulder/shoulder-target-velo", () -> toDegrees(shoulderPID.getSetpoint().velocity), null);
-        builder.addDoubleProperty("shoulder/shoulder-target-pos", () -> toDegrees(shoulderPID.getSetpoint().position), null);
+        // builder.addDoubleProperty("shoulder/shoulder-target-velo", () -> toDegrees(shoulderPID.getSetpoint().velocity), null);
+        // builder.addDoubleProperty("shoulder/shoulder-target-pos", () -> toDegrees(shoulderPID.getSetpoint().position), null);
 
-        builder.addDoubleProperty("wrist/velocity_error", () -> toDegrees(wristPID.getVelocityError()), null);
-        builder.addDoubleProperty("wrist/position_error", () -> toDegrees(wristPID.getPositionError()), null);
+        // builder.addDoubleProperty("wrist/velocity_error", () -> toDegrees(wristPID.getVelocityError()), null);
+        // builder.addDoubleProperty("wrist/position_error", () -> toDegrees(wristPID.getPositionError()), null);
         builder.addDoubleProperty("wrist/absolute", wristEncoder::getDegrees, null);
-        builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
+        builder.addDoubleProperty("wrist/target", () -> getWristTarget(), null);
+        // builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
 
-        builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
-        builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
+        // builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
+        // builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
 
         // builder.addDoubleProperty("armpose/x", () -> getArmPose().getX(), null);
         // builder.addDoubleProperty("armpose/y", () -> getArmPose().getY(), null);

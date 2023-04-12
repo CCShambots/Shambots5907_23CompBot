@@ -226,11 +226,11 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
+        // builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
         builder.addDoubleProperty("target", () -> toDegrees(getTurretTarget()), null);
         builder.addDoubleProperty("absolute", () -> turretPotentiometer.get(), null);
-        builder.addDoubleProperty("relative", () -> toDegrees(turret.getEncoderPosition()), null);
-        builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -  toDegrees((getTurretAngle()))), null);
-        builder.addBooleanProperty("is busy", () -> isBusy(), null);
+        // builder.addDoubleProperty("relative", () -> toDegrees(turret.getEncoderPosition()), null);
+        // builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -  toDegrees((getTurretAngle()))), null);
+        // builder.addBooleanProperty("is busy", () -> isBusy(), null);
     }
 }

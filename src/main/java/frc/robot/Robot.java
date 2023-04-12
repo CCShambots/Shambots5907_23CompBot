@@ -1,6 +1,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.server.PathPlannerServer;
+
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,6 +41,8 @@ public class Robot extends TimedRobot {
     new WaitCommand(2).andThen(robotContainer.syncAlliance()).schedule();
 
     //Logging
+    DataLogManager.start();
+    DriverStation.startDataLog(DataLogManager.getLog());
   }
 
   @Override
