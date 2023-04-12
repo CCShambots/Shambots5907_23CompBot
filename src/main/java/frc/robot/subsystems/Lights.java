@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.Candle.CANdleEX;
+import frc.robot.ShamLib.Candle.PulseSpeedUpCommand;
+import frc.robot.ShamLib.Candle.RGB;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.commands.WhileDisabledInstantCommand;
 
@@ -17,8 +19,11 @@ import static frc.robot.subsystems.Lights.LightState.*;
 
 public class Lights extends StateMachine<Lights.LightState> {
 
+
     private final CANdleEX candle = new CANdleEX(CANDLE_ID, brightness, NUM_LIGHTS);
     private LightState prevState = CONE;
+
+    private boolean exitingAuto = false;
 
     public Lights() {
         super("Lights", DISABLED, LightState.class);
@@ -45,12 +50,17 @@ public class Lights extends StateMachine<Lights.LightState> {
         addOmniTransition(LightState.HAVE_CONE_WANT_CUBE, () -> candle.setLEDs(Constants.Lights.HAVE_CONE_WANT_CUBE));
         addOmniTransition(LightState.HAVE_CUBE_WANT_CONE, () -> candle.setLEDs(Constants.Lights.HAVE_CUBE_WANT_CONE));
 
+        addAnimationTransition(AUTO);
+//        registerStateCommand(AUTO, new PulseSpeedUpCommand(candle, IDLE_RGB, 15, .125, 1.25)
+//                .andThen(transitionCommand(IDLE)));
+
         registerStateCommand(ENABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
         registerStateCommand(DISABLE_PROX, new WaitCommand(1).andThen(transitionCommand(prevState)));
     }
 
     public enum LightState {
         DISABLED(DISABLED_ANIMATION), //Where the state machine will start and immediately exit
+        AUTO(AUTO_ANIMATION),
         IDLE(null),
         SCORING(SCORING_ANIMATION), //The arm is going to score a game element
         GAME_PIECE_GRABBED(null), //A game piece has been grabbed and is inside the bot
@@ -104,6 +114,11 @@ public class Lights extends StateMachine<Lights.LightState> {
     @Override
     protected void onEnable() {
         requestTransition(IDLE);
+    }
+
+    @Override
+    protected void onAutonomousStart() {
+        requestTransition(AUTO);
     }
 
     @Override

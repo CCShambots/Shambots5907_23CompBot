@@ -394,6 +394,9 @@ public final class Constants {
 
     public static final RGB ENABLE_PROX_RGB = new RGB(0, 255, 0);
     public static final RGB DISABLE_PROX_RGB = new RGB(255, 0, 0);
+
+//    public static final Animation AUTO_ANIMATION = new TwinkleAnimation(0, 0, 255, 0, .95, NUM_LIGHTS, TwinkleAnimation.TwinklePercent.Percent30);
+    public static final Animation AUTO_ANIMATION = new ColorFlowAnimation(0, 0, 255, 0, .015, NUM_LIGHTS, ColorFlowAnimation.Direction.Forward);
   }
 
   public static void pullAllianceFromFMS(RobotContainer rc) {

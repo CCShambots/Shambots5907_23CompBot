@@ -36,6 +36,8 @@ public class Robot extends TimedRobot {
     addPeriodic(checkModulesLoop::poll, 10);
 
     new WaitCommand(2).andThen(robotContainer.syncAlliance()).schedule();
+
+    //Logging
   }
 
   @Override

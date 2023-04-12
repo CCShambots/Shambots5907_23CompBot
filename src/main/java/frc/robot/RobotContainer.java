@@ -3,7 +3,6 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -22,7 +21,9 @@ import frc.robot.commands.auto.NothingRoute;
 import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
 import frc.robot.commands.auto.blue.BluePickupRight;
+import frc.robot.commands.auto.blue.BlueThreeScoreLeft;
 import frc.robot.commands.auto.blue.BlueTwoScoreLeft;
+import frc.robot.commands.auto.blue.BlueTwoRight;
 import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
@@ -39,7 +40,6 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.ElementType.*;
-import static frc.robot.Constants.SwerveDrivetrain.MIN_TURBO_SPEED;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
 import static frc.robot.RobotContainer.AutoRoutes.*;
@@ -131,6 +131,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     loadPaths(1.25, 1, "blue-get-element-left");
     loadPaths(0.75, 0.75, "blue-pickup-right");
 
+    //Three score :)
+    loadPaths(2, 3, "blue-first-score-left");
+    loadPaths(4, 2, "blue-second-score-left");
+    loadPaths(3, 2, "blue-get-second-element-left");
+    loadPaths(4, 2, "blue-third-score-left");
+
+    //Right two score
+    loadPaths(2, 1, "blue-get-element-right");
+    loadPaths(3, 2, "blue-score-element-right");
+
     autoLoader = instantiateAutoLoader();
 
     initializeDriveTab();
@@ -160,7 +170,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void defineTransitions() {
     addOmniTransition(State.DISABLED, new ParallelCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+            // drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)
@@ -286,7 +296,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
       BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
       BLUE_PICKUP_RIGHT, new BluePickupRight(this),
-      BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this)
+      BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
+      BLUE_THREE_SCORE_LEFT, new BlueThreeScoreLeft(this),
+      BLUE_TWO_SCORE_RIGHT, new BlueTwoRight(this)
       )
     );
 
@@ -330,13 +342,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Turbo logic
     leftStick.trigger()
-            .and(() -> arm.getState() == ArmMode.STOWED)
-            .and(() -> drivetrain.getTargetLinearSpeed() >= MIN_TURBO_SPEED)
-            .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)));
-    leftStick.trigger().onFalse(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
-    new Trigger(() -> drivetrain.getTargetLinearSpeed() < MIN_TURBO_SPEED)
-            .or(() -> arm.getState() != ArmMode.STOWED)
+            .onFalse(new InstantCommand(() -> {if(arm.getState() == ArmMode.STOWED) drivetrain.setSpeedMode(TURBO);}));
+    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+    new Trigger(() -> arm.getState() != ArmMode.STOWED)
             .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+
+    new Trigger(() -> arm.getState() == ArmMode.STOWED).and(() -> !leftStick.trigger().getAsBoolean()).onTrue(
+      new InstantCommand(() -> drivetrain.setSpeedMode(TURBO))
+    );
 
     operatorCont.a().onTrue(transitionCommand(State.TRAVELING).alongWith(arm.transitionCommand(ArmMode.SEEKING_STOWED)));
     operatorCont.b().onTrue(new InstantCommand(() -> handleManualRequest(State.INTAKING, TurretState.INTAKING)));
@@ -388,8 +401,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onTrue(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 1)))
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
-  //  rightStick.topRight().onTrue(arm.transitionCommand(ArmMode.NEW_GROUND_PICKUP));
-  //  rightStick.topLeft().onTrue(arm.setArmSlowSpeedCommand());
+
+    rightStick.topRight().onTrue(lights.transitionCommand(LightState.AUTO));
   }
 
   public ArmMode getHighScoreMode() {
@@ -590,6 +603,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     BLUE_PICKUP_BALANCE_LEFT, 
     BLUE_TWO_SCORE_LEFT, 
     BLUE_BALANCE_CENTER, 
-    BLUE_PICKUP_RIGHT
+    BLUE_PICKUP_RIGHT,
+    BLUE_THREE_SCORE_LEFT,
+    BLUE_TWO_SCORE_RIGHT
   }
 }

@@ -45,20 +45,16 @@
       "/LiveWindow/Ungrouped/Talon FX (Pro) [22]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX (Pro) [23]": "Motor Controller",
       "/LiveWindow/Ungrouped/Talon FX (Pro) [24]": "Motor Controller",
+      "/Shuffleboard/Drive/+90": "Command",
+      "/Shuffleboard/Drive/-90": "Command",
       "/Shuffleboard/Drive/Auto Route": "String Chooser",
       "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
+      "/Shuffleboard/Drive/TOGGLE ELEMENT VISION": "Command",
       "/SmartDashboard///Robot/Drivetrain/field": "Field2d",
       "/SmartDashboard/Robot": "Subsystem",
       "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/turret": "Subsystem"
-    },
-    "windows": {
-      "/SmartDashboard///Robot/Drivetrain/field": {
-        "window": {
-          "visible": true
-        }
-      }
     }
   },
   "NetworkTables Settings": {
