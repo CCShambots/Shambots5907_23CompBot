@@ -91,7 +91,7 @@ public final class Constants {
 
       public static final double AUTO_BALANCE_SPEED = 0.6;
       public static final double DOCK_SPEED = 1.2;
-      public static final double DRIVE_OVER_SPEED = 1.2;
+      public static final double DRIVE_OVER_SPEED = 0.6;
 
       //in 1/50s of a second how long the bot should be balanced for before the autobalance command exits
       public static final int AUTO_BALANCE_BUFFER_SIZE = 13;
@@ -259,7 +259,7 @@ public final class Constants {
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
-    public static final double WRIST_ENCODER_OFFSET = -83.2; //Degrees
+    public static final double WRIST_ENCODER_OFFSET = -141.6; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_VEL = toRadians(160); //Radians/sec
     public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
@@ -297,8 +297,9 @@ public final class Constants {
     public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(19), toRadians(21), 0);
     public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
-    public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(25), toRadians(-108));
+    public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(22), toRadians(-108));
     public static final ArmState NEW_INTERMEDIATE_GROUND_PICKUP_POS = new ArmState(0, toRadians(35), toRadians(-108));
+    public static final ArmState TELEOP_GROUND_INTERMEDIATE_POS = new ArmState(0, toRadians(45), toRadians(-108));
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
     public static final ArmState PRIMED_POS = new ArmState(0, 0, toRadians(90), toRadians(-90), 0);
 }

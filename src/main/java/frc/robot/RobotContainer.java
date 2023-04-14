@@ -387,8 +387,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     operatorCont.rightStick().onTrue(new InstantCommand(() -> nextElement = Cube));
 
-    operatorCont.leftTrigger(0.8)
-            .and(operatorCont.rightTrigger(0.8))
+    operatorCont.button(8)
             .onTrue(transitionCommand(State.DISABLED));
 
     operatorCont.pov(90).and(() -> getState() == State.SCORING).onTrue(new InstantCommand(this::handleManualTurretRequest));
@@ -400,7 +399,18 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             .onFalse(new InstantCommand(() -> operatorCont.getHID().setRumble(kBothRumble, 0)));
 
 
-    rightStick.topRight().onTrue(lights.transitionCommand(LightState.AUTO));
+    operatorCont.leftTrigger(0.8)
+      .onTrue(arm.transitionCommand(ArmMode.TELEOP_GROUND_INTERMEDIATE))
+      .onFalse(arm.transitionCommand(ArmMode.SEEKING_STOWED));
+    operatorCont.rightTrigger(0.8)
+      .and(() -> operatorCont.getLeftTriggerAxis() > 0.8)
+      .onTrue(arm.transitionCommand(ArmMode.NEW_GROUND_PICKUP));
+
+    operatorCont.rightTrigger(0.8)
+    .onFalse(new InstantCommand(() -> {
+      if(operatorCont.getLeftTriggerAxis() > 0.8) arm.requestTransition(ArmMode.TELEOP_GROUND_INTERMEDIATE);
+      else arm.transitionCommand(ArmMode.SEEKING_STOWED);
+    }));
   }
 
   public ArmMode getHighScoreMode() {
