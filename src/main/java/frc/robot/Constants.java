@@ -244,7 +244,7 @@ public final class Constants {
     public static final int SHOULDER_ID = 23;
     public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/30.0) * (10.0 / 33.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
-    public static final double SHOULDER_ENCODER_OFFSET = -63.5; //Degrees -67.7
+    public static final double SHOULDER_ENCODER_OFFSET = 173.1; //Degrees -67.7
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
     public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
     public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
@@ -259,7 +259,7 @@ public final class Constants {
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
-    public static final double WRIST_ENCODER_OFFSET = -141.6; //Degrees
+    public static final double WRIST_ENCODER_OFFSET = -81.5; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
     public static final double WRIST_VEL = toRadians(160); //Radians/sec
     public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
