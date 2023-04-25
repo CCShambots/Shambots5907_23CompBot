@@ -18,7 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.Candle.MultipleColorSegments;
 import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
-import frc.robot.ShamLib.motors.pro.PIDSVGains;
+import frc.robot.ShamLib.motors.PIDFGains;
+import frc.robot.ShamLib.motors.PIDSVGains;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -31,7 +32,6 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import frc.robot.ShamLib.motors.v5.PIDFGains;
 import frc.robot.util.LUT;
 import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
@@ -44,6 +44,7 @@ import static java.lang.Math.toRadians;
 public final class Constants {
 
   public static boolean AT_COMP = false; //TODO: Make this true for compe
+  public static double SUPPLY_CURRENT_LIMIT = 20;
 
   public static final class Testing {
     public static final Trigger RAISE = new Trigger(() -> false);
@@ -158,25 +159,25 @@ public final class Constants {
     public static final int MODULE_1_DRIVE_ID = 11;
     public static final int MODULE_1_TURN_ID = 12;
     public static final int MODULE_1_ENCODER_ID = 11;
-    public static final double MODULE_1_OFFSET = -119.002734;
+    public static final double MODULE_1_ENCODER_OFFSET = -119.002734;
 
     //back left
     public static final int MODULE_2_DRIVE_ID = 13;
     public static final int MODULE_2_TURN_ID = 14;
     public static final int MODULE_2_ENCODER_ID = 13;
-    public static final double MODULE_2_OFFSET = -15.553125;
+    public static final double MODULE_2_ENCODER_OFFSET = -15.553125;
 
     //back right
     public static final int MODULE_3_DRIVE_ID = 15;
     public static final int MODULE_3_TURN_ID = 16;
     public static final int MODULE_3_ENCODER_ID = 15;
-    public static final double MODULE_3_OFFSET = -113.199023;
+    public static final double MODULE_3_ENCODER_OFFSET = -113.199023;
 
     //front right
     public static final int MODULE_4_DRIVE_ID = 17;
     public static final int MODULE_4_TURN_ID = 18;
     public static final int MODULE_4_ENCODER_ID = 17;
-    public static final double MODULE_4_OFFSET = 30.585938;
+    public static final double MODULE_4_ENCODER_OFFSET = 30.585938;
 
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
@@ -184,8 +185,8 @@ public final class Constants {
 
   public static final class SwerveModule {
 
-    public static final double MAX_TURN_SPEED = 1000; // motor rots / sec
-    public static final double MAX_TURN_ACCEL = 1000; // motor rots / sec^2
+    public static final double MAX_MODULE_TURN_SPEED = 1000; // motor rots / sec
+    public static final double MAX_MODULE_TURN_ACCEL = 1000; // motor rots / sec^2
 
     //Turn motor coefficients
     public static final PIDSVGains TURN_GAINS = new PIDSVGains(
@@ -237,7 +238,7 @@ public final class Constants {
                 0.0254 //inches to meters
             ; //Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 3000
+    public static final double ELEVATOR_MAX_VEL = 3000; //rot/sec 3000 //TODO: update these to the correct units
     public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2 5000
 
     //Shoulder hardware details
@@ -315,10 +316,14 @@ public final class Constants {
     public static final int TURRET_POT_PORT = 0; //Analog port
     public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
     public static final double TURRET_ENCODER_OFFSET = 261; //Degrees //-247.9
-    public static final double TURRET_MAX_VEL = 400; //1000
-    public static final double TURRET_MAX_ACCEL = 300; //1000
+
+    //TODO: Convert to the correct units
+    public static final double TURRET_MAX_VEL = 400;
+    public static final double TURRET_MAX_ACCEL = 300;
+    public static final double TURRET_MAX_JERK = 2500;
     public static final double TURRET_SLOW_VEL = 100;
     public static final double TURRET_SLOW_ACCEL = 100;
+    public static final double TURRET_SLOW_JERK = 1000;
     public static final Range TURRET_RANGE = Range.fromDegrees(-180, 180);
 
     public static final double TURRET_START_ANGLE  = toRadians(-90);

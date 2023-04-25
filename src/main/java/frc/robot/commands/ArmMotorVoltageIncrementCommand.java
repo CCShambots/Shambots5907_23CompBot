@@ -5,20 +5,20 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
-import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
+import frc.robot.ShamLib.motors.EnhancedTalonFX;
 import frc.robot.subsystems.Arm;
 
 import static frc.robot.Constants.Arm.*;
 
 public class ArmMotorVoltageIncrementCommand extends CommandBase {
-    final EnhancedTalonFXPro motor;
+    final EnhancedTalonFX motor;
     final Arm arm;
     final ArmFeedforward ff;
 
     final double incrementSize;
     int increment;
 
-    public ArmMotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize, Arm arm) {
+    public ArmMotorVoltageIncrementCommand(EnhancedTalonFX motor, double incrementSize, Arm arm) {
         this.motor = motor;
         this.incrementSize = incrementSize;
         this.arm = arm;

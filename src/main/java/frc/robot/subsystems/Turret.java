@@ -11,25 +11,27 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.ShamLib.motors.EnhancedTalonFX;
+import frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import static com.ctre.phoenixpro.signals.InvertedValue.Clockwise_Positive;
-import static com.ctre.phoenixpro.signals.NeutralModeValue.Coast;
 import static frc.robot.Constants.Turret.*;
 import static frc.robot.Constants.Vision.BASE_HAS_TARGET_SUPPLIER;
 import static frc.robot.Constants.Vision.BASE_X_OFFSET_SUPPLIER;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.CWP;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.COAST;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.RunMode.MOTION_MAGIC;
 import static frc.robot.subsystems.Turret.TurretState.*;
 import static java.lang.Math.*;
 import static java.lang.Math.toDegrees;
 
 public class Turret extends StateMachine<Turret.TurretState> {
 
-    private final MotionMagicTalonFXPro turret = new MotionMagicTalonFXPro(TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500);
+    private final EnhancedTalonFX turret;
     private final AnalogPotentiometer turretPotentiometer = new AnalogPotentiometer(TURRET_POT_PORT, TURRET_POT_RATIO, TURRET_ENCODER_OFFSET);
 
     private final BooleanSupplier towardSupplier;
@@ -61,23 +63,35 @@ public class Turret extends StateMachine<Turret.TurretState> {
         this.leftSupplier = leftSupplier;
         this.rightSupplier = rightSupplier;
 
+        turret = new EnhancedTalonFXConfiguration()
+                .setRunMode(MOTION_MAGIC)
+                .setDeviceNumber(TURRET_ID)
+                .setProControlGains(TURRET_GAINS)
+                .setInputToOutputRatio(TURRET_INPUT_TO_OUTPUT)
+                .setMaxVel(TURRET_MAX_VEL)
+                .setMaxAccel(TURRET_MAX_ACCEL)
+                .setJerk(TURRET_MAX_JERK)
+                .setInvertedBehavior(CWP)
+                .setNeutralBehavior(COAST)
+                .build();
+
+
         defineTransitions();
         registerStateCommands();
 
-        turret.configure(Coast, Clockwise_Positive);
         pullAbsoluteAngle();
     }
 
     private void defineTransitions() {
-        addOmniTransition(IDLE, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
-        addOmniTransition(SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
-        addOmniTransition(INTAKING, new InstantCommand(() -> turret.changeSpeed(TURRET_SLOW_VEL, TURRET_SLOW_ACCEL, 1000)));
-        addOmniTransition(CARDINALS, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
-        addOmniTransition(MANUAL_CONTROL, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        addOmniTransition(IDLE, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, TURRET_MAX_JERK)));
+        addOmniTransition(SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, TURRET_MAX_JERK)));
+        addOmniTransition(INTAKING, new InstantCommand(() -> turret.changeSpeed(TURRET_SLOW_VEL, TURRET_SLOW_ACCEL, TURRET_SLOW_JERK)));
+        addOmniTransition(CARDINALS, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, TURRET_MAX_JERK)));
+        addOmniTransition(MANUAL_CONTROL, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, TURRET_MAX_JERK)));
 
-        addOmniTransition(LIMELIGHT_SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        addOmniTransition(LIMELIGHT_SCORING, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, TURRET_MAX_JERK)));
 
-        addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
+        addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.setManualPower(0)));
     }
 
     private void registerStateCommands() {
@@ -141,8 +155,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
         setTarget(getTurretAngleToPoint(target).getRadians());
     }
 
-    public Command calculateFF(Trigger increment, BooleanSupplier interrupt) {
-        return turret.calculateKV(TURRET_GAINS.getS(), 0.05, increment, interrupt);
+    public Command calculateKV(Trigger increment, Trigger reverse, BooleanSupplier interrupt) {
+        return turret.calculateProKV(increment, reverse, interrupt);
     }
 
     /**

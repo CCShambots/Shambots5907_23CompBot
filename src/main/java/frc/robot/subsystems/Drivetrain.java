@@ -29,12 +29,15 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import frc.robot.ShamLib.swerve.module.SwerveModule;
+import frc.robot.ShamLib.swerve.module.SwerveModuleConfiguration;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
+import static frc.robot.ShamLib.swerve.module.SwerveModuleConfiguration.SDSModuleType.MK4iL2;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final SwerveDrive drive;
@@ -58,25 +61,34 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         getOdoPose = this::getPose;
 
+        //General module config
+        SwerveModuleConfiguration moduleConfig = new SwerveModuleConfiguration()
+                .setModuleType(MK4iL2)
+                .setDriveGains(DRIVE_GAINS)
+                .setTurnGains(TURN_GAINS)
+                .setMaxTurnVelo(MAX_MODULE_TURN_SPEED)
+                .setMaxTurnAccel(MAX_MODULE_TURN_ACCEL)
+                .setCanbus("drivetrain")
+                .setDriveInverted(false)
+                .setTurnInverted(false)
+                .setCurrentLimit(20) //TODO
+                ;
+
+
+
         drive = new SwerveDrive(
                 PIGEON_ID,
-                DRIVE_GAINS,
-                TURN_GAINS,
                 STANDARD_LINEAR_SPEED,
                 STANDARD_LINEAR_ACCELERATION,
-                MAX_TURN_SPEED,
-                MAX_TURN_ACCEL,
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
                 Constants.AT_COMP,
-                "drivetrain",
                 "",
-                Constants.getCurrentLimit(),
-                ModuleInfo.getMK4IL2Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
-                ModuleInfo.getMK4IL2Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
-                ModuleInfo.getMK4IL2Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
-                ModuleInfo.getMK4IL2Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], false)
+                moduleConfig.copyToNewModule(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_ENCODER_OFFSET, moduleOffsets[0]),
+                moduleConfig.copyToNewModule(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_ENCODER_OFFSET, moduleOffsets[0]),
+                moduleConfig.copyToNewModule(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_ENCODER_OFFSET, moduleOffsets[0]),
+                moduleConfig.copyToNewModule(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_ENCODER_OFFSET, moduleOffsets[0])
         );
 
         defineTransitions();
@@ -226,11 +238,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
 
     public Command calculateModuleTurn(Trigger increment, BooleanSupplier interrupt) {
-        return drive.calculateTurnKV(TURN_GAINS.getS(), increment, interrupt);
+        return drive.calculateTurnKV(increment, interrupt);
     }
 
     public Command calculateModuleDrive(Trigger increment, Trigger invert, BooleanSupplier interrupt) {
-        return drive.calculateDriveKV(DRIVE_GAINS.getS(), increment, invert, interrupt);
+        return drive.calculateDriveKV(increment, invert, interrupt);
     }
 
     public boolean isFieldRelative() {
@@ -382,7 +394,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         for(SwerveModule module : drive.getModules()) {
             loop.bind(() -> {
                     if(module.isModuleMisaligned() && !isEnabled()) {
-                        new RealignModuleCommand(module).schedule();
+                        module.realignModule().schedule();
                     }
                 }
             );  

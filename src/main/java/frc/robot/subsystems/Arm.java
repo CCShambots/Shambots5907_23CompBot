@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
-import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.ShamLib.motors.EnhancedTalonFX;
+import frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.subsystems.Claw.ClawState;
@@ -22,10 +22,11 @@ import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
 
-import static com.ctre.phoenixpro.signals.InvertedValue.*;
-import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
 import static frc.robot.Constants.Arm.*;
-import static frc.robot.Constants.applyCurrentLimit;
+import static frc.robot.Constants.SUPPLY_CURRENT_LIMIT;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.*;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.*;
+import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.RunMode.*;
 import static frc.robot.subsystems.Arm.ArmMode.*;
 import static java.lang.Math.*;
 
@@ -33,10 +34,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private final ArmKinematics kinematics = new ArmKinematics(baseToTurret, turretToShoulder, shoulderToWrist, wristToEndEffector);
 
-    private final MotionMagicTalonFXPro elevator = new MotionMagicTalonFXPro(ELEVATOR_ID, ELEVATOR_GAINS, ELEVATOR_INPUT_TO_OUTPUT, ELEVATOR_MAX_VEL, ELEVATOR_MAX_ACCEL);
+    private final EnhancedTalonFX elevator;
 
     //Shoulder hardware
-    private final EnhancedTalonFXPro shoulder = new EnhancedTalonFXPro(SHOULDER_ID, SHOULDER_INPUT_TO_OUTPUT);/*new VelocityTalonFXPro(SHOULDER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT);*/
+    private final EnhancedTalonFX shoulder;
     private final ThroughBoreEncoder shoulderEncoder = new ThroughBoreEncoder(SHOULDER_ENCODER_PORT, SHOULDER_ENCODER_OFFSET);
     
     //Shoulder control loops
@@ -46,7 +47,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     private double shoulderTarget = toRadians(0);
     
     //Wrist hardware
-    private final EnhancedTalonFXPro wrist = new EnhancedTalonFXPro(WRIST_ID, WRIST_INPUT_TO_OUTPUT);
+    private final EnhancedTalonFX wrist;
     private final ThroughBoreEncoder wristEncoder = new ThroughBoreEncoder(WRIST_ENCODER_PORT, WRIST_ENCODER_OFFSET);
 
     //Wrist control loops
@@ -63,15 +64,46 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public Arm() {
         super("Arm", UNDETERMINED, ArmMode.class);
 
-        configureHardware();
+        elevator = new EnhancedTalonFXConfiguration()
+                .setRunMode(MOTION_MAGIC)
+                .setDeviceNumber(ELEVATOR_ID)
+                .setInputToOutputRatio(ELEVATOR_INPUT_TO_OUTPUT)
+                .setMaxVel(ELEVATOR_MAX_VEL)
+                .setMaxAccel(ELEVATOR_MAX_ACCEL)
+                .setInvertedBehavior(CCWP)
+                .setNeutralBehavior(BRAKE)
+                .setSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+                .build();
+
+        shoulder = new EnhancedTalonFXConfiguration()
+                .setRunMode(POWER)
+                .setDeviceNumber(SHOULDER_ID)
+                .setInputToOutputRatio(SHOULDER_INPUT_TO_OUTPUT)
+                .setInvertedBehavior(CCWP)
+                .setNeutralBehavior(BRAKE)
+                .setSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+                .build();
+
+        wrist = new EnhancedTalonFXConfiguration()
+                .setRunMode(POWER)
+                .setDeviceNumber(WRIST_ID)
+                .setInputToOutputRatio(WRIST_INPUT_TO_OUTPUT)
+                .setInvertedBehavior(CCWP)
+                .setNeutralBehavior(BRAKE)
+                .setSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+                .build();
+
+        configureEncoders();
 
         addChildSubsystem(claw);
 
         defineTransitions();
         registerStateCommands();
+    }
 
-        //TODO: uncomment
-        //goToArmState(STOWED_POS);
+    private void configureEncoders() {
+        shoulderEncoder.setInverted(false);
+        wristEncoder.setInverted(true);
     }
 
     public Command openClaw() {
@@ -102,9 +134,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         addTransition(SEEKING_STOWED, STOWED);
 
         addOmniTransition(SOFT_STOP, () -> {
-            elevator.set(0);
-            shoulder.set(0);
-            wrist.set(0);
+            elevator.setManualPower(0);
+            shoulder.setManualPower(0);
+            wrist.setManualPower(0);
         });
 
         addTransition(STOWED, PRIMED, () -> goToArmState(PRIMED_POS));
@@ -256,23 +288,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         TESTING
     }
 
-    private void configureHardware() {
-        shoulderEncoder.setInverted(false);
-        wristEncoder.setInverted(true);
 
-
-        elevator.configure(Brake, CounterClockwise_Positive);
-        applyCurrentLimit(elevator);
-
-        shoulder.configure(Brake, CounterClockwise_Positive);
-        applyCurrentLimit(shoulder);
-
-        wrist.configure(Brake, CounterClockwise_Positive);
-        applyCurrentLimit(wrist);
-    }
 
     public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {
-        return elevator.calculateKV(ELEVATOR_GAINS.getS(), 0.05, increment, interrupt);
+        return elevator.calculateProKV(increment, new Trigger(() -> false), interrupt);
     }
 
     public InstantCommand reset() {
