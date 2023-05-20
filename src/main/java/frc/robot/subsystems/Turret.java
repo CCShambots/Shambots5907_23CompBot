@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.EnhancedTalonFX;
-import frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
+import io.github.JBarta.Shamlib.motors.EnhancedTalonFX;
+import io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -22,10 +22,10 @@ import java.util.function.DoubleSupplier;
 import static frc.robot.Constants.Turret.*;
 import static frc.robot.Constants.Vision.BASE_HAS_TARGET_SUPPLIER;
 import static frc.robot.Constants.Vision.BASE_X_OFFSET_SUPPLIER;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.CWP;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.COAST;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.RunMode.MOTION_MAGIC;
 import static frc.robot.subsystems.Turret.TurretState.*;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.CWP;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.COAST;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.RunMode.MOTION_MAGIC;
 import static java.lang.Math.*;
 import static java.lang.Math.toDegrees;
 

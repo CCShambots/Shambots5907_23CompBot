@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElementType;
-import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.vision.Limelight;
 import frc.robot.subsystems.Claw.ClawState;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
+import io.github.JBarta.Shamlib.vision.Limelight;
 
 import java.util.function.Supplier;
 

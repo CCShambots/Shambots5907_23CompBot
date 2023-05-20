@@ -5,8 +5,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.ShamLib.PIDGains;
 import frc.robot.subsystems.Drivetrain;
+import io.github.JBarta.Shamlib.PIDGains;
 
 import java.util.*;
 import java.util.function.IntSupplier;

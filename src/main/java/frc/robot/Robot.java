@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.subsystems.Lights.LightState;
+import io.github.JBarta.Shamlib.SMF.SubsystemManagerFactory;
 
 
 public class Robot extends TimedRobot {

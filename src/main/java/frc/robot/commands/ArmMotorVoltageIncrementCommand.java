@@ -5,8 +5,8 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
-import frc.robot.ShamLib.motors.EnhancedTalonFX;
 import frc.robot.subsystems.Arm;
+import io.github.JBarta.Shamlib.motors.EnhancedTalonFX;
 
 import static frc.robot.Constants.Arm.*;
 

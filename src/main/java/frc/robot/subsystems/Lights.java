@@ -6,9 +6,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ElementType;
-import frc.robot.ShamLib.Candle.CANdleEX;
-import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.commands.WhileDisabledInstantCommand;
+import io.github.JBarta.Shamlib.Candle.CANdleEX;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
 
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Lights.*;

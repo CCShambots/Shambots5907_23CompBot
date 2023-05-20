@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.vision.Limelight;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
+import io.github.JBarta.Shamlib.vision.Limelight;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import static frc.robot.Constants.Vision.*;
 
-public class BaseVision extends StateMachine<BaseVision.BaseVisionState>{
+public class BaseVision extends StateMachine<BaseVision.BaseVisionState> {
 
     private final Limelight ll = new Limelight("limelight-base");
     private final Pose3d initialCameraPose;

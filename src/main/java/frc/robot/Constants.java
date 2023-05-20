@@ -15,18 +15,12 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.ShamLib.Candle.MultipleColorSegments;
-import frc.robot.ShamLib.Candle.RGBSegmentInfo;
-import frc.robot.ShamLib.PIDGains;
-import frc.robot.ShamLib.motors.PIDFGains;
-import frc.robot.ShamLib.motors.PIDSVGains;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import com.ctre.phoenix.led.*;
-import frc.robot.ShamLib.Candle.RGB;
 
 import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 
@@ -36,6 +30,12 @@ import frc.robot.util.LUT;
 import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
+import io.github.JBarta.Shamlib.Candle.MultipleColorSegments;
+import io.github.JBarta.Shamlib.Candle.RGB;
+import io.github.JBarta.Shamlib.Candle.RGBSegmentInfo;
+import io.github.JBarta.Shamlib.PIDGains;
+import io.github.JBarta.Shamlib.motors.PIDFGains;
+import io.github.JBarta.Shamlib.motors.PIDSVGains;
 
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 import static java.lang.Math.PI;

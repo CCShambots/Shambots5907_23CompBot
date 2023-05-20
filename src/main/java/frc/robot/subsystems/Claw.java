@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.util.ProxSensor;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import static frc.robot.Constants.Claw.*;

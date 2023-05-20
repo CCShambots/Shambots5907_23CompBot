@@ -10,24 +10,25 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.EnhancedTalonFX;
-import frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.subsystems.Claw.ClawState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
+import io.github.JBarta.Shamlib.motors.EnhancedTalonFX;
+import io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration;
 
 import java.util.function.BooleanSupplier;
 
 import static frc.robot.Constants.Arm.*;
 import static frc.robot.Constants.SUPPLY_CURRENT_LIMIT;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.*;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.*;
-import static frc.robot.ShamLib.motors.EnhancedTalonFXConfiguration.RunMode.*;
 import static frc.robot.subsystems.Arm.ArmMode.*;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.InvertedBehavior.CCWP;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.NeutralBehavior.BRAKE;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.RunMode.MOTION_MAGIC;
+import static io.github.JBarta.Shamlib.motors.EnhancedTalonFXConfiguration.RunMode.POWER;
 import static java.lang.Math.*;
 
 public class Arm extends StateMachine<Arm.ArmMode> {

@@ -19,25 +19,28 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.ShamLib.CommandFlightStick;
-import frc.robot.ShamLib.PIDGains;
-import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.swerve.*;
 
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import frc.robot.ShamLib.swerve.module.SwerveModule;
-import frc.robot.ShamLib.swerve.module.SwerveModuleConfiguration;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
+import io.github.JBarta.Shamlib.CommandFlightStick;
+import io.github.JBarta.Shamlib.PIDGains;
+import io.github.JBarta.Shamlib.SMF.StateMachine;
+import io.github.JBarta.Shamlib.swerve.DriveCommand;
+import io.github.JBarta.Shamlib.swerve.SwerveDrive;
+import io.github.JBarta.Shamlib.swerve.SwerveSpeedLimits;
+import io.github.JBarta.Shamlib.swerve.TrajectoryBuilder;
+import io.github.JBarta.Shamlib.swerve.module.SwerveModule;
+import io.github.JBarta.Shamlib.swerve.module.SwerveModuleConfiguration;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
-import static frc.robot.ShamLib.swerve.module.SwerveModuleConfiguration.SDSModuleType.MK4iL2;
+import static io.github.JBarta.Shamlib.swerve.module.SwerveModuleConfiguration.SDSModuleType.MK4iL2;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final SwerveDrive drive;
