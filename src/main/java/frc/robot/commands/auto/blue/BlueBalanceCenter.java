@@ -15,7 +15,7 @@ public class BlueBalanceCenter extends BaseAutoRoute {
 
     public BlueBalanceCenter(RobotContainer rc) {
 
-        super(Alliance.Blue);
+        super(Alliance.Blue, Math.toRadians(90));
 
         addCommands(
                 rc.waitForReady(),

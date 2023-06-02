@@ -420,6 +420,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         builder.addDoubleArrayProperty("pose", () -> poseToArray(getPose()), null );
 
+        builder.addDoubleArrayProperty("module-angles", () -> drive.getModuleAngles(), null);
+
         // builder.addDoubleProperty("pitch", () -> getPitch(), null);
         // builder.addDoubleProperty("roll", () -> getRoll(), null);
 

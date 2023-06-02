@@ -57,7 +57,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private final BaseVision baseVision;
   private final ClawVision clawVision;
   private final Drivetrain drivetrain;
-  private final Arm arm;
+  private final Arm arm;  
   private final Lights lights;
   private final Turret turret;
 
@@ -65,7 +65,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
   private Constants.ElementType nextElement = Cone;
-  private boolean trustElementVision = true;
+  private boolean trustElementVision = false;
 
   //Declare autonomous loader
   private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
@@ -579,7 +579,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   @Override
   protected void onTeleopStart() {
     requestTransition(State.TRAVELING);
-    new WaitCommand(134).andThen(new ConditionalCommand(transitionCommand(State.BRAKE), new InstantCommand(), () -> drivetrain.getTargetLinearSpeed() < 0.5)).schedule();
+    new WaitCommand(134.7).andThen(new ConditionalCommand(transitionCommand(State.BRAKE), new InstantCommand(), () -> drivetrain.getTargetLinearSpeed() < 0.5)).schedule();
+    new WaitCommand(134.7).andThen(arm.openClaw()).schedule();
   }
 
   @Override

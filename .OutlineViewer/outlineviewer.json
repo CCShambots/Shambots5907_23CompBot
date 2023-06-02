@@ -3,7 +3,7 @@
     "mode": "Client (NT4)",
     "serverTeam": "5907"
   },
-  "Transitory Values": {
+  "Retained Values": {
     "open": false
   },
   "retained": {
@@ -21,7 +21,8 @@
         "shoulder": {
           "open": true
         }
-      }
+      },
+      "open": true
     }
   }
 }

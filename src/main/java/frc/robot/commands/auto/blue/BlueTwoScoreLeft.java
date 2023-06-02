@@ -17,7 +17,7 @@ public class BlueTwoScoreLeft extends BaseAutoRoute {
 
     public BlueTwoScoreLeft(RobotContainer rc) {
 
-        super(Alliance.Blue);
+        super(Alliance.Blue, Math.toRadians(90));
 
         addCommands(
                 rc.waitForReady(),

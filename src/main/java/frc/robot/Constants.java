@@ -43,7 +43,7 @@ import static java.lang.Math.toRadians;
 
 public final class Constants {
 
-  public static boolean AT_COMP = false; //TODO: Make this true for compe
+  public static boolean AT_COMP = true;
 
   public static final class Testing {
     public static final Trigger RAISE = new Trigger(() -> false);
@@ -292,12 +292,12 @@ public final class Constants {
     
     //Arm setpoints
     public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-137), 0);
-    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(94), toRadians(-109), 0);
+    public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(94), toRadians(-106), 0);
     public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(46), 0);
-    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(9.5), toRadians(19), toRadians(21), 0);
-    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
+    public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(10.5), toRadians(19), toRadians(21), 0);
+    public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-69), 0);
     public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
-    public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(22), toRadians(-108));
+    public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(24), toRadians(-108));
     public static final ArmState NEW_INTERMEDIATE_GROUND_PICKUP_POS = new ArmState(0, toRadians(35), toRadians(-108));
     public static final ArmState TELEOP_GROUND_INTERMEDIATE_POS = new ArmState(0, toRadians(45), toRadians(-108));
     public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);
@@ -351,7 +351,7 @@ public final class Constants {
   public static class Lights {
     public static final int CANDLE_ID = 30;
     public static final double brightness = 1;
-    public static final int NUM_LIGHTS = 308;
+    public static final int NUM_LIGHTS = 305;
     public static final int NUM_LIGHTS_WITHOUT_CANDLE = NUM_LIGHTS - 8;
 
     public static final double BOUNCE_SPEED = 0.75;
@@ -397,7 +397,7 @@ public final class Constants {
     public static final RGB DISABLE_PROX_RGB = new RGB(255, 0, 0);
 
 //    public static final Animation AUTO_ANIMATION = new TwinkleAnimation(0, 0, 255, 0, .95, NUM_LIGHTS, TwinkleAnimation.TwinklePercent.Percent30);
-    public static final Animation AUTO_ANIMATION = new ColorFlowAnimation(0, 0, 255, 0, .015, NUM_LIGHTS, ColorFlowAnimation.Direction.Forward);
+    public static final Animation AUTO_ANIMATION = new ColorFlowAnimation(0, 0, 255, 0, .0125, NUM_LIGHTS, ColorFlowAnimation.Direction.Forward);
   }
 
   public static void pullAllianceFromFMS(RobotContainer rc) {

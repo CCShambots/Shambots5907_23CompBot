@@ -27,8 +27,8 @@ public class NewTurretManualControlCommand extends CommandBase {
     @Override
     public void initialize() {
         //Set these to true to require me to release the button and repress before the turret bumps at all
-        prevLeft = true;
-        prevRight = true;
+        prevLeft = false;
+        prevRight = false;
     }
 
 
@@ -38,6 +38,7 @@ public class NewTurretManualControlCommand extends CommandBase {
         boolean curLeft = right.getAsBoolean();
         boolean curRight = left.getAsBoolean();
         //get left and right rotation request in radians per second
+
         if(curLeft && !prevLeft)  {
             turret.setTarget(turret.getTurretTarget() + Constants.Turret.MANUAL_CONTROL_BUMP);
         }
