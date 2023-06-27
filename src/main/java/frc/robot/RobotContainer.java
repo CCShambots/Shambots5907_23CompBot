@@ -480,10 +480,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public BaseAutoRoute getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
-
-  public Runnable runArmControlLoops() {
-    return arm.runControlLoops();
-  }
+//
+//  public Runnable runArmControlLoops() {
+//    return arm.runControlLoops();
+//  }
 
   public boolean lowVoltage() {
     return pd.getVoltage() <= Constants.VOLTAGE_WARNING;

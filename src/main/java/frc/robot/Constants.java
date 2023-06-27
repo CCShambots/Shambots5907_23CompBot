@@ -31,7 +31,6 @@ import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import frc.robot.ShamLib.motors.v5.PIDFGains;
 import frc.robot.util.LUT;
 import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
@@ -241,48 +240,74 @@ public final class Constants {
     public static final double ELEVATOR_MAX_ACCEL = 5000; //rot/sec^2 5000
 
     //Shoulder hardware details
-    public static final int SHOULDER_ID = 23;
-    public static final double SHOULDER_INPUT_TO_OUTPUT = (1.0/30.0) * (10.0 / 33.0) * 2 * PI; //Rotations --> Radians
+    public static final int SHOULDER_LEADER_ID = 23;
+    public static final int SHOULDER_FOLLOWER_ID = 29;
+    public static final double SHOULDER_INPUT_TO_OUTPUT = (12.0/64.0) * (16.0 / 64.0) * (32.0 / 64.0) * 2 * PI; //Rotations --> Radians
     public static final int SHOULDER_ENCODER_PORT = 8;
     public static final double SHOULDER_ENCODER_OFFSET = 173.1; //Degrees -67.7
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
-    public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
-    public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
 
-    public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
-    public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
+    public static final double SHOULDER_VEL = 50;
+    public static final double SHOULDER_ACCEL = 100;
+    public static final double SHOULDER_JERK = 2500;
 
-    public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
-    public static final double SHOULDER_FAST_ACCEL = toRadians(500); //Radians/sec^2
+//    public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
+//    public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
+
+    public static final double SHOULDER_SLOW_VEL = 50;
+    public static final double SHOULDER_SLOW_ACCEL = 100;
+    public static final double SHOULDER_SLOW_JERK = 2500;
+
+//    public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
+//    public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
+
+    public static final double SHOULDER_FAST_VEL = 50;
+    public static final double SHOULDER_FAST_ACCEL = 100;
+    public static final double SHOULDER_FAST_JERK = 2500;
+
+//    public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
+//    public static final double SHOULDER_FAST_ACCEL = toRadians(500); //Radians/sec^2
 
     //Wrist hardware details
     public static final int WRIST_ID = 24;
-    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 35.0) * 2 * PI; //Ticks --> Radians
+    public static final double WRIST_INPUT_TO_OUTPUT = (1.0 / 10.0) * (25.0/75.0) * 2 * PI; //Ticks --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
     public static final double WRIST_ENCODER_OFFSET = -81.5; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
-    public static final double WRIST_VEL = toRadians(160); //Radians/sec
-    public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
 
-    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
-    public static final double WRIST_SLOW_ACCEL = toRadians(160); //Radians/sec^2
+    public static final double WRIST_VEL = 100;
+    public static final double WRIST_ACCEL = 100;
+    public static final double WRIST_JERK = 2500;
+
+//    public static final double WRIST_VEL = toRadians(160); //Radians/sec
+//    public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
+
+      public static final double WRIST_SLOW_VEL = 50;
+      public static final double WRIST_SLOW_ACCEL = 100;
+      public static final double WRIST_SLOW_JERK = 2500;
+
+//    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
+//    public static final double WRIST_SLOW_ACCEL = toRadians(160); //Radians/sec^2
 
 
     //Control gains
-    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
+//    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
 
-    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0.6);
-    public static final double SHOULDER_KS = 0.1;
-    public static final double SHOULDER_KG = 0;
-    public static final double SHOULDER_KV = 2.6;
+    public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+//    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0.6);
+//    public static final double SHOULDER_KS = 0.1;
+//    public static final double SHOULDER_KG = 0;
+//    public static final double SHOULDER_KV = 2.6;
 
-    public static final PIDGains WRIST_GAINS = new PIDGains(4.5, 0, 0.25); 
-    public static final double WRIST_KS = 0.25;
-    public static final double WRIST_KG = 0.3;
-    public static final double WRIST_KV = 0.9; //1.4
+    public static final PIDSVGains WRIST_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
 
-    public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
+//    public static final PIDGains WRIST_GAINS = new PIDGains(4.5, 0, 0.25);
+//    public static final double WRIST_KS = 0.25;
+//    public static final double WRIST_KG = 0.3;
+//    public static final double WRIST_KV = 0.9; //1.4
+
+//    public static final PIDFGains ROTATOR_GAINS = new PIDFGains(2.5, 0, 100, 0);
 
     //Other constants
     public static final double END_TOLERANCE_CONE_ANGLE = toRadians(2); //Radians

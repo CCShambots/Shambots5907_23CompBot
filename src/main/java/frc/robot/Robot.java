@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     }
 
     //Run the module control loops every 5 ms
-    addPeriodic(robotContainer.runArmControlLoops(), 0.005);
+//    addPeriodic(robotContainer.runArmControlLoops(), 0.005);
 
     //Check the alliance from FMS when the bot turns on
     Constants.pullAllianceFromFMS(robotContainer);
