@@ -335,6 +335,15 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
 //    leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
 
+
+//    leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(-45))));
+//    leftStick.topBase().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(0))));
+//    leftStick.topRight().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(45))));
+
+//    leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(-15))));
+//    leftStick.topBase().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(0))));
+//    leftStick.topRight().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(45))));
+
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 

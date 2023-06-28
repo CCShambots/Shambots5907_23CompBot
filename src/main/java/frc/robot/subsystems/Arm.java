@@ -471,14 +471,12 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         // builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
 
         // builder.addDoubleProperty("shoulder/velo", () -> toDegrees(shoulder.getEncoderVelocity()), null);
-         builder.addDoubleProperty("shoulder/motor-angle", () -> toDegrees(shoulderLeader.getEncoderPosition()), null);
+        builder.addDoubleProperty("shoulder/motor-angle", () -> toDegrees(shoulderLeader.getEncoderPosition()), null);
         builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
-        // builder.addDoubleProperty("shoulder/error", () -> getError(toDegrees(shoulder.getEncoderVelocity()), toDegrees(getShoulderTarget())), null);
         builder.addDoubleProperty("shoulder/absolute-angle", shoulderEncoder::getDegrees, null);
 
-        // builder.addDoubleProperty("shoulder/velocity_error", () -> toDegrees(shoulderPID.getVelocityError()), null);
-        // builder.addDoubleProperty("shoulder/position_error", () -> toDegrees(shoulderPID.getPositionError()), null);
-        // builder.addDoubleProperty("shoulder/absolute", shoulderEncoder::getDegrees, null);
+        builder.addDoubleProperty("shoulder/absolute-error", () -> getError(toDegrees(shoulderEncoder.getDegrees()), toDegrees(getShoulderTarget())), null);
+        builder.addDoubleProperty("shoulder/motor-error", () -> getError(toDegrees(shoulderLeader.getEncoderPosition()), toDegrees(getShoulderTarget())), null);
 
         // builder.addDoubleProperty("shoulder/shoulder-target-velo", () -> toDegrees(shoulderPID.getSetpoint().velocity), null);
         // builder.addDoubleProperty("shoulder/shoulder-target-pos", () -> toDegrees(shoulderPID.getSetpoint().position), null);
@@ -490,8 +488,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         builder.addDoubleProperty("wrist/target", this::getWristTarget, null);
         // builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
 
-        // builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
-        // builder.addDoubleProperty("wrist/wrist-target-pos", () -> toDegrees(wristPID.getSetpoint().position), null);
+        builder.addDoubleProperty("wrist/absolute-error", () -> getError(toDegrees(wristEncoder.getDegrees()), toDegrees(getWristTarget())), null);
+        builder.addDoubleProperty("wrist/motor-error", () -> getError(toDegrees(wrist.getEncoderPosition()), toDegrees(getWristTarget())), null);
+
     }
 
 
