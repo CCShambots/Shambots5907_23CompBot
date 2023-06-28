@@ -332,6 +332,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
 //    dt().enableTeleopAutobalanceControls(leftStick, rightStick);
 
+    leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
+//    leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
+
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 

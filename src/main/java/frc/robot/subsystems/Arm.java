@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.Follower;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
@@ -92,6 +91,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     public Command disableClawProx() {
         return new InstantCommand(claw::disableProx);
     }
+
     private void defineTransitions() {
         addOmniTransition(SEEKING_STOWED);
         addTransition(SEEKING_STOWED, STOWED);
@@ -268,6 +268,15 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {
         return elevator.calculateKV(ELEVATOR_GAINS.getS(), 0.05, increment, interrupt);
+    }
+
+    public Command calculateWristFF(Trigger increment, BooleanSupplier interrupt) {
+        return wrist.calculateKV(WRIST_GAINS.getS(), 0.05, increment, interrupt);
+    }
+
+
+    public Command calculateShoulderFF(Trigger increment, BooleanSupplier interrupt) {
+        return shoulderLeader.calculateKV(SHOULDER_GAINS.getS(), 0.05, increment, interrupt);
     }
 
     public InstantCommand reset() {
@@ -462,10 +471,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         // builder.addDoubleProperty("elevator/error", () -> getError(Units.metersToInches(getElevatorTarget()), Units.metersToInches(getElevatorHeight())), null);
 
         // builder.addDoubleProperty("shoulder/velo", () -> toDegrees(shoulder.getEncoderVelocity()), null);
-        // builder.addDoubleProperty("shoulder/angle", () -> toDegrees(shoulder.getEncoderPosition()), null);
+         builder.addDoubleProperty("shoulder/motor-angle", () -> toDegrees(shoulderLeader.getEncoderPosition()), null);
         builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
         // builder.addDoubleProperty("shoulder/error", () -> getError(toDegrees(shoulder.getEncoderVelocity()), toDegrees(getShoulderTarget())), null);
-        builder.addDoubleProperty("shoulder/absolute", shoulderEncoder::getDegrees, null);
+        builder.addDoubleProperty("shoulder/absolute-angle", shoulderEncoder::getDegrees, null);
 
         // builder.addDoubleProperty("shoulder/velocity_error", () -> toDegrees(shoulderPID.getVelocityError()), null);
         // builder.addDoubleProperty("shoulder/position_error", () -> toDegrees(shoulderPID.getPositionError()), null);
@@ -476,8 +485,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         // builder.addDoubleProperty("wrist/velocity_error", () -> toDegrees(wristPID.getVelocityError()), null);
         // builder.addDoubleProperty("wrist/position_error", () -> toDegrees(wristPID.getPositionError()), null);
-        builder.addDoubleProperty("wrist/absolute", wristEncoder::getDegrees, null);
-        builder.addDoubleProperty("wrist/target", () -> getWristTarget(), null);
+        builder.addDoubleProperty("wrist/absolute-angle", wristEncoder::getDegrees, null);
+        builder.addDoubleProperty("wrist/motor-angle", () -> toDegrees(wrist.getEncoderPosition()), null);
+        builder.addDoubleProperty("wrist/target", this::getWristTarget, null);
         // builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
 
         // builder.addDoubleProperty("wrist/wrist-target-velo", () -> toDegrees(wristPID.getSetpoint().velocity), null);
