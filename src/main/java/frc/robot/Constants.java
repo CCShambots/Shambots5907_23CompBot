@@ -247,22 +247,22 @@ public final class Constants {
     public static final double SHOULDER_ENCODER_OFFSET = 173.1; //Degrees -67.7
     public static final Range shoulderRange = Range.fromDegrees(-45, 115);
 
-    public static final double SHOULDER_VEL = 50;
-    public static final double SHOULDER_ACCEL = 100;
+    public static final double SHOULDER_VEL = 10; //50
+    public static final double SHOULDER_ACCEL = 20; //100
     public static final double SHOULDER_JERK = 2500;
 
 //    public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
 //    public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
 
-    public static final double SHOULDER_SLOW_VEL = 50;
-    public static final double SHOULDER_SLOW_ACCEL = 100;
+    public static final double SHOULDER_SLOW_VEL = 5; //50
+    public static final double SHOULDER_SLOW_ACCEL = 10; //100
     public static final double SHOULDER_SLOW_JERK = 2500;
 
 //    public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
 //    public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
 
-    public static final double SHOULDER_FAST_VEL = 50;
-    public static final double SHOULDER_FAST_ACCEL = 100;
+    public static final double SHOULDER_FAST_VEL = 10; //50
+    public static final double SHOULDER_FAST_ACCEL = 20; //100
     public static final double SHOULDER_FAST_JERK = 2500;
 
 //    public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
@@ -275,15 +275,15 @@ public final class Constants {
     public static final double WRIST_ENCODER_OFFSET = -81.5; //Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
 
-    public static final double WRIST_VEL = 100;
-    public static final double WRIST_ACCEL = 100;
+    public static final double WRIST_VEL = 10; //100
+    public static final double WRIST_ACCEL = 10; //100
     public static final double WRIST_JERK = 2500;
 
 //    public static final double WRIST_VEL = toRadians(160); //Radians/sec
 //    public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
 
-      public static final double WRIST_SLOW_VEL = 50;
-      public static final double WRIST_SLOW_ACCEL = 100;
+      public static final double WRIST_SLOW_VEL = 5; //50
+      public static final double WRIST_SLOW_ACCEL = 10; //100
       public static final double WRIST_SLOW_JERK = 2500;
 
 //    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
