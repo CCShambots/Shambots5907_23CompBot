@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
 
 
@@ -42,6 +43,8 @@ public class Robot extends TimedRobot {
     addPeriodic(checkModulesLoop::poll, 10);
 
     new WaitCommand(2).andThen(robotContainer.syncAlliance()).schedule();
+
+    new WaitCommand(2).andThen(new WhileDisabledInstantCommand(() -> robotContainer.arm().pullAbsoluteAngles())).schedule();
 
     //Logging
     DataLogManager.start();
