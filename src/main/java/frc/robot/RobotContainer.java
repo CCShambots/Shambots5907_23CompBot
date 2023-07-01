@@ -65,7 +65,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
   private Constants.ElementType nextElement = Cone;
-  private boolean trustElementVision = false;
+  private boolean trustElementVision = true;
 
   //Declare autonomous loader
   private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
@@ -340,9 +340,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(0))));
   //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(45))));
 
-   leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(45))));
-   leftStick.topBase().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(90))));
-   leftStick.topRight().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(110))));
+  //  leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(45))));
+  //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(90))));
+  //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(110))));
 
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));

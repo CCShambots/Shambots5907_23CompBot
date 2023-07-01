@@ -261,15 +261,15 @@ public final class Constants {
 
 //    public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
 //    public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
-        public static final double SHOULDER_SLOW_VEL = 5; //50
-        public static final double SHOULDER_SLOW_ACCEL = 10; //100
-        public static final double SHOULDER_SLOW_JERK = 2500;
+        public static final double SHOULDER_SLOW_VEL = 12.5; //50
+        public static final double SHOULDER_SLOW_ACCEL = 12.5; //100
+        public static final double SHOULDER_SLOW_JERK = 1800;
 
 //    public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
 //    public static final double SHOULDER_SLOW_ACCEL = toRadians(80); //Radians/sec^2
-        public static final double SHOULDER_FAST_VEL = 10; //50
-        public static final double SHOULDER_FAST_ACCEL = 20; //100
-        public static final double SHOULDER_FAST_JERK = 2500;
+        public static final double SHOULDER_FAST_VEL = 25; //50
+        public static final double SHOULDER_FAST_ACCEL = 25; //100
+        public static final double SHOULDER_FAST_JERK = 1800;
 
 //    public static final double SHOULDER_FAST_VEL = toRadians(400); //Radians/sec
 //    public static final double SHOULDER_FAST_ACCEL = toRadians(500); //Radians/sec^2
@@ -286,8 +286,8 @@ public final class Constants {
 
 //    public static final double WRIST_VEL = toRadians(160); //Radians/sec
 //    public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
-        public static final double WRIST_SLOW_VEL = 5; //50
-        public static final double WRIST_SLOW_ACCEL = 10; //100
+        public static final double WRIST_SLOW_VEL = 40; 
+        public static final double WRIST_SLOW_ACCEL = 20; 
         public static final double WRIST_SLOW_JERK = 2500;
 
 //    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
@@ -317,12 +317,12 @@ public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.
 
         //Arm setpoints
         public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-137), 0);
-        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(94), toRadians(-106), 0);
-        public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-43), toRadians(46), 0);
-        public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(10.5), toRadians(19), toRadians(21), 0);
-        public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-69), 0);
+        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(104), toRadians(-112), 0);
+        public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-25), toRadians(46), 0);
+        public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(10.5), toRadians(22), toRadians(14), 0);
+        public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
         public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
-        public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(24), toRadians(-108));
+        public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(28), toRadians(-108));
         public static final ArmState NEW_INTERMEDIATE_GROUND_PICKUP_POS = new ArmState(0, toRadians(35), toRadians(-108));
         public static final ArmState TELEOP_GROUND_INTERMEDIATE_POS = new ArmState(0, toRadians(45), toRadians(-108));
         public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);

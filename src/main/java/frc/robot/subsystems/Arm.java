@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenixpro.controls.Follower;
-import com.ctre.phoenixpro.controls.StrictFollower;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
@@ -191,14 +190,12 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         registerStateCommand(SEEKING_STOWED,
         new FunctionalCommand(() -> {
             if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-            //TODO: Uncomment
-            // if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
+            if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
         }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
             new FunctionalCommand(
                 () -> {
                     setElevatorTarget(STOWED_POS.getElevatorExtension());
-                    //TODO: Uncomment/fix
-                    // setShoulderTarget(toRadians(-45));
+                    setShoulderTarget(toRadians(45));
                 },
                 () -> {},
                 (interrupted) -> {},
@@ -300,9 +297,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public void goToArmState(ArmState state) {
         if(state.isValid()) {
-            // setElevatorTarget(state.getElevatorExtension());
-            // setShoulderTarget(state.getShoulderAngle());
-            // setWristTarget(state.getWristAngle());
+            setElevatorTarget(state.getElevatorExtension());
+            setShoulderTarget(state.getShoulderAngle());
+            setWristTarget(state.getWristAngle());
         }
     }
 
@@ -336,7 +333,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
      * @param target target height (in meters)
      */
     public void setElevatorTarget(double target) {
-        // elevator.setTarget(target);
+        elevator.setTarget(target);
     }
 
     /**
@@ -344,7 +341,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
      * @param target target angle (in radians)
      */
     public void setShoulderTarget(double target) {
-
         shoulderLeader.setTarget(target);
     }
 
@@ -353,8 +349,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
      * @param target target angle (in radians)
      */
     public void setWristTarget(double target) {
-        // wrist.setTarget(target);
-        
+        wrist.setTarget(target);
     }
 
 

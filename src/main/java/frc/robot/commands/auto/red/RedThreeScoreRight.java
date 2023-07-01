@@ -1,6 +1,8 @@
 package frc.robot.commands.auto.red;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -61,7 +63,9 @@ public class RedThreeScoreRight extends BaseAutoRoute {
                 rc.turret().goToAngle(Math.toRadians(-90)),
                 new WaitCommand(1.95),
                 rc.arm().openClaw(),
-                rc.turret().setStartAngle(Math.toRadians(90))
+
+                new InstantCommand(() -> rc.dt().resetGyro(new Rotation2d(Math.toRadians(180))))
+                // rc.turret().setStartAngle(Math.toRadians(90))
         );
     }
 }
