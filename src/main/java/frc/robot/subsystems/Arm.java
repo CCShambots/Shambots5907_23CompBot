@@ -8,10 +8,12 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.arm.ExtendArmCommand;
 import frc.robot.subsystems.Claw.ClawState;
 import frc.robot.util.kinematics.ArmKinematics;
@@ -60,12 +62,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         addChildSubsystem(claw);
 
-        
-        shoulderLeader.setInverted(true);
-        
-        applyCurrentLimit(shoulderFollower);
-        shoulderFollower.setControl(new Follower(shoulderLeader.getDeviceID(), false));
-
         defineTransitions();
         registerStateCommands();
 
@@ -99,7 +95,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private void defineTransitions() {
         addOmniTransition(SEEKING_STOWED);
-        addTransition(SEEKING_STOWED, STOWED);
+        addTransition(SEEKING_STOWED, STOWED, new InstantCommand(() -> {new WaitCommand(2).andThen(new InstantCommand(this::pullAbsoluteAngles)).schedule();}));
 
         addOmniTransition(SOFT_STOP, () -> {
             elevator.set(0);
@@ -264,11 +260,22 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         elevator.configure(Brake, CounterClockwise_Positive);
         applyCurrentLimit(elevator);
 
-        shoulderLeader.configure(Brake, CounterClockwise_Positive);
+        shoulderLeader.configure(Brake, Clockwise_Positive);
         applyCurrentLimit(shoulderLeader);
 
+        shoulderFollower.configure(Brake, Clockwise_Positive);
+        applyCurrentLimit(shoulderFollower);
+        
         wrist.configure(Brake, CounterClockwise_Positive);
         applyCurrentLimit(wrist);
+        
+        new WaitCommand(2)
+        .andThen(setShoulderFollower())
+        .schedule();
+    }
+
+    public Command setShoulderFollower() {
+        return new WhileDisabledInstantCommand(() -> shoulderFollower.setControl(new Follower(shoulderLeader.getDeviceID(), false)));
     }
 
     public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {

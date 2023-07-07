@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
+import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.GrabSequenceCommand;
 import frc.robot.subsystems.Arm;
@@ -52,7 +53,7 @@ public class RedThreeScoreRight extends BaseAutoRoute {
                 rc.turret().goToAngle(Math.toRadians(90)),
                 rc.arm().setArmSlowSpeedCommand(),
                 rc.arm().transitionCommand(ArmMode.NEW_GROUND_INTERMEDIATE),
-                new WaitCommand(1.5),
+                new WaitCommand(1),
                 rc.arm().transitionCommand(Arm.ArmMode.NEW_GROUND_PICKUP),
                 rc.arm().openClaw(),
                 rc.dt().waitForState(DrivetrainState.IDLE),
@@ -60,12 +61,16 @@ public class RedThreeScoreRight extends BaseAutoRoute {
                 rc.arm().transitionCommand(ArmMode.LOW_SCORE),
                 rc.runTraj("red-third-score-right"),
                 new WaitCommand(0.5),
+                
                 rc.turret().goToAngle(Math.toRadians(-90)),
                 new WaitCommand(1.95),
                 rc.arm().openClaw(),
 
-                new InstantCommand(() -> rc.dt().resetGyro(new Rotation2d(Math.toRadians(180))))
-                // rc.turret().setStartAngle(Math.toRadians(90))
+                new InstantCommand(() -> {
+                        new WaitCommand(4)
+                        .andThen(new WhileDisabledInstantCommand(() -> rc.dt().resetGyro(new Rotation2d(Math.toRadians(180))))).schedule();
+                }),
+                rc.turret().setStartAngle(Math.toRadians(90))
         );
     }
 }

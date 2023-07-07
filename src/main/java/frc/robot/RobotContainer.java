@@ -280,8 +280,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Red routes
     routes.putAll(Map.of(
-            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
-            // RED_PICKUP_BALANCE_CENTER, new RedPickupBalanceCenter(this),
+//            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
             RED_BALANCE_CENTER, new RedBalanceCenter(this),
             RED_PICKUP_LEFT, new RedPickupLeft(this),
             RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
@@ -291,7 +290,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Blue routes
     routes.putAll(Map.of(
-      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
+//      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
       BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
       BLUE_PICKUP_RIGHT, new BluePickupRight(this),
       BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
@@ -347,6 +346,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
+    rightStick.topLeft().onTrue(new InstantCommand(() -> { if(arm.getState() != ArmMode.STOWED) arm.setWristTarget(arm.getWristTarget()-Math.toRadians(2));}));
+    rightStick.topRight().onTrue(new InstantCommand(() -> { if(arm.getState() != ArmMode.STOWED) arm.setWristTarget(arm.getWristTarget()+Math.toRadians(2));}));
 
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 

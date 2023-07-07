@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
 
     new WaitCommand(2).andThen(new WhileDisabledInstantCommand(() -> robotContainer.arm().pullAbsoluteAngles())).schedule();
 
-    addPeriodic(() -> {if(robotContainer.arm().getState() == ArmMode.STOWED) robotContainer.arm().pullAbsoluteAngles();}, 5);
+    addPeriodic(() -> {if(!robotContainer.arm().isTransitioning()) robotContainer.arm().pullAbsoluteAngles();}, 2);
 
     //Logging
     DataLogManager.start();
@@ -67,6 +67,8 @@ public class Robot extends TimedRobot {
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
     robotContainer.lights().enable();
+
+    robotContainer.arm().setShoulderFollower().schedule();
   }
 
   @Override
@@ -86,6 +88,8 @@ public class Robot extends TimedRobot {
     //Start all the subsystems in autonomous mode
     Constants.HAS_BEEN_ENABLED = true;
     SubsystemManagerFactory.getInstance().notifyAutonomousStart();
+
+    robotContainer.arm().setShoulderFollower().schedule();
   }
 
   @Override
@@ -98,13 +102,14 @@ public class Robot extends TimedRobot {
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
-
     robotContainer.scheduleEndgameBuzz();
     //Send the grid interface into indicate so that I can update things quickly from autonomous
     Constants.gridInterface.indicateMode();
 
     //Send the grid automatically back to override mode after a few seconds of teleop
     new WaitCommand(6).andThen(new InstantCommand(Constants.gridInterface::overrideMode));
+
+    robotContainer.arm().setShoulderFollower().schedule();
   }
 
   @Override
@@ -119,6 +124,8 @@ public class Robot extends TimedRobot {
     robotContainer.turret().setTarget(robotContainer.getAutonomousCommand().getStartAngle());
     robotContainer.dt().setAllModules(Constants.SwerveDrivetrain.STOPPED_STATE);
     // robotContainer.requestTransition(RobotContainer.State.TESTING);
+
+    robotContainer.arm().setShoulderFollower().schedule();
   }
 
   @Override
