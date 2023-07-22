@@ -18,12 +18,14 @@ public class ArmMotorVoltageIncrementCommand extends CommandBase {
     final double incrementSize;
     int increment;
 
+    @Deprecated
     public ArmMotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize, Arm arm) {
         this.motor = motor;
         this.incrementSize = incrementSize;
         this.arm = arm;
 
-        ff = new ArmFeedforward(WRIST_KS, WRIST_KG, 0);
+//        ff = new ArmFeedforward(WRIST_KS, WRIST_KG, 0);
+        ff = new ArmFeedforward(0, 0, 0);
         increment = 0;
     }
 

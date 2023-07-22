@@ -60,8 +60,8 @@ public class BlueThreeScoreLeft extends BaseAutoRoute {
                 new WaitCommand(0.5),
                 rc.turret().goToAngle(Math.toRadians(90)),
                 new WaitCommand(1.95),
-                rc.arm().openClaw(),
-                rc.turret().setStartAngle(Math.toRadians(-90))
+                rc.arm().openClaw()
+                // rc.turret().setStartAngle(Math.toRadians(-90))
         );
     }
 }

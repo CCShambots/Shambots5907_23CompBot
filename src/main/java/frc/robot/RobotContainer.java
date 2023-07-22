@@ -65,7 +65,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
   private Constants.ElementType nextElement = Cone;
-  private boolean trustElementVision = false;
+  private boolean trustElementVision = true;
 
   //Declare autonomous loader
   private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
@@ -280,8 +280,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Red routes
     routes.putAll(Map.of(
-            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
-            // RED_PICKUP_BALANCE_CENTER, new RedPickupBalanceCenter(this),
+//            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
             RED_BALANCE_CENTER, new RedBalanceCenter(this),
             RED_PICKUP_LEFT, new RedPickupLeft(this),
             RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
@@ -291,7 +290,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     //Blue routes
     routes.putAll(Map.of(
-      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
+//      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
       BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
       BLUE_PICKUP_RIGHT, new BluePickupRight(this),
       BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
@@ -332,9 +331,23 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
 //    dt().enableTeleopAutobalanceControls(leftStick, rightStick);
 
+    // leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
+  //  leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
+
+
+  //  leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(-45))));
+  //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(0))));
+  //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(45))));
+
+  //  leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(45))));
+  //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(90))));
+  //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(110))));
+
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
 
+    rightStick.topLeft().onTrue(new InstantCommand(() -> { if(arm.getState() != ArmMode.STOWED) arm.setWristTarget(arm.getWristTarget()-Math.toRadians(2));}));
+    rightStick.topRight().onTrue(new InstantCommand(() -> { if(arm.getState() != ArmMode.STOWED) arm.setWristTarget(arm.getWristTarget()+Math.toRadians(2));}));
 
     leftStick.topBase().onTrue(new InstantCommand(drivetrain::resetGyro));
 
@@ -480,10 +493,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public BaseAutoRoute getAutonomousCommand() {
     return autoLoader.getCurrentSelection();
   }
-
-  public Runnable runArmControlLoops() {
-    return arm.runControlLoops();
-  }
+//
+//  public Runnable runArmControlLoops() {
+//    return arm.runControlLoops();
+//  }
 
   public boolean lowVoltage() {
     return pd.getVoltage() <= Constants.VOLTAGE_WARNING;
