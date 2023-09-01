@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
 
     new WaitCommand(2).andThen(new WhileDisabledInstantCommand(() -> robotContainer.arm().pullAbsoluteAngles())).schedule();
 
-    addPeriodic(() -> {if(!robotContainer.arm().isTransitioning()) robotContainer.arm().pullAbsoluteAngles();}, 2);
+    // addPeriodic(() -> {if(!robotContainer.arm().isTransitioning()) robotContainer.arm().pullAbsoluteAngles();}, 2);
 
     //Logging
     DataLogManager.start();

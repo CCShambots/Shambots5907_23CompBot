@@ -252,17 +252,15 @@ public final class Constants {
         public static final int SHOULDER_FOLLOWER_ID = 29;
         public static final double SHOULDER_INPUT_TO_OUTPUT = (10.0 / 64.0) * (16.0 / 64.0) * (32.0 / 64.0) * 2 * PI; //Rotations --> Radians
         public static final int SHOULDER_ENCODER_PORT = 8;
-        public static final double SHOULDER_ENCODER_OFFSET = -121; //Degrees 
+        public static final double SHOULDER_ENCODER_OFFSET = -57.7; //Degrees 
         public static final Range shoulderRange = Range.fromDegrees(-45, 115);
 
-        public static final double SHOULDER_VEL = 25;
-        public static final double SHOULDER_ACCEL = 25;
+        public static final double SHOULDER_VEL = 25;//25
+        public static final double SHOULDER_ACCEL = 25;//25
         public static final double SHOULDER_JERK = 1800;
 
-//    public static final double SHOULDER_VEL = toRadians(160); //Radians/sec
-//    public static final double SHOULDER_ACCEL = toRadians(160); //Radians/sec^2
-        public static final double SHOULDER_SLOW_VEL = 12.5; //50
-        public static final double SHOULDER_SLOW_ACCEL = 12.5; //100
+        public static final double SHOULDER_SLOW_VEL = 17; //50
+        public static final double SHOULDER_SLOW_ACCEL = 17; //100
         public static final double SHOULDER_SLOW_JERK = 1800;
 
 //    public static final double SHOULDER_SLOW_VEL = toRadians(40); //Radians/sec
@@ -280,18 +278,14 @@ public final class Constants {
         public static final double WRIST_ENCODER_OFFSET = 33; //Degrees
         public static final Range wristRange = Range.fromDegrees(-155, 45); //Degrees
 
-        public static final double WRIST_VEL = 80; 
-        public static final double WRIST_ACCEL = 40; 
+        public static final double WRIST_VEL = 80;//80 
+        public static final double WRIST_ACCEL = 40;//40 
         public static final double WRIST_JERK = 2500;
 
-//    public static final double WRIST_VEL = toRadians(160); //Radians/sec
-//    public static final double WRIST_ACCEL = toRadians(380); //Radians/sec^2
         public static final double WRIST_SLOW_VEL = 40; 
         public static final double WRIST_SLOW_ACCEL = 20; 
         public static final double WRIST_SLOW_JERK = 2500;
 
-//    public static final double WRIST_SLOW_VEL = toRadians(80); //Radians/sec
-//    public static final double WRIST_SLOW_ACCEL = toRadians(160); //Radians/sec^2
         //Control gains
 //    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
 public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
@@ -317,7 +311,7 @@ public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.
 
         //Arm setpoints
         public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-137), 0);
-        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(104), toRadians(-112), 0);
+        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(102), toRadians(-112), 0);
         public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-25), toRadians(46), 0);
         public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(10.5), toRadians(22), toRadians(15), 0);
         public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
@@ -340,7 +334,7 @@ public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.
                 ; //Rotations --> Radians
         public static final int TURRET_POT_PORT = 0; //Analog port
         public static final double TURRET_POT_RATIO = -514.2857142857143; //Converts turns of the potentiometer to output degrees
-        public static final double TURRET_ENCODER_OFFSET = 261; //Degrees //-247.9
+        public static final double TURRET_ENCODER_OFFSET = 257; //Degrees
         public static final double TURRET_MAX_VEL = 400; //1000
         public static final double TURRET_MAX_ACCEL = 300; //1000
         public static final double TURRET_SLOW_VEL = 100;

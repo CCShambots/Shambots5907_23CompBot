@@ -30,6 +30,8 @@ public class NewTurretManualControlCommand extends CommandBase {
         prevLeft = false;
         prevRight = false;
 
+        //TODO: FIX BAD ZEROING
+
         turret.setTarget(turret.getTurretAngle());
     }
 
