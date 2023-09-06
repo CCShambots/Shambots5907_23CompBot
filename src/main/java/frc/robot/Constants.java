@@ -311,12 +311,12 @@ public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.
 
         //Arm setpoints
         public static final ArmState STOWED_POS = new ArmState(0, 0, toRadians(113), toRadians(-137), 0);
-        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(102), toRadians(-112), 0);
+        public static final ArmState PICKUP_DOUBLE_POS = new ArmState(0, 0, toRadians(102), toRadians(-114), 0);
         public static final ArmState GROUND_PICKUP_POS = new ArmState(0, Units.inchesToMeters(7), toRadians(-25), toRadians(46), 0);
         public static final ArmState HIGH_POS = new ArmState(0, Units.inchesToMeters(10.5), toRadians(22), toRadians(15), 0);
         public static final ArmState MID_POS = new ArmState(0, 0, toRadians(68), toRadians(-73), 0);
         public static final ArmState LOW_POS = new ArmState(0, 0, toRadians(71), toRadians(-139), 0);
-        public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(28), toRadians(-108));
+        public static final ArmState NEW_GROUND_PICKUP_POS = new ArmState(0, toRadians(25), toRadians(-108));
         public static final ArmState NEW_INTERMEDIATE_GROUND_PICKUP_POS = new ArmState(0, toRadians(35), toRadians(-108));
         public static final ArmState TELEOP_GROUND_INTERMEDIATE_POS = new ArmState(0, toRadians(45), toRadians(-108));
         public static final ArmState HIGH_CUBE_POS = new ArmState(0, 0, toRadians(40), toRadians(-12), 0);

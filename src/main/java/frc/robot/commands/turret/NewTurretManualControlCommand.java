@@ -27,12 +27,10 @@ public class NewTurretManualControlCommand extends CommandBase {
     @Override
     public void initialize() {
         //Set these to true to require me to release the button and repress before the turret bumps at all
-        prevLeft = false;
-        prevRight = false;
+        prevLeft = true;
+        prevRight = true;
 
-        //TODO: FIX BAD ZEROING
-
-        turret.setTarget(turret.getTurretAngle());
+        turret.setTarget(Math.max(-Math.PI, Math.min(Math.PI, turret.getTurretAngle())));
     }
 
 
