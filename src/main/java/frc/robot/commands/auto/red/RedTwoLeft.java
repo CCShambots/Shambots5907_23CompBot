@@ -1,5 +1,6 @@
 package frc.robot.commands.auto.red;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,7 +29,9 @@ public class RedTwoLeft extends BaseAutoRoute {
                 rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
                 rc.arm().waitForState(ArmMode.STOWED),
                 new WaitCommand(0.5),
-                rc.turret().goToAngle(Math.toRadians(90))
+                rc.turret().goToAngle(Math.toRadians(90)),
+                rc.dt().waitForState(DrivetrainState.IDLE),
+                rc.dt().resetGyroCommand(Rotation2d.fromDegrees(180))
 //                rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
 //                new ParallelCommandGroup(
 //                        rc.runTraj("red-get-element-left", true),

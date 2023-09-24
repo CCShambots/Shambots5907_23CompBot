@@ -16,7 +16,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 public class BlueTwoRight extends BaseAutoRoute {
 
     public BlueTwoRight(RobotContainer rc) {
-        super(Alliance.Blue);
+        super(Alliance.Blue, Math.toRadians(90));
 
         addCommands(
                 rc.waitForReady(),
