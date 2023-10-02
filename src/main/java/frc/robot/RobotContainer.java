@@ -22,7 +22,6 @@ import frc.robot.commands.auto.blue.BlueBalanceCenter;
 import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
 import frc.robot.commands.auto.blue.BluePickupRight;
 import frc.robot.commands.auto.blue.BlueThreeScoreLeft;
-import frc.robot.commands.auto.blue.BlueTwoScoreLeft;
 import frc.robot.commands.auto.blue.BlueTwoRight;
 import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
@@ -152,7 +151,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
-    SmartDashboard.putData("drivetrain", drivetrain);
+    // SmartDashboard.putData("drivetrain", drivetrain);
     SmartDashboard.putData("arm", arm);
     SmartDashboard.putData("turret", turret);
     SmartDashboard.putData("claw", arm.claw());
@@ -452,14 +451,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     if (!(s == State.SCORING || s == State.INTAKING)) return;
 
     if (getState() == s) {
-      if (isFlag(State.MANUAL_CONTROL)) {
-        clearFlag(State.MANUAL_CONTROL);
-        turret.requestTransition(ts);
-      }
-      else {
-        setFlag(State.MANUAL_CONTROL);
-        turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
-      }
+      // if (isFlag(State.MANUAL_CONTROL)) {
+      //   clearFlag(State.MANUAL_CONTROL);
+      //   turret.requestTransition(ts);
+      // }
+      // else {
+      //   setFlag(State.MANUAL_CONTROL);
+      //   turret.requestTransition(Turret.TurretState.MANUAL_CONTROL);
+      // }
+      setFlag(State.MANUAL_CONTROL);
+      turret.requestTransition(TurretState.MANUAL_CONTROL);
     }
     else {
       requestTransition(s);

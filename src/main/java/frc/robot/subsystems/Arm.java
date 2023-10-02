@@ -95,7 +95,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private void defineTransitions() {
         addOmniTransition(SEEKING_STOWED);
-        addTransition(SEEKING_STOWED, STOWED, new InstantCommand(() -> {new WaitCommand(2).andThen(new InstantCommand(this::pullAbsoluteAngles)).schedule();}));
+//        addTransition(SEEKING_STOWED, STOWED, new InstantCommand(() -> {new WaitCommand(2).andThen(new InstantCommand(this::pullAbsoluteAngles)).schedule();}));
+        addTransition(SEEKING_STOWED, STOWED);
 
         addOmniTransition(SOFT_STOP, () -> {
             elevator.set(0);
@@ -292,9 +293,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     }
 
     public InstantCommand reset() {
-        return new InstantCommand(() -> {
-            pullAbsoluteAngles();
-        });
+        return new InstantCommand(this::pollAbsoluteAngles);
     }
 
 
@@ -362,7 +361,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void determineSelf() {
-        pullAbsoluteAngles();
+        pollAbsoluteAngles();
 
         setArmNormalSpeed();
 
@@ -439,7 +438,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         return getShoulderAngle() <= SHOULDER_ELEVATOR_THRESHOLD;
     }
 
-    public void pullAbsoluteAngles() {
+    public void pollAbsoluteAngles() {
         shoulderLeader.resetPosition(shoulderEncoder.getRadians());
 
         wrist.resetPosition(wristEncoder.getRadians());

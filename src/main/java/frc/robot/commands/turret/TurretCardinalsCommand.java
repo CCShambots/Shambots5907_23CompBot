@@ -54,6 +54,9 @@ public class TurretCardinalsCommand extends CommandBase {
             System.out.println("evaluating: " + turretAngle.getDegrees() + " (turret); " + botRotation.getDegrees() + " (bot rotation)");
 
             t.setTarget(MathUtil.angleModulus(turretAngle.getRadians()));
+
+            //Back when the turret was broken
+            // t.setTarget(currentToward ? Math.toRadians(0) : Math.toRadians(180));
         }
 
         prevToward = currentToward;
