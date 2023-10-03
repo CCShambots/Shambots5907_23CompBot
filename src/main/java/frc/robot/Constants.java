@@ -4,9 +4,10 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
-import com.ctre.phoenixpro.configs.TalonFXConfiguration;
-import com.ctre.phoenixpro.hardware.TalonFX;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -16,8 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.Candle.MultipleColorSegments;
 import frc.robot.ShamLib.Candle.RGBSegmentInfo;
+import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
 import frc.robot.ShamLib.PIDGains;
-import frc.robot.ShamLib.motors.pro.PIDSVGains;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
