@@ -66,7 +66,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 STANDARD_LINEAR_ACCELERATION,
                 MAX_TURN_SPEED,
                 MAX_TURN_ACCEL,
-                new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
                 Constants.AT_COMP,
@@ -217,11 +216,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
          ));
     }
 
-    public double getPitch() {
+    public Rotation2d getPitch() {
         return drive.getPitch();
     }
 
-    public double getRoll() {
+    public Rotation2d getRoll() {
         return drive.getRoll();
     }
 
@@ -339,7 +338,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
 
         drive.resetGyro(rotation);
-        drive.fixHoldAngle();
+        // drive.fixHoldAngle();
 
         drive.resetOdometryPose(drive.getPose());
 
@@ -411,7 +410,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         // builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
         builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
 
-        builder.addDoubleProperty("total angles", () -> Math.abs(getPitch()) + Math.abs(getRoll()), null);
+        builder.addDoubleProperty("total angles", () -> Math.abs(getPitch().getDegrees()) + Math.abs(getRoll().getDegrees()), null);
 
         // builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
         

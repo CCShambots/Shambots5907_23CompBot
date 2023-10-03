@@ -43,12 +43,12 @@ public class AutoBalanceCommand extends CommandBase {
     }
 
     private void defineMods() {
-        rMod = dt.getRoll() < 0 ? 1 : -1;
-        pMod = dt.getPitch() < 0 ? 1 : -1;
+        rMod = dt.getRoll().getDegrees() < 0 ? 1 : -1;
+        pMod = dt.getPitch().getDegrees() < 0 ? 1 : -1;
     }
 
     private double getCumulativeAngle() {
-        return dt.getPitch() * pMod + dt.getRoll() * rMod;
+        return dt.getPitch().getDegrees() * pMod + dt.getRoll().getDegrees() * rMod;
     }
 
     @Override

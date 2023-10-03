@@ -46,6 +46,6 @@ public class DockChargingStationCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > dockThreshold;
+        return Math.abs(dt.getPitch().getDegrees()) + Math.abs(dt.getRoll().getDegrees()) > dockThreshold;
     }
 }

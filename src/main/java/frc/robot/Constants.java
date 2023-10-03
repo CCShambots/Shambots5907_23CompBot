@@ -134,9 +134,9 @@ public final class Constants {
             new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2) //front right
         };
 
-        public static final double P_HOLDANGLETELE = 0.25;
-        public static final double I_HOLDANGLETELE = 0;
-        public static final double D_HOLDANGLETELE = 0;
+        // public static final double P_HOLDANGLETELE = 0.25;
+        // public static final double I_HOLDANGLETELE = 0;
+        // public static final double D_HOLDANGLETELE = 0;
 
         public static final double P_HOLDANGLEAUTO = 5;
         public static final double I_HOLDANGLEAUTO = 0;
