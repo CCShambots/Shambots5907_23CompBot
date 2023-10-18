@@ -42,7 +42,7 @@ import static java.lang.Math.toRadians;
 
 public final class Constants {
 
-    public static boolean AT_COMP = true;
+    public static boolean AT_COMP = false;
 
     public static final class Testing {
 

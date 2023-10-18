@@ -155,6 +155,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     SmartDashboard.putData("arm", arm);
     SmartDashboard.putData("turret", turret);
     SmartDashboard.putData("claw", arm.claw());
+    SmartDashboard.putData("drivetrain", drivetrain);
 
     defineTransitions();
     defineStateCommands();
