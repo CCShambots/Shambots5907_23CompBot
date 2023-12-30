@@ -1,11 +1,11 @@
 package frc.robot.commands.arm;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.util.kinematics.ArmState;
 
 
-public class ExtendArmCommand extends CommandBase {
+public class ExtendArmCommand extends Command {
 
     private final Arm a;
     private final ArmState target;

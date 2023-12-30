@@ -2,7 +2,7 @@ package frc.robot.commands.turret;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
@@ -14,7 +14,7 @@ import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
 import static frc.robot.Constants.alliance;
 import static java.lang.Math.PI;
 
-public class TurretCardinalsCommand extends CommandBase {
+public class TurretCardinalsCommand extends Command {
 
     private final Turret t;
     private final BooleanSupplier towardSupplier;

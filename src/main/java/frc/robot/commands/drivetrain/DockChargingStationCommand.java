@@ -1,13 +1,13 @@
 package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
 import java.util.function.IntSupplier;
 
-public class DockChargingStationCommand extends CommandBase {
+public class DockChargingStationCommand extends Command {
     private int direction;
     private final IntSupplier directionSupplier;
     private final Drivetrain dt;

@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
@@ -10,7 +10,7 @@ import frc.robot.subsystems.Arm;
 
 import static frc.robot.Constants.Arm.*;
 
-public class ArmMotorVoltageIncrementCommand extends CommandBase {
+public class ArmMotorVoltageIncrementCommand extends Command {
     final EnhancedTalonFXPro motor;
     final Arm arm;
     final ArmFeedforward ff;

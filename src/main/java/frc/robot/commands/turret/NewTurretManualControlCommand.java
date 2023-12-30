@@ -1,12 +1,12 @@
 package frc.robot.commands.turret;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Turret;
 
 import java.util.function.BooleanSupplier;
 
-public class NewTurretManualControlCommand extends CommandBase {
+public class NewTurretManualControlCommand extends Command {
     private final BooleanSupplier left;
     private final BooleanSupplier right;
 
