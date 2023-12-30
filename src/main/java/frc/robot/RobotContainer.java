@@ -31,6 +31,19 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
+import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
+import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
+import static frc.robot.Constants.ElementType.*;
+import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
+import static frc.robot.Constants.alliance;
+import static frc.robot.subsystems.Arm.ArmMode.STOWED;
+import static frc.robot.subsystems.Arm.ArmMode.TESTING;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
+
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   // Declare HIDs
@@ -110,10 +123,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void defineTransitions() {
-    addOmniTransition(
-        State.DISABLED,
-        new ParallelCommandGroup(
-            // drivetrain.transitionCommand(DrivetrainState.X_SHAPE),
+    addOmniTransition(State.DISABLED, new ParallelCommandGroup(
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)));
@@ -128,10 +138,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addTransition(State.DISABLED, State.AUTONOMOUS);
 
-    addOmniTransition(
-        State.TRAVELING,
-        new ParallelCommandGroup(
-            // arm.transitionCommand(ArmMode.SEEKING_STOWED),
+    addOmniTransition(State.TRAVELING, new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
             turret.transitionCommand(Turret.TurretState.CARDINALS),
             clawVision.transitionCommand(ClawVision.VisionState.ELEMENT_TYPE)));
@@ -141,8 +148,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         State.INTAKING,
         new ParallelCommandGroup(
             arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE)
-            // turret.transitionCommand(Turret.TurretState.INTAKING)
-            ));
+    ));
 
     addTransition(
         State.TRAVELING,
@@ -150,8 +156,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
             new InstantCommand(() -> arm.requestTransition(currentScoreMode))
-            // turret.transitionCommand(Turret.TurretState.SCORING)
-            ));
+    ));
 
     // TODO: REMOVE ALL TESTING STUFF
     addOmniTransition(
@@ -296,9 +301,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     new Trigger(() -> arm.getState() != ArmMode.STOWED)
         .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    new Trigger(() -> arm.getState() == ArmMode.STOWED)
-        .and(() -> !leftStick.trigger().getAsBoolean())
-        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)));
+    // new Trigger(() -> arm.getState() == ArmMode.STOWED).and(() -> !leftStick.trigger().getAsBoolean()).onTrue(
+    //   new InstantCommand(() -> drivetrain.setSpeedMode(TURBO))
+    // );
 
     operatorCont
         .a()

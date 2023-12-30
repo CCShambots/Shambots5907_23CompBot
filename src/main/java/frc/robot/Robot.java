@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static frc.robot.subsystems.Lights.LightState.DISABLED;
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -126,7 +128,9 @@ public class Robot extends LoggedRobot {
       robotContainer.lights().requestTransition(LightState.SOFT_STOP);
     } else {
       robotContainer.clearFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
-      robotContainer.lights().requestTransition(LightState.DISABLED);
+      if(robotContainer.lights().getState() != DISABLED) {
+        robotContainer.lights().requestTransition(LightState.DISABLED);
+      }
     }
   }
 
