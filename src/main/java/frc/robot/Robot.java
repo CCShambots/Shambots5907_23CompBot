@@ -47,14 +47,11 @@ public class Robot extends LoggedRobot {
     SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-    // LiveWindow.disable AllTelemetry();
 
-    if(!Constants.AT_COMP) {
-      PathPlannerServer.startServer(5811);
-    }
-
-    //Run the module control loops every 5 ms
-//    addPeriodic(robotContainer.runArmControlLoops(), 0.005);
+    //TODO: What happened to the pathplanner server
+    // if(!Constants.AT_COMP) {
+      // PathPlannerLogging.startServer(5811);
+    // }
 
     //Check the alliance from FMS when the bot turns on
     Constants.pullAllianceFromFMS(robotContainer);
@@ -142,7 +139,7 @@ public class Robot extends LoggedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    robotContainer.turret().setTarget(robotContainer.getAutonomousCommand().getStartAngle());
+    // robotContainer.turret().setTarget(robotContainer.getAutonomousCommand().getStartAngle());
     robotContainer.dt().setAllModules(Constants.SwerveDrivetrain.STOPPED_STATE);
     // robotContainer.requestTransition(RobotContainer.State.TESTING);
 

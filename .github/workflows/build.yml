@@ -8,10 +8,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container: wpilib/roborio-cross-ubuntu:2022-18.04
+    container: wpilib/roborio-cross-ubuntu:2024-22.04
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Grant execute permission

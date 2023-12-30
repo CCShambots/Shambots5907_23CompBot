@@ -1,7 +1,7 @@
 package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
@@ -14,7 +14,7 @@ import java.util.function.IntSupplier;
 
 import static frc.robot.Constants.SwerveDrivetrain.AutoBalance.*;
 
-public class DriveOverChargeStationCommand extends CommandBase {
+public class DriveOverChargeStationCommand extends Command {
     private final Drivetrain dt;
     private ArrayList<Double> buff;
 
@@ -45,11 +45,7 @@ public class DriveOverChargeStationCommand extends CommandBase {
                 0
         ), dt.getCurrentAngle());
 
-        // if(getCumulativeAngle() > 0 != initialPos && !dt.isFlag(DrivetrainState.HIT_ZERO)) {
-        //     dt.setFlag(DrivetrainState.HIT_ZERO);
-        // }
-        
-        dt.drive(speeds, false);
+        dt.drive(speeds);
 
         buff.remove(buff.size() - 1);
         buff.add(0, Math.abs(getCumulativeAngle()));
@@ -61,7 +57,7 @@ public class DriveOverChargeStationCommand extends CommandBase {
     }
 
     private double getCumulativeAngle() {
-        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll());
+        return Math.abs(dt.getPitch().getDegrees()) + Math.abs(dt.getRoll().getDegrees());
     }
 
     @Override

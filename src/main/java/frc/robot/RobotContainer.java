@@ -1,29 +1,18 @@
 package frc.robot;
 
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElementType;
-import frc.robot.ShamLib.AutonomousLoader;
 import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.commands.auto.BaseAutoRoute;
-import frc.robot.commands.auto.NothingRoute;
-import frc.robot.commands.auto.blue.BlueBalanceCenter;
-import frc.robot.commands.auto.blue.BluePickupBalanceLeft;
-import frc.robot.commands.auto.blue.BluePickupRight;
-import frc.robot.commands.auto.blue.BlueThreeScoreLeft;
-import frc.robot.commands.auto.blue.BlueTwoRight;
-import frc.robot.commands.auto.red.*;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmMode;
@@ -32,8 +21,7 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
@@ -41,7 +29,6 @@ import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
-import static frc.robot.RobotContainer.AutoRoutes.*;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
@@ -67,9 +54,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private boolean trustElementVision = true;
 
   //Declare autonomous loader
-  private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
+  // private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
 
-  private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
+  // private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
+
+  private final SendableChooser<Command> autoChooser;
 
   public RobotContainer(EventLoop checkModulesLoop) {
     super("Robot", State.UNDETERMINED, State.class);
@@ -100,47 +89,49 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     drivetrain.registerMisalignedSwerveTriggers(checkModulesLoop);
 
 
-    //Load the trajectories into the hashmap
-    loadPaths(
-        "red-go-score-right",
-        "red-go-balance-right",
-        "red-return-left",
-        "red-balance-center",
+    // //Load the trajectories into the hashmap
+    // loadPaths(
+    //     "red-go-score-right",
+    //     "red-go-balance-right",
+    //     "red-return-left",
+    //     "red-balance-center",
 
-        "blue-go-score-left",
-        "blue-go-balance-left",
-        "blue-return-right"
-    );
+    //     "blue-go-score-left",
+    //     "blue-go-balance-left",
+    //     "blue-return-right"
+    // );
 
-    loadPaths(2, 4, "red-back-off-right");
-    loadPaths(1.25, 1, "red-get-element-right");
-    loadPaths(0.75, 0.75, "red-pickup-left");
+    // loadPaths(2, 4, "red-back-off-right");
+    // loadPaths(1.25, 1, "red-get-element-right");
+    // loadPaths(0.75, 0.75, "red-pickup-left");
 
-    //Left two score
-    loadPaths(2, 1, "red-get-element-left");
-    loadPaths(3, 2, "red-score-element-left");
+    // //Left two score
+    // loadPaths(2, 1, "red-get-element-left");
+    // loadPaths(3, 2, "red-score-element-left");
 
-    //Three score :)
-    loadPaths(2, 3, "red-first-score-right");
-    loadPaths(4, 2, "red-second-score-right");
-    loadPaths(3, 2, "red-get-second-element-right");
-    loadPaths(4, 2, "red-third-score-right");
+    // //Three score :)
+    // loadPaths(2, 3, "red-first-score-right");
+    // loadPaths(4, 2, "red-second-score-right");
+    // loadPaths(3, 2, "red-get-second-element-right");
+    // loadPaths(4, 2, "red-third-score-right");
     
-    loadPaths(2, 4, "blue-back-off-left");
-    loadPaths(1.25, 1, "blue-get-element-left");
-    loadPaths(0.75, 0.75, "blue-pickup-right");
+    // loadPaths(2, 4, "blue-back-off-left");
+    // loadPaths(1.25, 1, "blue-get-element-left");
+    // loadPaths(0.75, 0.75, "blue-pickup-right");
 
-    //Three score :)
-    loadPaths(2, 3, "blue-first-score-left");
-    loadPaths(4, 2, "blue-second-score-left");
-    loadPaths(3, 2, "blue-get-second-element-left");
-    loadPaths(4, 2, "blue-third-score-left");
+    // //Three score :)
+    // loadPaths(2, 3, "blue-first-score-left");
+    // loadPaths(4, 2, "blue-second-score-left");
+    // loadPaths(3, 2, "blue-get-second-element-left");
+    // loadPaths(4, 2, "blue-third-score-left");
 
-    //Right two score
-    loadPaths(2, 1, "blue-get-element-right");
-    loadPaths(3, 2, "blue-score-element-right");
+    // //Right two score
+    // loadPaths(2, 1, "blue-get-element-right");
+    // loadPaths(3, 2, "blue-score-element-right");
 
-    autoLoader = instantiateAutoLoader();
+    // autoLoader = instantiateAutoLoader();
+
+    autoChooser = AutoBuilder.buildAutoChooser();
 
     initializeDriveTab();
 
@@ -155,6 +146,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     SmartDashboard.putData("arm", arm);
     SmartDashboard.putData("turret", turret);
     SmartDashboard.putData("claw", arm.claw());
+    SmartDashboard.putData("drivetrain", drivetrain);
 
     defineTransitions();
     defineStateCommands();
@@ -240,12 +232,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   private void initializeDriveTab() {
     ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
-    driveTab.add("Auto Route", autoLoader.getSendableChooser()).withPosition(3, 0).withSize(2, 2);
+    driveTab.add("Auto Route", autoChooser).withPosition(3, 0).withSize(2, 2);
     driveTab.addString("ALLIANCE", () -> alliance.name()).withPosition(0, 0).withSize(2, 2);
     driveTab.add("SWITCH ALLIANCE", switchAlliance()).withPosition(5,2).withSize(2, 2);
     driveTab.add("SYNC ALLIANCE", syncAlliance()).withPosition(5,0).withSize(2, 2);
-    driveTab.addBoolean("Matching Auto", () -> getAutonomousCommand().getAlliance() == Constants.alliance)
-            .withPosition(3, 2).withSize(2, 2);
+    // driveTab.addBoolean("Matching Auto", () -> getAlliance() == Constants.alliance)
+            // .withPosition(3, 2).withSize(2, 2);
 
     driveTab.add("+90", zeroTurret(Math.toRadians(90))).withPosition(2, 1).withSize(1, 1);
     driveTab.add("-90", zeroTurret(Math.toRadians(-90))).withPosition(2, 2).withSize(1, 1);
@@ -271,42 +263,42 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return new WhileDisabledInstantCommand(() -> trustElementVision = !trustElementVision);
   }
 
-  private AutonomousLoader<BaseAutoRoute, AutoRoutes> instantiateAutoLoader() {
-    final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
+//   private AutonomousLoader<BaseAutoRoute, AutoRoutes> instantiateAutoLoader() {
+//     final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
 
-    //Put new auto routes here
-    Map<AutoRoutes, BaseAutoRoute> routes = new HashMap<>();
+//     //Put new auto routes here
+//     Map<AutoRoutes, BaseAutoRoute> routes = new HashMap<>();
 
-    //Red routes
-    routes.putAll(Map.of(
-//            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
-            RED_BALANCE_CENTER, new RedBalanceCenter(this),
-            RED_PICKUP_LEFT, new RedPickupLeft(this),
-            RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
-            RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this),
-            RED_TWO_SCORE_LEFT, new RedTwoLeft(this)
-    ));
+//     //Red routes
+//     routes.putAll(Map.of(
+// //            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
+//             RED_BALANCE_CENTER, new RedBalanceCenter(this),
+//             RED_PICKUP_LEFT, new RedPickupLeft(this),
+//             RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
+//             RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this),
+//             RED_TWO_SCORE_LEFT, new RedTwoLeft(this)
+//     ));
 
-    //Blue routes
-    routes.putAll(Map.of(
-//      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
-      BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
-      BLUE_PICKUP_RIGHT, new BluePickupRight(this),
-      BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
-      BLUE_THREE_SCORE_LEFT, new BlueThreeScoreLeft(this),
-      BLUE_TWO_SCORE_RIGHT, new BlueTwoRight(this)
-      )
-    );
+//     //Blue routes
+//     routes.putAll(Map.of(
+// //      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
+//       BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
+//       BLUE_PICKUP_RIGHT, new BluePickupRight(this),
+//       BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
+//       BLUE_THREE_SCORE_LEFT, new BlueThreeScoreLeft(this),
+//       BLUE_TWO_SCORE_RIGHT, new BlueTwoRight(this)
+//       )
+//     );
 
-    //Route to do nothing just in case everything has gone wrong
-    routes.put(
-            NOTHING, new NothingRoute()
-    );
+//     //Route to do nothing just in case everything has gone wrong
+//     routes.put(
+//             NOTHING, new NothingRoute()
+//     );
 
-    autoLoader = new AutonomousLoader<BaseAutoRoute, AutoRoutes>(routes);
+//     autoLoader = new AutonomousLoader<BaseAutoRoute, AutoRoutes>(routes);
 
-    return autoLoader;
-  }
+//     return autoLoader;
+//   }
 
   private InstantCommand switchAlliance() {
     return new WhileDisabledInstantCommand(
@@ -491,13 +483,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     );
   }
 
-  public BaseAutoRoute getAutonomousCommand() {
-    return autoLoader.getCurrentSelection();
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
   }
-//
-//  public Runnable runArmControlLoops() {
-//    return arm.runControlLoops();
-//  }
+
 
   public boolean lowVoltage() {
     return pd.getVoltage() <= Constants.VOLTAGE_WARNING;
@@ -509,46 +498,49 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
    * @param reversed whether the trajectories should be loaded as reversed
    * @param names the names of the trajectories to load
    */
-  public void loadPaths(double maxSpeed, double maxAccel, boolean reversed, String... names) {
-    for (String n : names) {
-      trajectories.put(n, PathPlanner.loadPath(n, maxSpeed, maxAccel, reversed));
-    }
-  }
+  // public void loadPaths(double maxSpeed, double maxAccel, boolean reversed, String... names) {
+  //   for (String n : names) {
+  //     trajectories.put(n, PathPlannerPath.fromPathFile(n, maxSpeed, maxAccel, reversed));
+  //   }
+  // }
 
   /**
    * Load a sequence of paths directly into the map of trajectories
    * @param names the names of the trajectories to load
    */
-  public void loadPaths(double maxSpeed, double maxAccel, String... names) {
-    loadPaths(maxSpeed, maxAccel, false, names);
-  }
+  // public void loadPaths(double maxSpeed, double maxAccel, String... names) {
+  //   loadPaths(maxSpeed, maxAccel, false, names);
+  // }
 
-  public void loadPaths(String... names) {
-    loadPaths(Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO, Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, names);
-  }
+  // public void loadPaths(String... names) {
+  //   loadPaths(Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO, Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, names);
+  // }
 
-  public Map<String, PathPlannerTrajectory> paths() {
-    return trajectories;
-  }
+  // public Map<String, PathPlannerTrajectory> paths() {
+  //   return trajectories;
+  // }
 
-  public Command runTraj(PathPlannerTrajectory traj) {
-    return drivetrain.runTrajectory(traj, DrivetrainState.IDLE);
-  }
+  // public Command runTraj(PathPlannerTrajectory traj) {
+  //   return drivetrain.runTrajectory(traj, DrivetrainState.IDLE);
+  // }
 
-  public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
-    return drivetrain.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
-  }
+  // public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
+  //   return drivetrain.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
+  // }
 
   public Command runTraj(String traj) {
-    return runTraj(paths().get(traj));
+    // return runTraj(paths().get(traj));
+    return new InstantCommand();
   }
 
-  public Command runTrajWithEvents(String traj, Map<String, Command> eventMap) {
-    return drivetrain.runTrajectoryWithEvents(paths().get(traj), eventMap);
-  }
+  // public Command runTrajWithEvents(String traj, Map<String, Command> eventMap) {
+  //   return drivetrain.runTrajectoryWithEvents(paths().get(traj), eventMap);
+  // }
 
   public Command runTraj(String traj, boolean resetPose) {
-    return runTraj(paths().get(traj), resetPose);
+    // return runTraj(paths().get(traj), resetPose);
+
+    return new InstantCommand();
   }
 
   public Arm arm() {

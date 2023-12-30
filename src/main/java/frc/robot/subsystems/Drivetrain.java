@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -35,6 +35,8 @@ import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
+import static frc.robot.ShamLib.swerve.ModuleInfo.SwerveModuleSpeedLevel.*;
+import static frc.robot.ShamLib.swerve.ModuleInfo.SwerveModuleType.*;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     private final SwerveDrive drive;
@@ -64,19 +66,21 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 TURN_GAINS,
                 STANDARD_LINEAR_SPEED,
                 STANDARD_LINEAR_ACCELERATION,
+                STANDARD_ROTATION,
+                STANDARD_ROT_ACCEL,
                 MAX_TURN_SPEED,
                 MAX_TURN_ACCEL,
-                new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                Constants.AT_COMP,
+                !Constants.AT_COMP,
                 "drivetrain",
                 "",
                 Constants.getCurrentLimit(),
-                ModuleInfo.getMK4IL2Module(MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
-                ModuleInfo.getMK4IL2Module(MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
-                ModuleInfo.getMK4IL2Module(MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
-                ModuleInfo.getMK4IL2Module(MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], false)
+                this,
+                ModuleInfo.generateModuleInfo(MK4i, L2, MODULE_1_DRIVE_ID, MODULE_1_TURN_ID, MODULE_1_ENCODER_ID, MODULE_1_OFFSET, moduleOffsets[0], false),
+                ModuleInfo.generateModuleInfo(MK4i, L2, MODULE_2_DRIVE_ID, MODULE_2_TURN_ID, MODULE_2_ENCODER_ID, MODULE_2_OFFSET, moduleOffsets[1], false),
+                ModuleInfo.generateModuleInfo(MK4i, L2, MODULE_3_DRIVE_ID, MODULE_3_TURN_ID, MODULE_3_ENCODER_ID, MODULE_3_OFFSET, moduleOffsets[2], false),
+                ModuleInfo.generateModuleInfo(MK4i, L2, MODULE_4_DRIVE_ID, MODULE_4_TURN_ID, MODULE_4_ENCODER_ID, MODULE_4_OFFSET, moduleOffsets[3], false)
         );
 
         defineTransitions();
@@ -217,11 +221,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
          ));
     }
 
-    public double getPitch() {
+    public Rotation2d getPitch() {
         return drive.getPitch();
     }
 
-    public double getRoll() {
+    public Rotation2d getRoll() {
         return drive.getRoll();
     }
 
@@ -252,12 +256,16 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
     }
 
-    public void drive(ChassisSpeeds speeds, boolean allowHoldAngleChange) {
-        drive.drive(speeds, allowHoldAngleChange);
+    public void drive(ChassisSpeeds speeds) {
+        drive.drive(speeds);
     }
 
-    public void drive(ChassisSpeeds speeds) {
-        drive.drive(speeds, false);
+    public void resetOdometryPose(Pose2d pose) {
+        drive.resetOdometryPose(pose);
+    }
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return drive.getChassisSpeeds();
     }
 
     //TODO: remove
@@ -270,12 +278,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
      * @param endState the state to end the trajectory in
      * @return the command to run
      */
-    public Command runTrajectory(PathPlannerTrajectory trajectory, boolean resetPose, DrivetrainState endState) {
+    public Command runPath(PathPlannerPath trajectory, boolean resetPose, DrivetrainState endState) {
         return new SequentialCommandGroup(
                 new InstantCommand(
                         () -> registerStateCommand(
                                 DrivetrainState.TRAJECTORY,
-                                drive.getTrajectoryCommand(trajectory, resetPose)
+                                drive.getPathCommand(trajectory, resetPose)
                                         .andThen(new InstantCommand(() -> {
                                             registerStateCommand(DrivetrainState.TRAJECTORY, new InstantCommand());
                                             requestTransition(endState);
@@ -286,20 +294,16 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         );
     }
 
-    public Command runTrajectory(PathPlannerTrajectory trajectory, DrivetrainState endState) {
-        return runTrajectory(trajectory, false, endState);
+    public Command runPath(PathPlannerPath trajectory, DrivetrainState endState) {
+        return runPath(trajectory, false, endState);
     }
 
-    public Command runTrajectoryWithEvents(PathPlannerTrajectory traj, Map<String, Command> eventMap) {
+    public Command runPathWithEvents(PathPlannerPath path) {
             return new FollowPathWithEvents(
-                runTrajectory(traj, DrivetrainState.IDLE),
-                traj.getMarkers(),
-                eventMap
+                runPath(path, DrivetrainState.IDLE),
+                path,
+                this::getPose
         );
-    }
-
-    public TrajectoryBuilder getTrajectoryBuilder() {
-        return drive.getTrajectoryBuilder();
     }
 
     public void setModuleStates(SwerveModuleState... states) {
@@ -339,7 +343,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         }
 
         drive.resetGyro(rotation);
-        drive.fixHoldAngle();
 
         drive.resetOdometryPose(drive.getPose());
 
@@ -408,12 +411,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        // builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
-        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
+        builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
+        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);;
 
-        builder.addDoubleProperty("total angles", () -> Math.abs(getPitch()) + Math.abs(getRoll()), null);
+        builder.addDoubleProperty("total angles", () -> Math.abs(getPitch().getDegrees()) + Math.abs(getRoll().getDegrees()), null);
 
-        // builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
+        builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
         
         builder.addDoubleProperty("linear-speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
         builder.addDoubleProperty("angular-speed", () -> drive.getChassisSpeeds().omegaRadiansPerSecond, null);
@@ -422,8 +425,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         builder.addDoubleArrayProperty("module-angles", () -> drive.getModuleAngles(), null);
 
-        // builder.addDoubleProperty("pitch", () -> getPitch(), null);
-        // builder.addDoubleProperty("roll", () -> getRoll(), null);
+        builder.addDoubleProperty("pitch", () -> getPitch().getDegrees(), null);
+        builder.addDoubleProperty("roll", () -> getRoll().getDegrees(), null);
 
 
         // builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
@@ -474,11 +477,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            // "field", drive.getField()
-            // "module-1", drive.getModules().get(0)
-            // "module-2", drive.getModules().get(1),
-            // "module-3", drive.getModules().get(2),
-            // "module-4", drive.getModules().get(3)
+            "field", drive.getField(),
+            "module-1", drive.getModules().get(0),
+            "module-2", drive.getModules().get(1),
+            "module-3", drive.getModules().get(2),
+            "module-4", drive.getModules().get(3)
         );
     }
 
