@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.claw;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Compressor;
@@ -7,12 +7,16 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.subsystems.claw.ClawIO.ClawIOInputs;
 import frc.robot.util.ProxSensor;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import static frc.robot.Constants.Claw.*;
 
 public class Claw extends StateMachine<Claw.ClawState> {
+    private final ClawIO io;
+    // private final ClawIOInputsAutoLogged = new ClawIOInputsAutoLogged();
+
     final DoubleSolenoid solenoid = new DoubleSolenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID_1, SOLENOID_ID_2);
 
     final Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
@@ -23,14 +27,22 @@ public class Claw extends StateMachine<Claw.ClawState> {
     private final Timer timer = new Timer();
     private boolean proxEnabled = true;
 
-    public Claw() {
+    public Claw(ClawIO io) {
         super("Claw", ClawState.UNDETERMINED, ClawState.class);
+
+        this.io = io;
 
         compressor.enableDigital();
 
         defineTransitions();
 
         registerStateCommands();
+    }
+
+    @Override
+    protected void update() {
+        // io.updateInputs(null);
+
     }
 
     private void defineTransitions() {

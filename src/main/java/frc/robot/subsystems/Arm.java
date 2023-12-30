@@ -13,7 +13,9 @@ import frc.robot.ShamLib.motors.talonfx.MotionMagicTalonFX;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.arm.ExtendArmCommand;
-import frc.robot.subsystems.Claw.ClawState;
+import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.ClawIOReal;
+import frc.robot.subsystems.claw.Claw.ClawState;
 import frc.robot.util.kinematics.ArmKinematics;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.kinematics.ArmTrajectory;
@@ -51,7 +53,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     );
     private final ThroughBoreEncoder wristEncoder = new ThroughBoreEncoder(WRIST_ENCODER_PORT, WRIST_ENCODER_OFFSET);
 
-    private final Claw claw = new Claw();
+    private final Claw claw = new Claw(new ClawIOReal());
 
     private ArmState currentArmState = STOWED_POS;
 

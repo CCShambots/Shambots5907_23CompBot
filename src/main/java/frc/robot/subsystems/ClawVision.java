@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElementType;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.vision.Limelight;
-import frc.robot.subsystems.Claw.ClawState;
+import frc.robot.subsystems.claw.Claw.ClawState;
 
 import java.util.function.Supplier;
 
