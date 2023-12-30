@@ -53,11 +53,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private Constants.ElementType nextElement = Cone;
   private boolean trustElementVision = true;
 
-  //Declare autonomous loader
-  // private final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
-
-  // private final HashMap<String, PathPlannerTrajectory> trajectories = new HashMap<>();
-
+  //Declare autonomous sendable chooser
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer(EventLoop checkModulesLoop) {
@@ -87,49 +83,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     );
 
     drivetrain.registerMisalignedSwerveTriggers(checkModulesLoop);
-
-
-    // //Load the trajectories into the hashmap
-    // loadPaths(
-    //     "red-go-score-right",
-    //     "red-go-balance-right",
-    //     "red-return-left",
-    //     "red-balance-center",
-
-    //     "blue-go-score-left",
-    //     "blue-go-balance-left",
-    //     "blue-return-right"
-    // );
-
-    // loadPaths(2, 4, "red-back-off-right");
-    // loadPaths(1.25, 1, "red-get-element-right");
-    // loadPaths(0.75, 0.75, "red-pickup-left");
-
-    // //Left two score
-    // loadPaths(2, 1, "red-get-element-left");
-    // loadPaths(3, 2, "red-score-element-left");
-
-    // //Three score :)
-    // loadPaths(2, 3, "red-first-score-right");
-    // loadPaths(4, 2, "red-second-score-right");
-    // loadPaths(3, 2, "red-get-second-element-right");
-    // loadPaths(4, 2, "red-third-score-right");
-    
-    // loadPaths(2, 4, "blue-back-off-left");
-    // loadPaths(1.25, 1, "blue-get-element-left");
-    // loadPaths(0.75, 0.75, "blue-pickup-right");
-
-    // //Three score :)
-    // loadPaths(2, 3, "blue-first-score-left");
-    // loadPaths(4, 2, "blue-second-score-left");
-    // loadPaths(3, 2, "blue-get-second-element-left");
-    // loadPaths(4, 2, "blue-third-score-left");
-
-    // //Right two score
-    // loadPaths(2, 1, "blue-get-element-right");
-    // loadPaths(3, 2, "blue-score-element-right");
-
-    // autoLoader = instantiateAutoLoader();
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -263,43 +216,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return new WhileDisabledInstantCommand(() -> trustElementVision = !trustElementVision);
   }
 
-//   private AutonomousLoader<BaseAutoRoute, AutoRoutes> instantiateAutoLoader() {
-//     final AutonomousLoader<BaseAutoRoute, AutoRoutes> autoLoader;
-
-//     //Put new auto routes here
-//     Map<AutoRoutes, BaseAutoRoute> routes = new HashMap<>();
-
-//     //Red routes
-//     routes.putAll(Map.of(
-// //            RED_TWO_SCORE_RIGHT, new RedTwoScoreRight(this),
-//             RED_BALANCE_CENTER, new RedBalanceCenter(this),
-//             RED_PICKUP_LEFT, new RedPickupLeft(this),
-//             RED_PICKUP_BALANCE_RIGHT, new RedPickupBalanceRight(this),
-//             RED_THREE_SCORE_RIGHT, new RedThreeScoreRight(this),
-//             RED_TWO_SCORE_LEFT, new RedTwoLeft(this)
-//     ));
-
-//     //Blue routes
-//     routes.putAll(Map.of(
-// //      BLUE_TWO_SCORE_LEFT, new BlueTwoScoreLeft(this),
-//       BLUE_BALANCE_CENTER, new BlueBalanceCenter(this),
-//       BLUE_PICKUP_RIGHT, new BluePickupRight(this),
-//       BLUE_PICKUP_BALANCE_LEFT, new BluePickupBalanceLeft(this),
-//       BLUE_THREE_SCORE_LEFT, new BlueThreeScoreLeft(this),
-//       BLUE_TWO_SCORE_RIGHT, new BlueTwoRight(this)
-//       )
-//     );
-
-//     //Route to do nothing just in case everything has gone wrong
-//     routes.put(
-//             NOTHING, new NothingRoute()
-//     );
-
-//     autoLoader = new AutonomousLoader<BaseAutoRoute, AutoRoutes>(routes);
-
-//     return autoLoader;
-//   }
-
   private InstantCommand switchAlliance() {
     return new WhileDisabledInstantCommand(
             () -> {
@@ -319,20 +235,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   private void configureBindings() {
-
-//    dt().enableTeleopAutobalanceControls(leftStick, rightStick);
-
-    // leftStick.topLeft().onTrue(arm.calculateWristFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
-  //  leftStick.topLeft().onTrue(arm.calculateShoulderFF(leftStick.topRight(), () -> leftStick.topBase().getAsBoolean()));
-
-
-  //  leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(-45))));
-  //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(0))));
-  //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setWristTarget(Math.toRadians(45))));
-
-  //  leftStick.topLeft().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(45))));
-  //  leftStick.topBase().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(90))));
-  //  leftStick.topRight().onTrue(new InstantCommand(() -> arm.setShoulderTarget(Math.toRadians(110))));
 
     rightStick.trigger().onTrue(transitionCommand(State.BRAKE));
     rightStick.trigger().onFalse(transitionCommand(State.TRAVELING));
@@ -492,50 +394,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     return pd.getVoltage() <= Constants.VOLTAGE_WARNING;
   }
 
-  /**
-   * Load a sequence of paths directly into the map of trajectories.
-   * Calling this method again with the same names will regenerate the trajectory and replace the old instance of the trajectory
-   * @param reversed whether the trajectories should be loaded as reversed
-   * @param names the names of the trajectories to load
-   */
-  // public void loadPaths(double maxSpeed, double maxAccel, boolean reversed, String... names) {
-  //   for (String n : names) {
-  //     trajectories.put(n, PathPlannerPath.fromPathFile(n, maxSpeed, maxAccel, reversed));
-  //   }
-  // }
-
-  /**
-   * Load a sequence of paths directly into the map of trajectories
-   * @param names the names of the trajectories to load
-   */
-  // public void loadPaths(double maxSpeed, double maxAccel, String... names) {
-  //   loadPaths(maxSpeed, maxAccel, false, names);
-  // }
-
-  // public void loadPaths(String... names) {
-  //   loadPaths(Constants.SwerveDrivetrain.MAX_LINEAR_SPEED_AUTO, Constants.SwerveDrivetrain.MAX_LINEAR_ACCELERATION_AUTO, names);
-  // }
-
-  // public Map<String, PathPlannerTrajectory> paths() {
-  //   return trajectories;
-  // }
-
-  // public Command runTraj(PathPlannerTrajectory traj) {
-  //   return drivetrain.runTrajectory(traj, DrivetrainState.IDLE);
-  // }
-
-  // public Command runTraj(PathPlannerTrajectory traj, boolean resetPose) {
-  //   return drivetrain.runTrajectory(traj, resetPose, DrivetrainState.IDLE);
-  // }
-
   public Command runTraj(String traj) {
     // return runTraj(paths().get(traj));
     return new InstantCommand();
   }
-
-  // public Command runTrajWithEvents(String traj, Map<String, Command> eventMap) {
-  //   return drivetrain.runTrajectoryWithEvents(paths().get(traj), eventMap);
-  // }
 
   public Command runTraj(String traj, boolean resetPose) {
     // return runTraj(paths().get(traj), resetPose);
