@@ -11,13 +11,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.util.ProxSensor;
+import org.littletonrobotics.junction.Logger;
 
 public class Claw extends StateMachine<Claw.ClawState> {
   private final ClawIO io;
-  // private final ClawIOInputsAutoLogged = new ClawIOInputsAutoLogged();
-
-  final DoubleSolenoid solenoid =
-      new DoubleSolenoid(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM, SOLENOID_ID_1, SOLENOID_ID_2);
+  private final ClawIOInputsAutoLogged inputs = new ClawIOInputsAutoLogged();
 
   final Compressor compressor = new Compressor(COMPRESSOR_ID, PneumaticsModuleType.CTREPCM);
 
@@ -41,21 +39,21 @@ public class Claw extends StateMachine<Claw.ClawState> {
 
   @Override
   protected void update() {
-    // io.updateInputs(null);
-
+    io.updateInputs(inputs);
+    Logger.processInputs("claw", inputs);
   }
 
   private void defineTransitions() {
     addOmniTransition(
         ClawState.CLOSED,
         () -> {
-          solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
+          io.close();
           prevState = ClawState.CLOSED;
         });
     addOmniTransition(
         ClawState.OPENED,
         () -> {
-          solenoid.set(SOLENOID_CLAW_OPEN_VALUE);
+          io.open();
           prevState = ClawState.OPENED;
           timer.reset();
           timer.start();
@@ -75,9 +73,9 @@ public class Claw extends StateMachine<Claw.ClawState> {
   @Override
   protected void determineSelf() {
     if (prevState == ClawState.UNDETERMINED) {
-      DoubleSolenoid.Value solenoidValue = solenoid.get();
+      DoubleSolenoid.Value solenoidValue = inputs.solenoidValue;
       if (solenoidValue == kOff) {
-        solenoid.set(flip(SOLENOID_CLAW_OPEN_VALUE));
+        io.close();
         setState(ClawState.CLOSED);
       } else if (solenoidValue == SOLENOID_CLAW_OPEN_VALUE) {
         setState(ClawState.OPENED);
@@ -100,10 +98,6 @@ public class Claw extends StateMachine<Claw.ClawState> {
 
   public void disableProx() {
     proxEnabled = false;
-  }
-
-  private DoubleSolenoid.Value flip(DoubleSolenoid.Value value) {
-    return value == kForward ? kReverse : kForward;
   }
 
   public enum ClawState {

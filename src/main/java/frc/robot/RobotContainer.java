@@ -443,7 +443,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public void scheduleEndgameBuzz() {
-    new WaitCommand(103.8).andThen(rumbleLoop(), rumbleLoop(), rumbleLoop()).schedule();
+    new WaitCommand(103.8)
+        .andThen(
+            rumbleLoop(),
+            rumbleLoop(),
+            rumbleLoop())
+        .schedule();
   }
 
   private Command rumbleLoop() {

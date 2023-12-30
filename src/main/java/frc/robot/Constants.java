@@ -14,8 +14,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,6 +36,19 @@ import java.util.function.UnaryOperator;
 
 public final class Constants {
 
+  public static final Mode currentMode = Mode.SIM;
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
   public static boolean AT_COMP = false;
 
   public static final class Testing {
@@ -53,7 +64,7 @@ public final class Constants {
   public static Alliance alliance = Alliance.Red;
   public static boolean overrideAlliance =
       false; // Flag to indicate that the drivers have manually set the allianc
-  public static final GridInterface gridInterface = new GridInterface(alliance);
+  // public static final GridInterface gridInterface = new GridInterface(alliance);
   public static boolean gridReinstantiated = true;
 
   public static final class Claw {
@@ -450,7 +461,7 @@ public final class Constants {
       alliance = isRedAlliance ? Alliance.Red : Alliance.Blue;
     }
 
-    reInstantiateGridUI(alliance);
+    // reInstantiateGridUI(alliance);
   }
 
   public static CurrentLimitsConfigs getCurrentLimit() {
@@ -473,8 +484,8 @@ public final class Constants {
     None
   }
 
-  public static void reInstantiateGridUI(Alliance alliance) {
-    gridInterface.setAlliance(alliance);
-    Constants.gridReinstantiated = true;
-  }
+  // public static void reInstantiateGridUI(Alliance alliance) {
+    // gridInterface.setAlliance(alliance);
+    // Constants.gridReinstantiated = true;
+  // }
 }

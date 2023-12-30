@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.WhileDisabledInstantCommand;
@@ -25,21 +24,46 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-    Logger.recordMetadata("ProjectName", "2023Comp"); // Set a metadata value
 
-    if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-      new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
-    } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath =
-          LogFileUtil
-              .findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(
-          new WPILOGWriter(
-              LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
+
+    switch (Constants.currentMode) {
+      case REAL:
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        // TODO: Deal with this
+        new PowerDistribution(1, ModuleType.kRev);
+        break;
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+      case REPLAY:
+        setUseTiming(false); // Run as fast as possible
+        String logPath =
+            LogFileUtil
+                .findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+        Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+        Logger.addDataReceiver(
+            new WPILOGWriter(
+                LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+        break;
     }
 
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
@@ -81,7 +105,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Update the grid interface to make sure scored elements make it to the webpage
-    Constants.gridInterface.update();
+    // Constants.gridInterface.update();
   }
 
   @Override
@@ -124,12 +148,10 @@ public class Robot extends LoggedRobot {
 
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
-    robotContainer.scheduleEndgameBuzz();
-    // Send the grid interface into indicate so that I can update things quickly from autonomous
-    Constants.gridInterface.indicateMode();
+    // robotContainer.scheduleEndgameBuzz();
 
     // Send the grid automatically back to override mode after a few seconds of teleop
-    new WaitCommand(6).andThen(new InstantCommand(Constants.gridInterface::overrideMode));
+    // new WaitCommand(6).andThen(new InstantCommand(Constants.gridInterface::overrideMode));
 
     robotContainer.arm().setShoulderFollower().schedule();
   }
