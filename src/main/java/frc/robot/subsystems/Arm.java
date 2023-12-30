@@ -6,6 +6,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -96,7 +97,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private void defineTransitions() {
         addOmniTransition(SEEKING_STOWED);
-//        addTransition(SEEKING_STOWED, STOWED, new InstantCommand(() -> {new WaitCommand(2).andThen(new InstantCommand(this::pullAbsoluteAngles)).schedule();}));
         addTransition(SEEKING_STOWED, STOWED);
 
         addOmniTransition(SOFT_STOP, () -> {
@@ -122,13 +122,10 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         //Teleop stuff
         addTransition(STOWED, NEW_GROUND_PICKUP, () -> {
             goToArmState(NEW_GROUND_PICKUP_POS);
-            // claw.disableProx();
-            // setArmSlowSpeed();
         });
         addTransition(STOWED, TELEOP_GROUND_INTERMEDIATE, () -> {
             goToArmState(TELEOP_GROUND_INTERMEDIATE_POS);
             claw.disableProx();
-            // setArmSlowSpeed();
         });
 
         addTransition(TELEOP_GROUND_INTERMEDIATE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
@@ -186,22 +183,22 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         );
 
         registerStateCommand(SEEKING_STOWED,
-        new FunctionalCommand(() -> {
-            if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-            if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
-        }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
-            new FunctionalCommand(
-                () -> {
-                    setElevatorTarget(STOWED_POS.getElevatorExtension());
-                    setShoulderTarget(toRadians(45));
-                },
-                () -> {},
-                (interrupted) -> {},
-                () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
-            ),
-            new InstantCommand(() -> goToArmState(STOWED_POS)),
-            new InstantCommand(() -> requestTransition(STOWED))
-        )
+            new FunctionalCommand(() -> {
+                if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
+                if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
+            }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
+                new FunctionalCommand(
+                    () -> {
+                        setElevatorTarget(STOWED_POS.getElevatorExtension());
+                        setShoulderTarget(toRadians(45));
+                    },
+                    () -> {},
+                    (interrupted) -> {},
+                    () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
+                ),
+                new InstantCommand(() -> goToArmState(STOWED_POS)),
+                new InstantCommand(() -> requestTransition(STOWED))
+            )
         );
 
         registerStateCommand(SEEKING_PRIMED,
@@ -238,7 +235,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     public enum ArmMode {
         UNDETERMINED, 
-        SEEKING_STOWED, STOWED,
+        SEEKING_STOWED, 
+        STOWED,
         SEEKING_PICKUP_DOUBLE, PICKUP_DOUBLE,
         SEEKING_PICKUP_GROUND, PICKUP_GROUND,
         NEW_GROUND_PICKUP, NEW_GROUND_INTERMEDIATE, TELEOP_GROUND_INTERMEDIATE,
@@ -366,7 +364,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
         setArmNormalSpeed();
 
-        setState(STOWED);
+        // setState(STOWED);
         requestTransition(ArmMode.SEEKING_STOWED);
     }
 
@@ -376,9 +374,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     @Override
     protected void onEnable() {
-        //Make sure no I buildup or anything insane happens
-//        wristPID.reset(getWristAngle());
-//        shoulderPID.reset(getShoulderAngle());
 
         setElevatorTarget(getElevatorHeight());
 
