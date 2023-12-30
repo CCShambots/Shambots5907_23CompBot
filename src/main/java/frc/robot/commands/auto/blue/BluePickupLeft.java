@@ -13,34 +13,30 @@ import frc.robot.subsystems.Turret.TurretState;
 
 public class BluePickupLeft extends BaseAutoRoute {
 
-    public BluePickupLeft(RobotContainer rc) {
+  public BluePickupLeft(RobotContainer rc) {
 
-        super(Alliance.Blue);
+    super(Alliance.Blue);
 
-        addCommands(
-                rc.waitForReady(),
-                new ScoreFirstElementCommand(rc),
-
-                new ParallelCommandGroup(
-                        rc.runTraj("blue-get-element-left", true),
-                        new SequentialCommandGroup(
-                                new WaitCommand(0.5),
-                                rc.turret().goToAngle(Math.toRadians(-90)),
-                                new WaitCommand(1),
-                                rc.arm().setArmSlowSpeedCommand(),
-                                rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
-                                new WaitCommand(1.5),
-                                rc.turret().transitionCommand(TurretState.INTAKING),
-                                rc.arm().openClaw()
-                        )
-                ),
-                rc.dt().waitForState(DrivetrainState.IDLE),
-                rc.arm().closeClaw(),
+    addCommands(
+        rc.waitForReady(),
+        new ScoreFirstElementCommand(rc),
+        new ParallelCommandGroup(
+            rc.runTraj("blue-get-element-left", true),
+            new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
-                rc.turret().transitionCommand(TurretState.IDLE),
-                rc.turret().goToAngle(Math.toRadians(90)),
-                rc.arm().setArmNormalSpeedCommand()
-        );
-    }
+                rc.turret().goToAngle(Math.toRadians(-90)),
+                new WaitCommand(1),
+                rc.arm().setArmSlowSpeedCommand(),
+                rc.arm().transitionCommand(ArmMode.SEEKING_PICKUP_GROUND),
+                new WaitCommand(1.5),
+                rc.turret().transitionCommand(TurretState.INTAKING),
+                rc.arm().openClaw())),
+        rc.dt().waitForState(DrivetrainState.IDLE),
+        rc.arm().closeClaw(),
+        new WaitCommand(0.5),
+        rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
+        rc.turret().transitionCommand(TurretState.IDLE),
+        rc.turret().goToAngle(Math.toRadians(90)),
+        rc.arm().setArmNormalSpeedCommand());
+  }
 }

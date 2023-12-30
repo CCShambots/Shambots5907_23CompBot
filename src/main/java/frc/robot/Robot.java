@@ -1,12 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -18,7 +11,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
-
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
 
@@ -35,38 +33,45 @@ public class Robot extends LoggedRobot {
       new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
     } else {
       setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      String logPath =
+          LogFileUtil
+              .findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
       Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+      Logger.addDataReceiver(
+          new WPILOGWriter(
+              LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
     }
 
-    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
+    // be added.
 
     robotContainer = new RobotContainer(checkModulesLoop);
 
     SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
-
-    //TODO: What happened to the pathplanner server
+    // TODO: What happened to the pathplanner server
     // if(!Constants.AT_COMP) {
-      // PathPlannerLogging.startServer(5811);
+    // PathPlannerLogging.startServer(5811);
     // }
 
-    //Check the alliance from FMS when the bot turns on
+    // Check the alliance from FMS when the bot turns on
     Constants.pullAllianceFromFMS(robotContainer);
 
-    //TODO: Figure out how to add another periodic thing
-    //Update the event loop for misaligned modules once every 10 seconds
+    // TODO: Figure out how to add another periodic thing
+    // Update the event loop for misaligned modules once every 10 seconds
     // addPeriodic(checkModulesLoop::poll, 10);
 
     new WaitCommand(2).andThen(robotContainer.syncAlliance()).schedule();
 
-    new WaitCommand(2).andThen(new WhileDisabledInstantCommand(() -> robotContainer.arm().pollAbsoluteAngles())).schedule();
+    new WaitCommand(2)
+        .andThen(new WhileDisabledInstantCommand(() -> robotContainer.arm().pollAbsoluteAngles()))
+        .schedule();
 
-    // addPeriodic(() -> {if(!robotContainer.arm().isTransitioning()) robotContainer.arm().pullAbsoluteAngles();}, 2);
+    // addPeriodic(() -> {if(!robotContainer.arm().isTransitioning())
+    // robotContainer.arm().pullAbsoluteAngles();}, 2);
 
-    //Logging
+    // Logging
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
   }
@@ -75,13 +80,13 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    //Update the grid interface to make sure scored elements make it to the webpage
+    // Update the grid interface to make sure scored elements make it to the webpage
     Constants.gridInterface.update();
-   }
+  }
 
   @Override
   public void disabledInit() {
-    //Make sure all subsystems are disabled
+    // Make sure all subsystems are disabled
     SubsystemManagerFactory.getInstance().disableAllSubsystems();
 
     robotContainer.lights().enable();
@@ -91,11 +96,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if (!Constants.HAS_BEEN_ENABLED && robotContainer.turret().getMinimumAbsoluteErrorToStartingPos() > 3) {
+    if (!Constants.HAS_BEEN_ENABLED
+        && robotContainer.turret().getMinimumAbsoluteErrorToStartingPos() > 3) {
       robotContainer.setFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
       robotContainer.lights().requestTransition(LightState.SOFT_STOP);
-    }
-    else {
+    } else {
       robotContainer.clearFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
       robotContainer.lights().requestTransition(LightState.DISABLED);
     }
@@ -103,7 +108,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    //Start all the subsystems in autonomous mode
+    // Start all the subsystems in autonomous mode
     Constants.HAS_BEEN_ENABLED = true;
     SubsystemManagerFactory.getInstance().notifyAutonomousStart();
 
@@ -111,8 +116,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
@@ -121,10 +125,10 @@ public class Robot extends LoggedRobot {
     SubsystemManagerFactory.getInstance().notifyTeleopStart();
 
     robotContainer.scheduleEndgameBuzz();
-    //Send the grid interface into indicate so that I can update things quickly from autonomous
+    // Send the grid interface into indicate so that I can update things quickly from autonomous
     Constants.gridInterface.indicateMode();
 
-    //Send the grid automatically back to override mode after a few seconds of teleop
+    // Send the grid automatically back to override mode after a few seconds of teleop
     new WaitCommand(6).andThen(new InstantCommand(Constants.gridInterface::overrideMode));
 
     robotContainer.arm().setShoulderFollower().schedule();

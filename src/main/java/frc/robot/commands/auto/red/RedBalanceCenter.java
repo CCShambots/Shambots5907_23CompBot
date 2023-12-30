@@ -13,30 +13,26 @@ import frc.robot.subsystems.Turret.TurretState;
 
 public class RedBalanceCenter extends BaseAutoRoute {
 
-    public RedBalanceCenter(RobotContainer rc) {
-        super(Alliance.Red, Math.toRadians(90));
+  public RedBalanceCenter(RobotContainer rc) {
+    super(Alliance.Red, Math.toRadians(90));
 
-        addCommands(
-                rc.waitForReady(),
-                rc.dt().resetGyroCommand(new Rotation2d(Math.toRadians(180))),
-
-                new ScoreFirstElementCommand(rc),
-
-                new ParallelCommandGroup(
-                        rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
-                        new WaitCommand(1).andThen(
-                                rc.arm().setArmNormalSpeedCommand(),
-                                rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED),
-                                rc.arm().waitForState(ArmMode.STOWED),
-                                new WaitCommand(2),
-                                rc.turret().goToAngle(Math.toRadians(-90))
-                        )
-                ), 
-                rc.dt().waitForState(DrivetrainState.IDLE),
-                new WaitCommand(1),
-                rc.dt().transitionCommand(DrivetrainState.DOCKING),
-                rc.dt().waitForState(DrivetrainState.BALANCING),
-                rc.turret().transitionCommand(TurretState.IDLE)
-        );
-    }
+    addCommands(
+        rc.waitForReady(),
+        rc.dt().resetGyroCommand(new Rotation2d(Math.toRadians(180))),
+        new ScoreFirstElementCommand(rc),
+        new ParallelCommandGroup(
+            rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
+            new WaitCommand(1)
+                .andThen(
+                    rc.arm().setArmNormalSpeedCommand(),
+                    rc.arm().transitionCommand(Arm.ArmMode.SEEKING_STOWED),
+                    rc.arm().waitForState(ArmMode.STOWED),
+                    new WaitCommand(2),
+                    rc.turret().goToAngle(Math.toRadians(-90)))),
+        rc.dt().waitForState(DrivetrainState.IDLE),
+        new WaitCommand(1),
+        rc.dt().transitionCommand(DrivetrainState.DOCKING),
+        rc.dt().waitForState(DrivetrainState.BALANCING),
+        rc.turret().transitionCommand(TurretState.IDLE));
+  }
 }

@@ -13,33 +13,29 @@ import frc.robot.subsystems.Turret.TurretState;
 
 public class BlueBalanceCenter extends BaseAutoRoute {
 
-    public BlueBalanceCenter(RobotContainer rc) {
+  public BlueBalanceCenter(RobotContainer rc) {
 
-        super(Alliance.Blue, Math.toRadians(90));
+    super(Alliance.Blue, Math.toRadians(90));
 
-        addCommands(
-                rc.waitForReady(),
-                rc.dt().resetGyroCommand(new Rotation2d()),
-
-                new ScoreFirstElementCommand(rc),
-
-                rc.dt().setPositiveDockDirectionCommand(false),
-                new ParallelCommandGroup(
-                        rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
-                        new WaitCommand(1).andThen(
-                                rc.arm().setArmNormalSpeedCommand(),
-                                rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
-                                rc.arm().waitForState(ArmMode.STOWED),
-                                new WaitCommand(2),
-                                rc.turret().goToAngle(Math.toRadians(-90))
-                        )
-                ), 
-                // rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
-                rc.dt().waitForState(DrivetrainState.IDLE),
-                new WaitCommand(1),
-                rc.dt().transitionCommand(DrivetrainState.DOCKING),
-                rc.dt().waitForState(DrivetrainState.BALANCING),
-                rc.turret().transitionCommand(TurretState.IDLE)
-        );
-    }
+    addCommands(
+        rc.waitForReady(),
+        rc.dt().resetGyroCommand(new Rotation2d()),
+        new ScoreFirstElementCommand(rc),
+        rc.dt().setPositiveDockDirectionCommand(false),
+        new ParallelCommandGroup(
+            rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
+            new WaitCommand(1)
+                .andThen(
+                    rc.arm().setArmNormalSpeedCommand(),
+                    rc.arm().transitionCommand(ArmMode.SEEKING_STOWED),
+                    rc.arm().waitForState(ArmMode.STOWED),
+                    new WaitCommand(2),
+                    rc.turret().goToAngle(Math.toRadians(-90)))),
+        // rc.dt().waitForFlag(DrivetrainState.HIT_ZERO),
+        rc.dt().waitForState(DrivetrainState.IDLE),
+        new WaitCommand(1),
+        rc.dt().transitionCommand(DrivetrainState.DOCKING),
+        rc.dt().waitForState(DrivetrainState.BALANCING),
+        rc.turret().transitionCommand(TurretState.IDLE));
+  }
 }

@@ -7,94 +7,107 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.subsystems.Drivetrain;
-
 import java.util.*;
 import java.util.function.IntSupplier;
 
 public class AutoBalanceCommand extends Command {
-    private int direction;
-    private final IntSupplier directionSupplier;
-    private final Drivetrain dt;
-    
-    private final int bufferSize;
+  private int direction;
+  private final IntSupplier directionSupplier;
+  private final Drivetrain dt;
 
-    private final PIDController pid;
+  private final int bufferSize;
 
-    private ArrayList<Double> buff;
+  private final PIDController pid;
 
-    private int rMod, pMod;
+  private ArrayList<Double> buff;
 
-    private final Timer timer = new Timer();
-    private final double time;
+  private int rMod, pMod;
 
-    public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize, double time) {
-        this.directionSupplier = directionSupplier;
-        this.dt = dt;
+  private final Timer timer = new Timer();
+  private final double time;
 
-        this.time = time;
+  public AutoBalanceCommand(
+      Drivetrain dt,
+      IntSupplier directionSupplier,
+      PIDGains pidGains,
+      int bufferSize,
+      double time) {
+    this.directionSupplier = directionSupplier;
+    this.dt = dt;
 
-        pid = new PIDController(pidGains.p, pidGains.i, pidGains.d, 0.02);
+    this.time = time;
 
-        this.bufferSize = bufferSize;
-    }
+    pid = new PIDController(pidGains.p, pidGains.i, pidGains.d, 0.02);
 
-    public AutoBalanceCommand(Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
-        this(dt, directionSupplier, pidGains, bufferSize, Constants.SwerveDrivetrain.AutoBalance.NO_ANGLE_CHECK_TIME);
-    }
+    this.bufferSize = bufferSize;
+  }
 
-    private void defineMods() {
-        rMod = dt.getRoll().getDegrees() < 0 ? 1 : -1;
-        pMod = dt.getPitch().getDegrees() < 0 ? 1 : -1;
-    }
+  public AutoBalanceCommand(
+      Drivetrain dt, IntSupplier directionSupplier, PIDGains pidGains, int bufferSize) {
+    this(
+        dt,
+        directionSupplier,
+        pidGains,
+        bufferSize,
+        Constants.SwerveDrivetrain.AutoBalance.NO_ANGLE_CHECK_TIME);
+  }
 
-    private double getCumulativeAngle() {
-        return dt.getPitch().getDegrees() * pMod + dt.getRoll().getDegrees() * rMod;
-    }
+  private void defineMods() {
+    rMod = dt.getRoll().getDegrees() < 0 ? 1 : -1;
+    pMod = dt.getPitch().getDegrees() < 0 ? 1 : -1;
+  }
 
-    @Override
-    public void initialize() {
+  private double getCumulativeAngle() {
+    return dt.getPitch().getDegrees() * pMod + dt.getRoll().getDegrees() * rMod;
+  }
 
-        defineMods();
+  @Override
+  public void initialize() {
 
-        pid.reset();
-        this.direction = Math.max(Math.min(1, directionSupplier.getAsInt()), -1);
+    defineMods();
 
-        buff = new ArrayList<>(Collections.nCopies(bufferSize, Math.abs(getCumulativeAngle())));
+    pid.reset();
+    this.direction = Math.max(Math.min(1, directionSupplier.getAsInt()), -1);
 
-        timer.reset();
-        timer.start();
-    }
+    buff = new ArrayList<>(Collections.nCopies(bufferSize, Math.abs(getCumulativeAngle())));
 
-    @Override
-    public void execute() {
-        buff.remove(buff.size() - 1);
-        buff.add(0, Math.abs(getCumulativeAngle()));
+    timer.reset();
+    timer.start();
+  }
 
-        double pidOutput = Math.max(Math.min(1, pid.calculate(getCumulativeAngle(), 0)), -1);
+  @Override
+  public void execute() {
+    buff.remove(buff.size() - 1);
+    buff.add(0, Math.abs(getCumulativeAngle()));
 
-        if(timer.get() < time) pidOutput = 1;
+    double pidOutput = Math.max(Math.min(1, pid.calculate(getCumulativeAngle(), 0)), -1);
 
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+    if (timer.get() < time) pidOutput = 1;
+
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(
                 Constants.SwerveDrivetrain.AutoBalance.AUTO_BALANCE_SPEED * direction * pidOutput,
                 0,
-                0
-        ), dt.getCurrentAngle());
+                0),
+            dt.getCurrentAngle());
 
-        dt.drive(speeds);
-    }
+    dt.drive(speeds);
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-        dt.stopModules();
-        timer.stop();
-    }
+  @Override
+  public void end(boolean interrupted) {
+    dt.stopModules();
+    timer.stop();
+  }
 
-    @Override   
-    public boolean isFinished() {
-        Optional<Double> v = buff.stream().max(Comparator.naturalOrder());
+  @Override
+  public boolean isFinished() {
+    Optional<Double> v = buff.stream().max(Comparator.naturalOrder());
 
-        //3 is how many cumulative degrees of incline it should be less than for however long the buffer is
-        //can be changed to "v.isPresent() && v.get() < 3" but this is easier to read
-        return v.isPresent() ? v.get() < 3 && timer.get() > time : false ;
-    }
+    // 3 is how many cumulative degrees of incline it should be less than for however long the
+    // buffer is
+    // can be changed to "v.isPresent() && v.get() < 3" but this is easier to read
+    return v.isPresent() ? v.get() < 3 && timer.get() > time : false;
+  }
 }
