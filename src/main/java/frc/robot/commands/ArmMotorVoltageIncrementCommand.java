@@ -11,7 +11,7 @@ import frc.robot.subsystems.Arm;
 
 import static frc.robot.Constants.Arm.*;
 
-public class ArmMotorVoltageIncrementCommand extends CommandBase {
+public class ArmMotorVoltageIncrementCommand extends Command {
     final EnhancedTalonFX motor;
     final Arm arm;
     final ArmFeedforward ff;

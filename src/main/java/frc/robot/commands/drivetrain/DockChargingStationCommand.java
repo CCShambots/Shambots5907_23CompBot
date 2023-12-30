@@ -36,7 +36,7 @@ public class DockChargingStationCommand extends Command {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             new ChassisSpeeds(Constants.SwerveDrivetrain.AutoBalance.DOCK_SPEED * direction, 0, 0),
             dt.getCurrentAngle());
-        dt.drive(speeds, false);
+        dt.drive(speeds);
     }
 
     @Override
@@ -46,6 +46,6 @@ public class DockChargingStationCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll()) > dockThreshold;
+        return Math.abs(dt.getPitch().getDegrees()) + Math.abs(dt.getRoll().getDegrees()) > dockThreshold;
     }
 }

@@ -3,6 +3,7 @@ package frc.robot.util;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 //TODO: Fix deprecated trigger reference
 
@@ -23,7 +24,7 @@ public class ProxSensor implements Sendable {
      * @param toRun What to run
      */
     public void registerTrigger(boolean value, Runnable toRun) {
-        new Trigger(() -> this.isActivated() == value).whenActive(toRun);
+        new Trigger(() -> this.isActivated() == value).onTrue(new InstantCommand(toRun));
     }
 
     @Override

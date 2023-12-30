@@ -45,11 +45,7 @@ public class DriveOverChargeStationCommand extends Command {
                 0
         ), dt.getCurrentAngle());
 
-        // if(getCumulativeAngle() > 0 != initialPos && !dt.isFlag(DrivetrainState.HIT_ZERO)) {
-        //     dt.setFlag(DrivetrainState.HIT_ZERO);
-        // }
-        
-        dt.drive(speeds, false);
+        dt.drive(speeds);
 
         buff.remove(buff.size() - 1);
         buff.add(0, Math.abs(getCumulativeAngle()));
@@ -61,7 +57,7 @@ public class DriveOverChargeStationCommand extends Command {
     }
 
     private double getCumulativeAngle() {
-        return Math.abs(dt.getPitch()) + Math.abs(dt.getRoll());
+        return Math.abs(dt.getPitch().getDegrees()) + Math.abs(dt.getRoll().getDegrees());
     }
 
     @Override
