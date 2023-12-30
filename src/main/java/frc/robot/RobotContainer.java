@@ -21,7 +21,6 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.Turret.TurretState;
 
-
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
