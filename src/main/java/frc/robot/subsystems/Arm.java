@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenixpro.controls.Follower;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -11,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.ShamLib.motors.talonfx.MotionMagicTalonFX;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.arm.ExtendArmCommand;
@@ -22,8 +20,11 @@ import frc.robot.util.kinematics.ArmTrajectory;
 
 import java.util.function.BooleanSupplier;
 
-import static com.ctre.phoenixpro.signals.InvertedValue.*;
-import static com.ctre.phoenixpro.signals.NeutralModeValue.*;
+import com.ctre.phoenix6.controls.Follower;
+
+import static com.ctre.phoenix6.signals.InvertedValue.*;
+import static com.ctre.phoenix6.signals.NeutralModeValue.*;
+
 import static frc.robot.Constants.Arm.*;
 import static frc.robot.Constants.applyCurrentLimit;
 import static frc.robot.subsystems.Arm.ArmMode.*;
@@ -33,19 +34,19 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     private final ArmKinematics kinematics = new ArmKinematics(baseToTurret, turretToShoulder, shoulderToWrist, wristToEndEffector);
 
-    private final MotionMagicTalonFXPro elevator = new MotionMagicTalonFXPro(ELEVATOR_ID, ELEVATOR_GAINS, ELEVATOR_INPUT_TO_OUTPUT, ELEVATOR_MAX_VEL, ELEVATOR_MAX_ACCEL);
+    private final MotionMagicTalonFX elevator = new MotionMagicTalonFX(ELEVATOR_ID, ELEVATOR_GAINS, ELEVATOR_INPUT_TO_OUTPUT, ELEVATOR_MAX_VEL, ELEVATOR_MAX_ACCEL);
 
     //Shoulder hardware
-    private final MotionMagicTalonFXPro shoulderLeader = new MotionMagicTalonFXPro(
+    private final MotionMagicTalonFX shoulderLeader = new MotionMagicTalonFX(
             SHOULDER_LEADER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT, SHOULDER_VEL, SHOULDER_ACCEL, SHOULDER_JERK
     );
-    private final MotionMagicTalonFXPro shoulderFollower = new MotionMagicTalonFXPro(
+    private final MotionMagicTalonFX shoulderFollower = new MotionMagicTalonFX(
             SHOULDER_FOLLOWER_ID, SHOULDER_GAINS, SHOULDER_INPUT_TO_OUTPUT, SHOULDER_VEL, SHOULDER_ACCEL, SHOULDER_JERK
     );
     private final ThroughBoreEncoder shoulderEncoder = new ThroughBoreEncoder(SHOULDER_ENCODER_PORT, SHOULDER_ENCODER_OFFSET);
 
     //Wrist hardware
-    private final MotionMagicTalonFXPro wrist = new MotionMagicTalonFXPro(
+    private final MotionMagicTalonFX wrist = new MotionMagicTalonFX(
             WRIST_ID, WRIST_GAINS, WRIST_INPUT_TO_OUTPUT, WRIST_VEL, WRIST_ACCEL, WRIST_JERK
     );
     private final ThroughBoreEncoder wristEncoder = new ThroughBoreEncoder(WRIST_ENCODER_PORT, WRIST_ENCODER_OFFSET);

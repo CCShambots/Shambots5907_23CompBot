@@ -69,7 +69,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
                 new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE),
                 new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
                 new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-                Constants.AT_COMP,
+                !Constants.AT_COMP,
                 "drivetrain",
                 "",
                 Constants.getCurrentLimit(),
@@ -408,12 +408,12 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     @Override
     protected void additionalSendableData(SendableBuilder builder) {
-        // builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
-        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);
+        builder.addDoubleArrayProperty("absolute angles", drive::getModuleAbsoluteAngles, null);
+        builder.addDoubleProperty("angle", () -> drive.getCurrentAngle().getDegrees(), null);;
 
         builder.addDoubleProperty("total angles", () -> Math.abs(getPitch()) + Math.abs(getRoll()), null);
 
-        // builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
+        builder.addDoubleProperty("speed mode", () -> drive.getSpeedMode(), null);
         
         builder.addDoubleProperty("linear-speed", () -> Math.hypot(drive.getChassisSpeeds().vxMetersPerSecond, drive.getChassisSpeeds().vyMetersPerSecond), null);
         builder.addDoubleProperty("angular-speed", () -> drive.getChassisSpeeds().omegaRadiansPerSecond, null);
@@ -422,8 +422,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
         builder.addDoubleArrayProperty("module-angles", () -> drive.getModuleAngles(), null);
 
-        // builder.addDoubleProperty("pitch", () -> getPitch(), null);
-        // builder.addDoubleProperty("roll", () -> getRoll(), null);
+        builder.addDoubleProperty("pitch", () -> getPitch(), null);
+        builder.addDoubleProperty("roll", () -> getRoll(), null);
 
 
         // builder.addDoubleProperty("dock-threshold-angle", () -> AutoBalance.DOCK_THRESHOLD, (d) -> {
@@ -474,11 +474,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     @Override
     public Map<String, Sendable> additionalSendables() {
         return Map.of(
-            // "field", drive.getField()
-            // "module-1", drive.getModules().get(0)
-            // "module-2", drive.getModules().get(1),
-            // "module-3", drive.getModules().get(2),
-            // "module-4", drive.getModules().get(3)
+            "field", drive.getField(),
+            "module-1", drive.getModules().get(0),
+            "module-2", drive.getModules().get(1),
+            "module-3", drive.getModules().get(2),
+            "module-4", drive.getModules().get(3)
         );
     }
 

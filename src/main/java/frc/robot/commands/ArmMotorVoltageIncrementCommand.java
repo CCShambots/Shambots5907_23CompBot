@@ -3,15 +3,16 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
-import frc.robot.ShamLib.motors.pro.EnhancedTalonFXPro;
+import frc.robot.ShamLib.motors.talonfx.EnhancedTalonFX;
 import frc.robot.subsystems.Arm;
 
 import static frc.robot.Constants.Arm.*;
 
-public class ArmMotorVoltageIncrementCommand extends Command {
-    final EnhancedTalonFXPro motor;
+public class ArmMotorVoltageIncrementCommand extends CommandBase {
+    final EnhancedTalonFX motor;
     final Arm arm;
     final ArmFeedforward ff;
 
@@ -19,7 +20,7 @@ public class ArmMotorVoltageIncrementCommand extends Command {
     int increment;
 
     @Deprecated
-    public ArmMotorVoltageIncrementCommand(EnhancedTalonFXPro motor, double incrementSize, Arm arm) {
+    public ArmMotorVoltageIncrementCommand(EnhancedTalonFX motor, double incrementSize, Arm arm) {
         this.motor = motor;
         this.incrementSize = incrementSize;
         this.arm = arm;

@@ -11,15 +11,16 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.pro.MotionMagicTalonFXPro;
+import frc.robot.ShamLib.motors.talonfx.MotionMagicTalonFX;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import static com.ctre.phoenixpro.signals.InvertedValue.Clockwise_Positive;
-import static com.ctre.phoenixpro.signals.NeutralModeValue.Coast;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import static frc.robot.Constants.Turret.*;
 import static frc.robot.Constants.Vision.BASE_HAS_TARGET_SUPPLIER;
 import static frc.robot.Constants.Vision.BASE_X_OFFSET_SUPPLIER;
@@ -29,7 +30,7 @@ import static java.lang.Math.toDegrees;
 
 public class Turret extends StateMachine<Turret.TurretState> {
 
-    private final MotionMagicTalonFXPro turret = new MotionMagicTalonFXPro(TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500);
+    private final MotionMagicTalonFX turret = new MotionMagicTalonFX(TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500);
     private final AnalogPotentiometer turretPotentiometer = new AnalogPotentiometer(TURRET_POT_PORT, TURRET_POT_RATIO, TURRET_ENCODER_OFFSET);
 
     private final BooleanSupplier towardSupplier;
@@ -64,7 +65,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
         defineTransitions();
         registerStateCommands();
 
-        turret.configure(Coast, Clockwise_Positive);
+        turret.configure(NeutralModeValue.Coast, InvertedValue.Clockwise_Positive);
         pullAbsoluteAngle();
     }
 
