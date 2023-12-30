@@ -1,10 +1,16 @@
 package frc.robot;
 
-import com.pathplanner.lib.server.PathPlannerServer;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,13 +20,28 @@ import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
 
 
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 
   private RobotContainer robotContainer;
   private final EventLoop checkModulesLoop = new EventLoop();
 
   @Override
   public void robotInit() {
+    Logger.recordMetadata("ProjectName", "2023Comp"); // Set a metadata value
+
+    if (isReal()) {
+      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+    } else {
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    }
+
+    Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
     robotContainer = new RobotContainer(checkModulesLoop);
 
     SubsystemManagerFactory.getInstance().registerSubsystem(robotContainer, false);
@@ -38,8 +59,9 @@ public class Robot extends TimedRobot {
     //Check the alliance from FMS when the bot turns on
     Constants.pullAllianceFromFMS(robotContainer);
 
+    //TODO: Figure out how to add another periodic thing
     //Update the event loop for misaligned modules once every 10 seconds
-    addPeriodic(checkModulesLoop::poll, 10);
+    // addPeriodic(checkModulesLoop::poll, 10);
 
     new WaitCommand(2).andThen(robotContainer.syncAlliance()).schedule();
 
