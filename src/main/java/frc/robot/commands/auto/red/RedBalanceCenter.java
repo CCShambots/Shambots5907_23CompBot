@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
-import frc.robot.subsystems.Turret.TurretState;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmMode;
+import frc.robot.subsystems.turret.Turret.TurretState;
 
 public class RedBalanceCenter extends BaseAutoRoute {
 

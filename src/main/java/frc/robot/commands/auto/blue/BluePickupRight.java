@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
-import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
+import frc.robot.subsystems.arm.Arm.ArmMode;
 
 public class BluePickupRight extends BaseAutoRoute {
 

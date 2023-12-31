@@ -7,10 +7,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.GrabSequenceCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmMode;
 
 public class BlueThreeScoreLeft extends BaseAutoRoute {
 

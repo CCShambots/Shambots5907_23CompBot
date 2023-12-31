@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static frc.robot.Constants.currentMode;
 import static frc.robot.subsystems.Lights.LightState.DISABLED;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -26,6 +27,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+
+    if (isReal()) currentMode = frc.robot.Constants.Mode.REAL;
 
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -128,7 +131,7 @@ public class Robot extends LoggedRobot {
       robotContainer.lights().requestTransition(LightState.SOFT_STOP);
     } else {
       robotContainer.clearFlag(RobotContainer.State.TURRET_STARTUP_MISALIGNMENT);
-      if(robotContainer.lights().getState() != DISABLED) {
+      if (robotContainer.lights().getState() != DISABLED) {
         robotContainer.lights().requestTransition(LightState.DISABLED);
       }
     }

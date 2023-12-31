@@ -1,10 +1,10 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import static com.ctre.phoenix6.signals.InvertedValue.*;
 import static com.ctre.phoenix6.signals.NeutralModeValue.*;
 import static frc.robot.Constants.Arm.*;
 import static frc.robot.Constants.applyCurrentLimit;
-import static frc.robot.subsystems.Arm.ArmMode.*;
+import static frc.robot.subsystems.arm.Arm.ArmMode.*;
 import static java.lang.Math.*;
 
 import com.ctre.phoenix6.controls.Follower;
@@ -14,7 +14,6 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.SMF.StateMachine;
@@ -114,155 +113,11 @@ public class Arm extends StateMachine<Arm.ArmMode> {
     return new InstantCommand(claw::disableProx);
   }
 
-    private void defineTransitions() {
-        addOmniTransition(SEEKING_STOWED);
-        addTransition(SEEKING_STOWED, STOWED);
+  private void defineTransitions() {
+    addOmniTransition(SEEKING_STOWED);
+    addTransition(SEEKING_STOWED, STOWED);
 
-        addOmniTransition(SOFT_STOP, () -> {
-            elevator.set(0);
-            shoulderLeader.set(0);
-            wrist.set(0);
-        });
-
-        addTransition(STOWED, PRIMED, () -> goToArmState(PRIMED_POS));
-        addOmniTransition(SEEKING_PRIMED);
-        addTransition(SEEKING_PRIMED, PRIMED);
-        addOmniTransition(SEEKING_PICKUP_GROUND);
-
-        addTransition(PRIMED, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
-        addTransition(NEW_GROUND_INTERMEDIATE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
-        addTransition(NEW_GROUND_PICKUP, LOW_SCORE, () -> goToArmState(LOW_POS));
-        
-        //New ground pickup stuff
-        //Make sure we can go to and from low score (for auto)
-        addTransition(LOW_SCORE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
-        addTransition(LOW_SCORE, NEW_GROUND_INTERMEDIATE, () -> goToArmState(NEW_INTERMEDIATE_GROUND_PICKUP_POS));
-
-        //Teleop stuff
-        addTransition(STOWED, NEW_GROUND_PICKUP, () -> {
-            goToArmState(NEW_GROUND_PICKUP_POS);
-        });
-        addTransition(STOWED, TELEOP_GROUND_INTERMEDIATE, () -> {
-            goToArmState(TELEOP_GROUND_INTERMEDIATE_POS);
-            claw.disableProx();
-        });
-
-        addTransition(TELEOP_GROUND_INTERMEDIATE, NEW_GROUND_PICKUP, () -> goToArmState(NEW_GROUND_PICKUP_POS));
-
-
-        //Make sure we can go from pickup to intermediate (for screwing around in the community)
-        addTransition(NEW_GROUND_PICKUP, TELEOP_GROUND_INTERMEDIATE, () -> goToArmState(TELEOP_GROUND_INTERMEDIATE_POS));
-
-        //Make sure the arm will go normal speed again when it exits these states
-        addTransition(NEW_GROUND_PICKUP, SEEKING_STOWED, setArmNormalSpeedCommand().alongWith(enableClawProx()));
-        addTransition(NEW_GROUND_INTERMEDIATE, SEEKING_STOWED, setArmNormalSpeedCommand().alongWith(enableClawProx()));
-        
-        addTransition(STOWED, LOW_SCORE, () -> goToArmState(LOW_POS));
-        addTransition(PRIMED, LOW_SCORE, () -> goToArmState(LOW_POS));
-        addTransition(STOWED, MID_SCORE, () -> goToArmState(MID_POS));
-        addTransition(PRIMED, MID_SCORE, () -> goToArmState(MID_POS));
-        addTransition(STOWED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
-        addTransition(PRIMED, HIGH_CUBE, () -> goToArmState(HIGH_CUBE_POS));
-
-        addTransition(STOWED, SEEKING_POSE);
-        addTransition(SEEKING_POSE, AT_POSE);
-
-        addTransition(PICKUP_GROUND, SEEKING_HIGH);
-
-        addTransition(STOWED, SEEKING_PICKUP_DOUBLE, claw.transitionCommand(ClawState.OPENED));
-        addTransition(SEEKING_PICKUP_DOUBLE, SEEKING_HIGH);
-
-        addTransition(STOWED, SEEKING_HIGH);
-        addTransition(PRIMED, SEEKING_HIGH);
-        removeTransition(SEEKING_HIGH, STOWED);
-        addTransition(SEEKING_HIGH, HIGH);
-        addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
-
-        addTransition(PICKUP_GROUND, SEEKING_STOWED, new InstantCommand(() -> setWristTarget(toRadians(-45))));
-        addTransition(HIGH, SEEKING_STOWED, () -> setWristTarget(toRadians(-45)));
-
-        addTransition(STOWED, SEEKING_PICKUP_GROUND);
-        addTransition(HIGH, SEEKING_PICKUP_GROUND);
-        removeTransition(SEEKING_PICKUP_GROUND, STOWED);
-        addTransition(SEEKING_PICKUP_GROUND, PICKUP_GROUND);
-        addTransition(HIGH_CUBE, SEEKING_PICKUP_GROUND);
-    }
-
-    private void registerStateCommands() {
-        registerStateCommand(SEEKING_HIGH, 
-            new ExtendArmCommand(this, HIGH_POS).andThen(transitionCommand(HIGH))
-        );
-
-        registerStateCommand(SEEKING_PICKUP_GROUND, 
-            new ExtendArmCommand(this, GROUND_PICKUP_POS).andThen(transitionCommand(PICKUP_GROUND))
-        );
-
-        registerStateCommand(SEEKING_PICKUP_DOUBLE, 
-            new ExtendArmCommand(this, PICKUP_DOUBLE_POS).andThen(transitionCommand(PICKUP_DOUBLE))
-        );
-
-        registerStateCommand(SEEKING_STOWED,
-            new FunctionalCommand(() -> {
-                if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-                if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
-            }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
-                new FunctionalCommand(
-                    () -> {
-                        setElevatorTarget(STOWED_POS.getElevatorExtension());
-                        setShoulderTarget(toRadians(45));
-                    },
-                    () -> {},
-                    (interrupted) -> {},
-                    () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
-                ),
-                new InstantCommand(() -> goToArmState(STOWED_POS)),
-                new InstantCommand(() -> requestTransition(STOWED))
-            )
-        );
-
-        registerStateCommand(SEEKING_PRIMED,
-        new FunctionalCommand(() -> {
-            if(getWristAngle() < 0 && getShoulderAngle() < toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT)) setWristTarget(0);
-            if(getShoulderAngle() < 0) setShoulderTarget(toRadians(15));
-        }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() >=0 && (getShoulderAngle() >= toRadians(SHOULDER_REQUIRED_STOWED_HEIGHT) || getWristAngle() >=0 )).andThen(
-            new FunctionalCommand(
-                () -> {
-                    setElevatorTarget(PRIMED_POS.getElevatorExtension());
-                    setShoulderTarget(toRadians(-45));
-                },
-                () -> {},
-                (interrupted) -> {},
-                () -> getError(getElevatorHeight(), getElevatorTarget()) <= ELEVATOR_TOLERANCE
-            ),
-            new InstantCommand(() -> goToArmState(PRIMED_POS)),
-            new InstantCommand(() -> requestTransition(PRIMED))
-        )
-        );
-
-        registerStateCommand(SEEKING_POSE, 
-            new FunctionalCommand(() -> {
-//                setRotatorTarget(currentArmState.getRotatorAngle());
-                setWristTarget(currentArmState.getWristAngle());
-                setShoulderTarget(currentArmState.getShoulderAngle());
-            }, () -> {}, (interrupted) -> {}, () -> getShoulderAngle() <= SHOULDER_ELEVATOR_THRESHOLD).andThen(
-                new InstantCommand(() -> setElevatorTarget(currentArmState.getElevatorExtension())),
-                new InstantCommand(() -> requestTransition(AT_POSE))
-            )
-        );
-    }
-
-
-    public enum ArmMode {
-        UNDETERMINED, 
-        SEEKING_STOWED, 
-        STOWED,
-        SEEKING_PICKUP_DOUBLE, PICKUP_DOUBLE,
-        SEEKING_PICKUP_GROUND, PICKUP_GROUND,
-        NEW_GROUND_PICKUP, NEW_GROUND_INTERMEDIATE, TELEOP_GROUND_INTERMEDIATE,
-        LOW_SCORE, MID_SCORE,
-        SEEKING_HIGH, HIGH,
-        HIGH_CUBE,
-        SEEKING_PRIMED, PRIMED,
+    addOmniTransition(
         SOFT_STOP,
         () -> {
           elevator.set(0);
@@ -293,8 +148,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         NEW_GROUND_PICKUP,
         () -> {
           goToArmState(NEW_GROUND_PICKUP_POS);
-          // claw.disableProx();
-          // setArmSlowSpeed();
         });
     addTransition(
         STOWED,
@@ -302,7 +155,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         () -> {
           goToArmState(TELEOP_GROUND_INTERMEDIATE_POS);
           claw.disableProx();
-          // setArmSlowSpeed();
         });
 
     addTransition(
@@ -571,7 +423,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     setArmNormalSpeed();
 
-    setState(STOWED);
+    // setState(STOWED);
     requestTransition(ArmMode.SEEKING_STOWED);
   }
 
@@ -580,9 +432,6 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
   @Override
   protected void onEnable() {
-    // Make sure no I buildup or anything insane happens
-    //        wristPID.reset(getWristAngle());
-    //        shoulderPID.reset(getShoulderAngle());
 
     setElevatorTarget(getElevatorHeight());
 

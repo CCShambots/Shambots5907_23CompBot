@@ -2,7 +2,7 @@ package frc.robot.commands.turret;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.Turret;
+import frc.robot.subsystems.turret.Turret;
 import java.util.function.BooleanSupplier;
 
 public class TurretManualControlCommand extends Command {

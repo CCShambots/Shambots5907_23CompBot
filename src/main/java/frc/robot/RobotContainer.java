@@ -12,6 +12,7 @@ import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -25,24 +26,16 @@ import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Arm.ArmMode;
 import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
-import frc.robot.subsystems.Turret.TurretState;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-
-import static edu.wpi.first.wpilibj.DriverStation.Alliance.Blue;
-import static edu.wpi.first.wpilibj.DriverStation.Alliance.Red;
-import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
-import static frc.robot.Constants.ElementType.*;
-import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
-import static frc.robot.Constants.alliance;
-import static frc.robot.subsystems.Arm.ArmMode.STOWED;
-import static frc.robot.subsystems.Arm.ArmMode.TESTING;
-import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
-import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmMode;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.Turret.TurretState;
+import frc.robot.subsystems.turret.TurretIO;
+import frc.robot.subsystems.turret.TurretIOReal;
+import frc.robot.subsystems.turret.TurretIOSim;
 
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
@@ -75,14 +68,41 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     lights = new Lights();
     clawVision = new ClawVision(arm::getClawState);
 
-    turret =
-        new Turret(
-            operatorCont.x(),
-            operatorCont.y(),
-            clawVision::hasTarget,
-            () -> clawVision.getGameElementOffset().getRadians(),
-            operatorCont.pov(270),
-            operatorCont.pov(90));
+    switch (Constants.currentMode) {
+      case REAL:
+        turret =
+            new Turret(
+                new TurretIOReal(),
+                operatorCont.x(),
+                operatorCont.y(),
+                clawVision::hasTarget,
+                () -> clawVision.getGameElementOffset().getRadians(),
+                operatorCont.pov(270),
+                operatorCont.pov(90));
+        break;
+      case SIM:
+        turret =
+            new Turret(
+                new TurretIOSim(),
+                operatorCont.x(),
+                operatorCont.y(),
+                clawVision::hasTarget,
+                () -> clawVision.getGameElementOffset().getRadians(),
+                operatorCont.pov(270),
+                operatorCont.pov(90));
+        break;
+      default:
+        turret =
+            new Turret(
+                new TurretIO() {},
+                operatorCont.x(),
+                operatorCont.y(),
+                clawVision::hasTarget,
+                () -> clawVision.getGameElementOffset().getRadians(),
+                operatorCont.pov(270),
+                operatorCont.pov(90));
+        break;
+    }
 
     baseVision =
         new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getRelativeAngle()));
@@ -119,11 +139,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     configureBindings();
 
-    operatorCont.getHID().setRumble(kBothRumble, 0);
+    // operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
   private void defineTransitions() {
-    addOmniTransition(State.DISABLED, new ParallelCommandGroup(
+    addOmniTransition(
+        State.DISABLED,
+        new ParallelCommandGroup(
             arm.transitionCommand(ArmMode.SOFT_STOP),
             turret.transitionCommand(Turret.TurretState.SOFT_STOP),
             lights.transitionCommand(LightState.SOFT_STOP)));
@@ -138,7 +160,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     addTransition(State.DISABLED, State.AUTONOMOUS);
 
-    addOmniTransition(State.TRAVELING, new ParallelCommandGroup(
+    addOmniTransition(
+        State.TRAVELING,
+        new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
             turret.transitionCommand(Turret.TurretState.CARDINALS),
             clawVision.transitionCommand(ClawVision.VisionState.ELEMENT_TYPE)));
@@ -146,17 +170,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addTransition(
         State.TRAVELING,
         State.INTAKING,
-        new ParallelCommandGroup(
-            arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE)
-    ));
+        new ParallelCommandGroup(arm.transitionCommand(ArmMode.SEEKING_PICKUP_DOUBLE)));
 
     addTransition(
         State.TRAVELING,
         State.SCORING,
         new ParallelCommandGroup(
             lights.transitionCommand(LightState.SCORING),
-            new InstantCommand(() -> arm.requestTransition(currentScoreMode))
-    ));
+            new InstantCommand(() -> arm.requestTransition(currentScoreMode))));
 
     // TODO: REMOVE ALL TESTING STUFF
     addOmniTransition(
@@ -301,7 +322,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     new Trigger(() -> arm.getState() != ArmMode.STOWED)
         .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    // new Trigger(() -> arm.getState() == ArmMode.STOWED).and(() -> !leftStick.trigger().getAsBoolean()).onTrue(
+    // new Trigger(() -> arm.getState() == ArmMode.STOWED).and(() ->
+    // !leftStick.trigger().getAsBoolean()).onTrue(
     //   new InstantCommand(() -> drivetrain.setSpeedMode(TURBO))
     // );
 
@@ -448,12 +470,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public void scheduleEndgameBuzz() {
-    new WaitCommand(103.8)
-        .andThen(
-            rumbleLoop(),
-            rumbleLoop(),
-            rumbleLoop())
-        .schedule();
+    new WaitCommand(103.8).andThen(rumbleLoop(), rumbleLoop(), rumbleLoop()).schedule();
   }
 
   private Command rumbleLoop() {
@@ -469,7 +486,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public boolean lowVoltage() {
-    return pd.getVoltage() <= Constants.VOLTAGE_WARNING;
+    return RobotController.getBatteryVoltage() <= Constants.VOLTAGE_WARNING;
   }
 
   public Command runTraj(String traj) {

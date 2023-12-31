@@ -1,38 +1,31 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.Turret.*;
 import static frc.robot.Constants.Vision.BASE_HAS_TARGET_SUPPLIER;
 import static frc.robot.Constants.Vision.BASE_X_OFFSET_SUPPLIER;
-import static frc.robot.subsystems.Turret.TurretState.*;
+import static frc.robot.subsystems.turret.Turret.TurretState.*;
 import static java.lang.Math.*;
 import static java.lang.Math.toDegrees;
 
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.ShamLib.motors.talonfx.MotionMagicTalonFX;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends StateMachine<Turret.TurretState> {
-
-  private final MotionMagicTalonFX turret =
-      new MotionMagicTalonFX(
-          TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500);
-  private final AnalogPotentiometer turretPotentiometer =
-      new AnalogPotentiometer(TURRET_POT_PORT, TURRET_POT_RATIO, TURRET_ENCODER_OFFSET);
+  private final TurretIO io;
+  private final TurretIOInputsAutoLogged inputs = new TurretIOInputsAutoLogged();
 
   private final BooleanSupplier towardSupplier;
   private final BooleanSupplier awaySupplier;
@@ -46,13 +39,17 @@ public class Turret extends StateMachine<Turret.TurretState> {
   private double startAngle = 0;
 
   public Turret(
+      TurretIO io,
       BooleanSupplier towardSupplier,
       BooleanSupplier awaySupplier,
       BooleanSupplier clawHasTarget,
       DoubleSupplier clawVisionOffset,
       BooleanSupplier leftSupplier,
       BooleanSupplier rightSupplier) {
+
     super("turret", UNDETERMINED, TurretState.class);
+
+    this.io = io;
 
     this.towardSupplier = towardSupplier;
     this.awaySupplier = awaySupplier;
@@ -66,31 +63,29 @@ public class Turret extends StateMachine<Turret.TurretState> {
     defineTransitions();
     registerStateCommands();
 
-    turret.configure(NeutralModeValue.Coast, InvertedValue.Clockwise_Positive);
     pullAbsoluteAngle();
   }
 
   private void defineTransitions() {
     addOmniTransition(
-        IDLE, new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        IDLE, new InstantCommand(() -> io.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
     addOmniTransition(
-        SCORING,
-        new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        SCORING, new InstantCommand(() -> io.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
     addOmniTransition(
         INTAKING,
-        new InstantCommand(() -> turret.changeSpeed(TURRET_SLOW_VEL, TURRET_SLOW_ACCEL, 1000)));
+        new InstantCommand(() -> io.changeSpeed(TURRET_SLOW_VEL, TURRET_SLOW_ACCEL, 1000)));
     addOmniTransition(
         CARDINALS,
-        new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        new InstantCommand(() -> io.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
     addOmniTransition(
         MANUAL_CONTROL,
-        new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        new InstantCommand(() -> io.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
 
     addOmniTransition(
         LIMELIGHT_SCORING,
-        new InstantCommand(() -> turret.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
+        new InstantCommand(() -> io.changeSpeed(TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500)));
 
-    addOmniTransition(SOFT_STOP, new InstantCommand(() -> turret.set(0)));
+    addOmniTransition(SOFT_STOP, new InstantCommand(() -> io.setPower(0)));
   }
 
   private void registerStateCommands() {
@@ -151,6 +146,12 @@ public class Turret extends StateMachine<Turret.TurretState> {
   }
 
   @Override
+  protected void update() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Turret", inputs);
+  }
+
+  @Override
   protected void determineSelf() {
     pullAbsoluteAngle();
     setTarget(getRelativeAngle());
@@ -163,7 +164,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
   }
 
   public Command calculateFF(Trigger increment, BooleanSupplier interrupt) {
-    return turret.calculateKV(TURRET_GAINS.getS(), 0.05, increment, interrupt);
+    return io.calculateFF(increment, interrupt);
   }
 
   /**
@@ -185,15 +186,15 @@ public class Turret extends StateMachine<Turret.TurretState> {
   }
 
   public double getTurretAngle() {
-    return toRadians(turretPotentiometer.get());
+    return inputs.potentiometerAngle;
   }
 
   public double getRelativeAngle() {
-    return turret.getEncoderPosition();
+    return inputs.turretMotorAngle;
   }
 
   public double getTurretTarget() {
-    return turret.getTarget();
+    return inputs.turretTarget;
   }
 
   public double getErorr() {
@@ -201,16 +202,16 @@ public class Turret extends StateMachine<Turret.TurretState> {
   }
 
   public void pullAbsoluteAngle() {
-    turret.resetPosition(turretPotentiometer.get() * (PI / 180));
+    io.resetMotorAngle(getTurretAngle());
   }
 
   public double getMinimumAbsoluteErrorToStartingPos() {
-    double deg = toDegrees(turretPotentiometer.get() * (PI / 180));
+    double deg = toDegrees(getTurretAngle());
     return min(abs(deg - 90), abs(deg + 90));
   }
 
   public void resetAngle(double angle /*radians*/) {
-    turret.resetPosition(angle);
+    io.resetMotorAngle(angle);
   }
 
   public boolean isBusy() {
@@ -232,7 +233,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
    */
   public void setTarget(double target) {
     if (TURRET_RANGE.isWithin(target)) {
-      turret.setTarget(target);
+      io.setTarget(target);
     }
   }
 
@@ -252,7 +253,7 @@ public class Turret extends StateMachine<Turret.TurretState> {
   protected void additionalSendableData(SendableBuilder builder) {
     // builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
     builder.addDoubleProperty("target", () -> toDegrees(getTurretTarget()), null);
-    builder.addDoubleProperty("absolute", () -> turretPotentiometer.get(), null);
+    builder.addDoubleProperty("absolute", () -> inputs.potentiometerAngle, null);
     // builder.addDoubleProperty("relative", () -> toDegrees(turret.getEncoderPosition()), null);
     // builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -
     // toDegrees((getTurretAngle()))), null);

@@ -26,7 +26,6 @@ import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
 import frc.robot.util.LUT;
-import frc.robot.util.grid.GridInterface;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
 import java.util.function.BooleanSupplier;
@@ -36,7 +35,8 @@ import java.util.function.UnaryOperator;
 
 public final class Constants {
 
-  public static final Mode currentMode = Mode.SIM;
+  public static final double loopPeriodSecs = 0.02;
+  public static Mode currentMode = Mode.SIM;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -485,7 +485,7 @@ public final class Constants {
   }
 
   // public static void reInstantiateGridUI(Alliance alliance) {
-    // gridInterface.setAlliance(alliance);
-    // Constants.gridReinstantiated = true;
+  // gridInterface.setAlliance(alliance);
+  // Constants.gridReinstantiated = true;
   // }
 }
