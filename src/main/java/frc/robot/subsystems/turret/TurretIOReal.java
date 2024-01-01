@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
 
 public class TurretIOReal implements TurretIO {
 
-  final MotionMagicTalonFX turretMotor =
+  MotionMagicTalonFX turretMotor =
       new MotionMagicTalonFX(
           TURRET_ID, TURRET_GAINS, TURRET_INPUT_TO_OUTPUT, TURRET_MAX_VEL, TURRET_MAX_ACCEL, 2500);
 
