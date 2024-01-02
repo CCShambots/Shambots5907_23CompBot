@@ -24,8 +24,10 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElementType;
-import frc.robot.ShamLib.CommandFlightStick;
+import frc.robot.ShamLib.HID.CommandFlightStick;
+import frc.robot.ShamLib.HID.FlightStickImpostor;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.ClawVision.VisionState;
@@ -45,8 +47,8 @@ import frc.robot.subsystems.turret.TurretIOSim;
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   // Declare HIDs
-  private final CommandFlightStick leftStick = new CommandFlightStick(0);
-  private final CommandFlightStick rightStick = new CommandFlightStick(1);
+  private CommandFlightStick leftStick = new CommandFlightStick(0);
+  private CommandFlightStick rightStick = new CommandFlightStick(1);
   private final CommandXboxController operatorCont = new CommandXboxController(2);
 
   // Declare subsystems
@@ -87,6 +89,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
         break;
       case SIM:
+        leftStick = new CommandFlightStick(1, new FlightStickImpostor(operatorCont, 1, true));
+        rightStick = new CommandFlightStick(2, new FlightStickImpostor(operatorCont, 2, false));
+
         arm = new Arm(new ArmIOSim());
 
         clawVision = new ClawVision(arm::getClawState);
@@ -129,7 +134,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         new Drivetrain(
             () -> -leftStick.getY(),
             () -> -leftStick.getX(),
-            () -> -rightStick.getRawAxis(0),
+            () -> {
+              return Constants.currentBuildMode != BuildMode.SIM
+                  ? -rightStick.getRawAxis(0)
+                  : -operatorCont.getRightX();
+            },
             baseVision.getPoseSupplier(),
             baseVision.getLLHasTargetSupplier());
 
@@ -437,6 +446,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                     arm.requestTransition(ArmMode.TELEOP_GROUND_INTERMEDIATE);
                   else arm.transitionCommand(ArmMode.SEEKING_STOWED);
                 }));
+
+    // operatorCont.a().onTrue(drivetrain.transitionCommand(DrivetrainState.PATHFINDING));
   }
 
   public ArmMode getHighScoreMode() {

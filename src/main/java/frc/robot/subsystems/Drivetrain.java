@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.ShamLib.CommandFlightStick;
+import frc.robot.ShamLib.HID.CommandFlightStick;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.*;
@@ -168,6 +169,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     // addTransition(DrivetrainState.GOING_OVER_CHARGE_STATION, DrivetrainState.DOCKING);
     addOmniTransition(DrivetrainState.DOCKING);
+
+    addOmniTransition(DrivetrainState.PATHFINDING);
   }
 
   private void defineStateCommands() {
@@ -177,6 +180,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     registerStateCommand(DrivetrainState.BOT_ORIENTED_TELEOP_DRIVE, getDefaultTeleopDriveCommand());
 
     registerAutoBalanceCommands();
+
+    registerStateCommand(
+        DrivetrainState.PATHFINDING,
+        drive
+            .createPathFindingCommand(
+                new Pose2d(
+                    Units.feetToMeters(54) / 2, Units.feetToMeters(27) / 2, new Rotation2d()))
+            .andThen(transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
   }
 
   private void registerAutoBalanceCommands() {
@@ -285,9 +296,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   }
 
   public void updateOdometry() {
-
-    drive.updateField2dObject();
-
     // Only integrate vision measurement if the limelight has a target
     if (getState() == DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE && llHasPose.getAsBoolean()) {
       drive.addVisionMeasurement(llPose.get().toPose2d());
@@ -547,6 +555,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     DOCKING,
     BALANCING,
     DRIVING_OVER_CHARGE_STATION,
+
+    PATHFINDING,
 
     DONT_BALANCE,
     HIT_ZERO,

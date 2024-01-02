@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.ShamLib.SMF.StateMachine;
-import frc.robot.util.ProxSensor;
 import org.littletonrobotics.junction.Logger;
 
 public class Claw extends StateMachine<Claw.ClawState> {
@@ -21,7 +20,6 @@ public class Claw extends StateMachine<Claw.ClawState> {
 
   private ClawState prevState = ClawState.UNDETERMINED;
 
-  private final ProxSensor prox = new ProxSensor(PROX_PORT);
   private final Timer timer = new Timer();
   private boolean proxEnabled = true;
 
@@ -65,7 +63,7 @@ public class Claw extends StateMachine<Claw.ClawState> {
         ClawState.OPENED,
         new RunCommand(
             () -> {
-              if (proxEnabled && prox.isActivated() && timer.get() > 1)
+              if (proxEnabled && inputs.proxActivated && timer.get() > 1)
                 requestTransition(ClawState.CLOSED);
             }));
   }
@@ -89,7 +87,7 @@ public class Claw extends StateMachine<Claw.ClawState> {
 
   @Override
   protected void additionalSendableData(SendableBuilder builder) {
-    builder.addBooleanProperty("prox", () -> prox.isActivated(), null);
+    builder.addBooleanProperty("prox", () -> inputs.proxActivated, null);
   }
 
   public void enableProx() {

@@ -10,6 +10,7 @@ public interface ClawIO {
   @AutoLog
   public static class ClawIOInputs {
     public DoubleSolenoid.Value solenoidValue = kOff;
+    public boolean proxActivated = false;
   }
 
   /** Updates the set of loggable inputs. */
