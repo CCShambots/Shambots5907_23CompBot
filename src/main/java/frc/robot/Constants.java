@@ -24,6 +24,7 @@ import frc.robot.ShamLib.Candle.MultipleColorSegments;
 import frc.robot.ShamLib.Candle.RGB;
 import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
+import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
 import frc.robot.util.LUT;
 import frc.robot.util.kinematics.ArmState;
@@ -36,18 +37,7 @@ import java.util.function.UnaryOperator;
 public final class Constants {
 
   public static final double loopPeriodSecs = 0.02;
-  public static Mode currentMode = Mode.SIM;
-
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
-
-    /** Running a physics simulator. */
-    SIM,
-
-    /** Replaying from a log file. */
-    REPLAY
-  }
+  public static BuildMode currentBuildMode = BuildMode.SIM;
 
   public static boolean AT_COMP = false;
 

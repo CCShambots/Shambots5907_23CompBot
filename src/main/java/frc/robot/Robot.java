@@ -1,6 +1,6 @@
 package frc.robot;
 
-import static frc.robot.Constants.currentMode;
+import static frc.robot.Constants.currentBuildMode;
 import static frc.robot.subsystems.Lights.LightState.DISABLED;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.ShamLib.motors.talonfx.sim.PhysicsSim;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
@@ -35,7 +36,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
 
-    if (isReal()) currentMode = frc.robot.Constants.Mode.REAL;
+    if (isReal()) currentBuildMode = BuildMode.REAL;
 
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -55,7 +56,7 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    switch (Constants.currentMode) {
+    switch (Constants.currentBuildMode) {
       case REAL:
         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables

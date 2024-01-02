@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.Constants.SwerveModule.*;
-import static frc.robot.ShamLib.swerve.ModuleInfo.SwerveModuleSpeedLevel.*;
-import static frc.robot.ShamLib.swerve.ModuleInfo.SwerveModuleType.*;
+import static frc.robot.ShamLib.swerve.module.ModuleInfo.SwerveModuleSpeedLevel.*;
+import static frc.robot.ShamLib.swerve.module.ModuleInfo.SwerveModuleType.*;
 
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -27,6 +27,9 @@ import frc.robot.ShamLib.CommandFlightStick;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.*;
+import frc.robot.ShamLib.swerve.module.ModuleInfo;
+import frc.robot.ShamLib.swerve.module.RealignModuleCommand;
+import frc.robot.ShamLib.swerve.module.SwerveModule;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   private final SwerveDrive drive;
@@ -46,6 +50,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
   private boolean positiveDockDirection =
       true; // Whether the docking should run in a positive or negative direction
+
+  @AutoLogOutput private SwerveModuleState[] moduleStates;
 
   public Drivetrain(
       DoubleSupplier x,
@@ -65,6 +71,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     drive =
         new SwerveDrive(
+            Constants.currentBuildMode,
             PIGEON_ID,
             DRIVE_GAINS,
             TURN_GAINS,
@@ -278,7 +285,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   }
 
   public void updateOdometry() {
-    drive.updateOdometry();
 
     drive.updateField2dObject();
 
@@ -387,6 +393,10 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
   @Override
   protected void update() {
+    drive.update();
+
+    moduleStates = drive.getModuleStates();
+
     updateOdometry();
   }
 

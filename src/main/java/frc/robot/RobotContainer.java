@@ -10,6 +10,7 @@ import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -68,7 +69,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public RobotContainer(EventLoop checkModulesLoop) {
     super("Robot", State.UNDETERMINED, State.class);
 
-    switch (Constants.currentMode) {
+    switch (Constants.currentBuildMode) {
       case REAL:
         arm = new Arm(new ArmIOReal());
 
@@ -133,6 +134,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
             baseVision.getLLHasTargetSupplier());
 
     drivetrain.registerMisalignedSwerveTriggers(checkModulesLoop);
+
+    NamedCommands.registerCommand("extend", arm.transitionCommand(ArmMode.SEEKING_HIGH));
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -339,10 +342,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     new Trigger(() -> arm.getState() != ArmMode.STOWED)
         .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
 
-    // new Trigger(() -> arm.getState() == ArmMode.STOWED).and(() ->
-    // !leftStick.trigger().getAsBoolean()).onTrue(
-    //   new InstantCommand(() -> drivetrain.setSpeedMode(TURBO))
-    // );
+    new Trigger(() -> arm.getState() == ArmMode.STOWED)
+        .and(leftStick.trigger().negate())
+        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)));
 
     operatorCont
         .a()
