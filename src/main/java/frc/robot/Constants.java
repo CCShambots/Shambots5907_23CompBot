@@ -254,8 +254,8 @@ public final class Constants {
             0.0254 // inches to meters
         ; // Converts motor revolutions to meters
     public static final Range elevatorRange = new Range(0, inchesToMeters(26));
-    public static final double ELEVATOR_MAX_VEL = 3000; // rot/sec 3000
-    public static final double ELEVATOR_MAX_ACCEL = 5000; // rot/sec^2 5000
+    public static final double ELEVATOR_MAX_VEL = 400; // rot/sec 3000
+    public static final double ELEVATOR_MAX_ACCEL = 300; // rot/sec^2 5000
 
     // Shoulder hardware details
     public static final int SHOULDER_LEADER_ID = 23;
@@ -285,7 +285,7 @@ public final class Constants {
     // Wrist hardware details
     public static final int WRIST_ID = 24;
     public static final double WRIST_INPUT_TO_OUTPUT =
-        (1.0 / 10.0) * (25.0 / 75.0) * 2 * PI; // Ticks --> Radians
+        (1.0 / 10.0) * (25.0 / 75.0) * 2 * PI; // Rotations --> Radians
     public static final int WRIST_ENCODER_PORT = 7;
     public static final double WRIST_ENCODER_OFFSET = 33; // Degrees
     public static final Range wristRange = Range.fromDegrees(-155, 45); // Degrees
@@ -299,14 +299,9 @@ public final class Constants {
     public static final double WRIST_SLOW_JERK = 2500;
 
     // Control gains
-    //    public static final PIDSVGains TURRET_GAINS = new PIDSVGains(10, 0, 0, 0.35, 0.114);
     public static final PIDSVGains ELEVATOR_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.142);
 
     public static final PIDSVGains SHOULDER_GAINS = new PIDSVGains(2, 0, 0, 0.25, 0.15);
-    //    public static final PIDGains SHOULDER_GAINS = new PIDGains(6, 0, 0.6);
-    //    public static final double SHOULDER_KS = 0.1;
-    //    public static final double SHOULDER_KG = 0;
-    //    public static final double SHOULDER_KV = 2.6;
 
     public static final PIDSVGains WRIST_GAINS = new PIDSVGains(14, 0, 0, 0.3, 0.302927);
 

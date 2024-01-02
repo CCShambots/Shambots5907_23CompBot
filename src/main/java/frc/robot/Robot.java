@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Constants.currentMode;
 import static frc.robot.subsystems.Lights.LightState.DISABLED;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -14,6 +15,7 @@ import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
 import frc.robot.ShamLib.motors.talonfx.sim.PhysicsSim;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +27,10 @@ public class Robot extends LoggedRobot {
 
   private RobotContainer robotContainer;
   private final EventLoop checkModulesLoop = new EventLoop();
+
+  @AutoLogOutput private Pose3d[] componentPositions = new Pose3d[0];
+
+  @AutoLogOutput private Pose3d[] componentPositionTargets = new Pose3d[0];
 
   @Override
   public void robotInit() {
@@ -112,6 +118,9 @@ public class Robot extends LoggedRobot {
 
     // Update the grid interface to make sure scored elements make it to the webpage
     // Constants.gridInterface.update();
+
+    componentPositions = robotContainer.getComponentPoses();
+    componentPositionTargets = robotContainer.getComponentPoseTargets();
   }
 
   @Override

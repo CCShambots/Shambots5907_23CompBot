@@ -10,6 +10,7 @@ import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
@@ -31,6 +32,9 @@ import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmMode;
+import frc.robot.subsystems.arm.ArmIO;
+import frc.robot.subsystems.arm.ArmIOReal;
+import frc.robot.subsystems.arm.ArmIOSim;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.Turret.TurretState;
 import frc.robot.subsystems.turret.TurretIO;
@@ -64,12 +68,12 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   public RobotContainer(EventLoop checkModulesLoop) {
     super("Robot", State.UNDETERMINED, State.class);
 
-    arm = new Arm();
-    lights = new Lights();
-    clawVision = new ClawVision(arm::getClawState);
-
     switch (Constants.currentMode) {
       case REAL:
+        arm = new Arm(new ArmIOReal());
+
+        clawVision = new ClawVision(arm::getClawState);
+
         turret =
             new Turret(
                 new TurretIOReal(),
@@ -79,8 +83,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                 () -> clawVision.getGameElementOffset().getRadians(),
                 operatorCont.pov(270),
                 operatorCont.pov(90));
+
         break;
       case SIM:
+        arm = new Arm(new ArmIOSim());
+
+        clawVision = new ClawVision(arm::getClawState);
+
         turret =
             new Turret(
                 new TurretIOSim(),
@@ -90,8 +99,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                 () -> clawVision.getGameElementOffset().getRadians(),
                 operatorCont.pov(270),
                 operatorCont.pov(90));
+
         break;
       default:
+        arm = new Arm(new ArmIO() {});
+
+        clawVision = new ClawVision(arm::getClawState);
+
         turret =
             new Turret(
                 new TurretIO() {},
@@ -101,8 +115,11 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                 () -> clawVision.getGameElementOffset().getRadians(),
                 operatorCont.pov(270),
                 operatorCont.pov(90));
+
         break;
     }
+
+    lights = new Lights();
 
     baseVision =
         new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getRelativeAngle()));
@@ -558,6 +575,24 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   protected void onAutonomousStart() {
     registerStateCommand(State.AUTONOMOUS, getAutonomousCommand());
     requestTransition(State.AUTONOMOUS);
+  }
+
+  public Pose3d[] getComponentPoses() {
+    return new Pose3d[] {
+      turret.getOffsetPose(),
+      arm.getElevatorPose(turret.getTurretAngle()),
+      arm.getShoulderPose(turret.getTurretAngle()),
+      arm.getWristPose(turret.getTurretAngle())
+    };
+  }
+
+  public Pose3d[] getComponentPoseTargets() {
+    return new Pose3d[] {
+      turret.getOffsetTargetPose(),
+      arm.getElevatorPoseTarget(turret.getTurretTarget()),
+      arm.getShoulderPoseTarget(turret.getTurretTarget()),
+      arm.getWristPoseTarget(turret.getTurretTarget())
+    };
   }
 
   public enum State {

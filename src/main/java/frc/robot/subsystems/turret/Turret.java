@@ -23,7 +23,6 @@ import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends StateMachine<Turret.TurretState> {
@@ -40,10 +39,6 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
   private boolean enforceStartAngle = false;
   private double startAngle = 0;
-
-  @AutoLogOutput private Pose3d offsetPose = new Pose3d();
-
-  @AutoLogOutput private Pose3d offsetTargetPose = new Pose3d();
 
   public Turret(
       TurretIO io,
@@ -155,10 +150,15 @@ public class Turret extends StateMachine<Turret.TurretState> {
   @Override
   protected void update() {
     io.updateInputs(inputs);
-    Logger.processInputs("Turret", inputs);
+    Logger.processInputs(this.getName(), inputs);
+  }
 
-    offsetPose = new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretAngle()));
-    offsetTargetPose = new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretTarget()));
+  public Pose3d getOffsetPose() {
+    return new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretAngle()));
+  }
+
+  public Pose3d getOffsetTargetPose() {
+    return new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretTarget()));
   }
 
   @Override
