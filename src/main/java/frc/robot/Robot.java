@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.ShamLib.SMF.SubsystemManagerFactory;
+import frc.robot.ShamLib.motors.talonfx.sim.PhysicsSim;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.Lights.LightState;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -188,5 +189,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    PhysicsSim.getInstance().run();
+  }
 }

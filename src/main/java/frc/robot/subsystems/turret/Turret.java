@@ -8,7 +8,9 @@ import static java.lang.Math.*;
 import static java.lang.Math.toDegrees;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +23,7 @@ import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends StateMachine<Turret.TurretState> {
@@ -37,6 +40,10 @@ public class Turret extends StateMachine<Turret.TurretState> {
 
   private boolean enforceStartAngle = false;
   private double startAngle = 0;
+
+  @AutoLogOutput private Pose3d offsetPose = new Pose3d();
+
+  @AutoLogOutput private Pose3d offsetTargetPose = new Pose3d();
 
   public Turret(
       TurretIO io,
@@ -149,6 +156,9 @@ public class Turret extends StateMachine<Turret.TurretState> {
   protected void update() {
     io.updateInputs(inputs);
     Logger.processInputs("Turret", inputs);
+
+    offsetPose = new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretAngle()));
+    offsetTargetPose = new Pose3d(0, 0, 0, new Rotation3d(Math.PI / 2, 0, getTurretTarget()));
   }
 
   @Override

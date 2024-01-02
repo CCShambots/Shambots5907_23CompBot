@@ -14,9 +14,6 @@ public class TurretIOSim extends TurretIOReal {
 
   @Override
   public void updateInputs(TurretIOInputs inputs) {
-
-    PhysicsSim.getInstance().run();
-
     inputs.potentiometerAngle = turretMotor.getEncoderPosition();
     inputs.turretMotorAngle = turretMotor.getEncoderPosition();
     inputs.turretTarget = turretMotor.getTarget();
