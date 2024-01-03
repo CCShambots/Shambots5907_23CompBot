@@ -13,7 +13,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -59,7 +58,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   private final Lights lights;
   private final Turret turret;
 
-  private final PowerDistribution pd = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+  // private final PowerDistribution pd = new PowerDistribution(1,
+  // PowerDistribution.ModuleType.kRev);
 
   private ArmMode currentScoreMode = ArmMode.SEEKING_HIGH;
   private Constants.ElementType nextElement = Cone;

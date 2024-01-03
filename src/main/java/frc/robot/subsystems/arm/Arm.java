@@ -41,6 +41,8 @@ public class Arm extends StateMachine<Arm.ArmMode> {
 
     this.io = io;
 
+    io.updateInputs(inputs);
+
     new WaitCommand(2).andThen(setShoulderFollower()).schedule();
 
     addChildSubsystem(claw);
@@ -53,7 +55,7 @@ public class Arm extends StateMachine<Arm.ArmMode> {
   }
 
   public Command setShoulderFollower() {
-    return new InstantCommand(() -> io.setShoulderFollower());
+    return io.setShoulderFollower();
   }
 
   public Command openClaw() {
@@ -437,6 +439,9 @@ public class Arm extends StateMachine<Arm.ArmMode> {
   }
 
   public void pollAbsoluteAngles() {
+    System.out.println(inputs.shoulderAbsolutePos);
+    System.out.println(inputs.wristAbsolutePos);
+
     io.resetShoulderPos(inputs.shoulderAbsolutePos);
 
     io.resetWristPos(inputs.wristAbsolutePos);

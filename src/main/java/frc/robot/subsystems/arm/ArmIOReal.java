@@ -29,11 +29,11 @@ public class ArmIOReal implements ArmIO {
   protected final MotionMagicTalonFX shoulderLeader =
       new MotionMagicTalonFX(
           SHOULDER_LEADER_ID,
-          TURRET_GAINS,
-          TURRET_INPUT_TO_OUTPUT,
-          TURRET_MAX_VEL,
-          TURRET_MAX_ACCEL,
-          2500);
+          SHOULDER_GAINS,
+          SHOULDER_INPUT_TO_OUTPUT,
+          SHOULDER_VEL,
+          SHOULDER_ACCEL,
+          10000);
 
   protected final MotionMagicTalonFX shoulderFollower =
       new MotionMagicTalonFX(
@@ -95,9 +95,6 @@ public class ArmIOReal implements ArmIO {
   }
 
   private void configureCurrentLimits() {
-    for (int i = 0; i < 10; i++) {
-      System.out.println("CURRENT LIMITS BEING CONFIGURED");
-    }
     applyCurrentLimit(elevator);
     applyCurrentLimit(shoulderLeader);
     applyCurrentLimit(shoulderFollower);

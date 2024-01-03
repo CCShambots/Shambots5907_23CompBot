@@ -58,7 +58,8 @@ public class Robot extends LoggedRobot {
 
     switch (Constants.currentBuildMode) {
       case REAL:
-        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(
+            new WPILOGWriter("/home/lvuser/logs")); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         // TODO: Deal with this
         new PowerDistribution(1, ModuleType.kRev);
