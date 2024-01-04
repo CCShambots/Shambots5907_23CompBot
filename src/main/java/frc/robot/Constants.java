@@ -37,7 +37,7 @@ import java.util.function.UnaryOperator;
 public final class Constants {
 
   public static final double loopPeriodSecs = 0.02;
-  public static BuildMode currentBuildMode = BuildMode.SIM;
+  public static BuildMode currentBuildMode = BuildMode.REPLAY;
 
   public static boolean AT_COMP = false;
 

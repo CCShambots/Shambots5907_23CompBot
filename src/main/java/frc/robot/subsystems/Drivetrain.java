@@ -39,6 +39,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   private final SwerveDrive drive;
@@ -300,6 +301,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     if (getState() == DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE && llHasPose.getAsBoolean()) {
       drive.addVisionMeasurement(llPose.get().toPose2d());
     }
+
+    Logger.recordOutput(getName() + "/pose", getPose());
   }
 
   public void drive(ChassisSpeeds speeds) {
