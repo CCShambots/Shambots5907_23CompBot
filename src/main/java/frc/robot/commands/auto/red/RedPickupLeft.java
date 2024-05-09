@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
-import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.arm.Arm.ArmMode;
 
 public class RedPickupLeft extends BaseAutoRoute {
@@ -18,7 +17,6 @@ public class RedPickupLeft extends BaseAutoRoute {
     addCommands(
         rc.waitForReady(),
         new ScoreFirstElementCommand(rc),
-        rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
         new ParallelCommandGroup(
             rc.runTraj("red-pickup-left", true),
             new SequentialCommandGroup(

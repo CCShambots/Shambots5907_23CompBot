@@ -10,7 +10,6 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.GrabSequenceCommand;
-import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmMode;
@@ -25,7 +24,6 @@ public class RedThreeScoreRight extends BaseAutoRoute {
         rc.waitForReady(),
         rc.arm().transitionCommand(ArmMode.LOW_SCORE),
         rc.arm().openClaw(),
-        rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
         new ParallelCommandGroup(
             rc.runTraj("red-first-score-right", true),
             new SequentialCommandGroup(

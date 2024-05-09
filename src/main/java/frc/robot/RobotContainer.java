@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,7 +28,6 @@ import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.commands.WhileDisabledInstantCommand;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.Lights.LightState;
 import frc.robot.subsystems.arm.Arm;
@@ -52,7 +50,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   // Declare subsystems
   private final BaseVision baseVision;
-  private final ClawVision clawVision;
   private final Drivetrain drivetrain;
   private final Arm arm;
   private final Lights lights;
@@ -75,15 +72,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       case REAL:
         arm = new Arm(new ArmIOReal());
 
-        clawVision = new ClawVision(arm::getClawState);
-
         turret =
             new Turret(
                 new TurretIOReal(),
                 operatorCont.x(),
                 operatorCont.y(),
-                clawVision::hasTarget,
-                () -> clawVision.getGameElementOffset().getRadians(),
+                () -> false,
+                () -> 0,
                 operatorCont.pov(270),
                 operatorCont.pov(90));
 
@@ -94,15 +89,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
         arm = new Arm(new ArmIOSim());
 
-        clawVision = new ClawVision(arm::getClawState);
-
         turret =
             new Turret(
                 new TurretIOSim(),
                 operatorCont.x(),
                 operatorCont.y(),
-                clawVision::hasTarget,
-                () -> clawVision.getGameElementOffset().getRadians(),
+                () -> false,
+                () -> 0,
                 operatorCont.pov(270),
                 operatorCont.pov(90));
 
@@ -110,15 +103,13 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
       default:
         arm = new Arm(new ArmIO() {});
 
-        clawVision = new ClawVision(arm::getClawState);
-
         turret =
             new Turret(
                 new TurretIO() {},
                 operatorCont.x(),
                 operatorCont.y(),
-                clawVision::hasTarget,
-                () -> clawVision.getGameElementOffset().getRadians(),
+                () -> false,
+                () -> 0,
                 operatorCont.pov(270),
                 operatorCont.pov(90));
 
@@ -128,7 +119,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     lights = new Lights();
 
     baseVision =
-        new BaseVision(BASE_LIMELIGHT_POSE, () -> new Rotation2d(turret.getRelativeAngle()));
+        new BaseVision(
+            BASE_LIMELIGHT_POSE,
+            () -> new Rotation2d(turret.getRelativeAngle()),
+            Constants.Vision.BASE_LIMELIGHT_SETTINGS);
 
     drivetrain =
         new Drivetrain(
@@ -138,9 +132,9 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
               return Constants.currentBuildMode != BuildMode.SIM
                   ? -rightStick.getRawAxis(0)
                   : -operatorCont.getRightX();
-            },
-            baseVision.getPoseSupplier(),
-            baseVision.getLLHasTargetSupplier());
+            });
+
+    baseVision.addVisionUpdateConsumers(drivetrain::addVisionMeasurements);
 
     drivetrain.registerMisalignedSwerveTriggers(checkModulesLoop);
 
@@ -153,22 +147,14 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addChildSubsystem(drivetrain);
     addChildSubsystem(arm);
     addChildSubsystem(lights);
-    addChildSubsystem(clawVision);
-    addChildSubsystem(baseVision);
     addChildSubsystem(turret);
 
-    // SmartDashboard.putData("drivetrain", drivetrain);
-    SmartDashboard.putData("arm", arm);
-    SmartDashboard.putData("turret", turret);
-    SmartDashboard.putData("claw", arm.claw());
-    SmartDashboard.putData("drivetrain", drivetrain);
+    baseVision.enable();
 
     defineTransitions();
     defineStateCommands();
 
     configureBindings();
-
-    // operatorCont.getHID().setRumble(kBothRumble, 0);
   }
 
   private void defineTransitions() {
@@ -193,8 +179,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         State.TRAVELING,
         new ParallelCommandGroup(
             drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
-            turret.transitionCommand(Turret.TurretState.CARDINALS),
-            clawVision.transitionCommand(ClawVision.VisionState.ELEMENT_TYPE)));
+            turret.transitionCommand(Turret.TurretState.CARDINALS)));
 
     addTransition(
         State.TRAVELING,
@@ -224,8 +209,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         new RunCommand(
             () -> {
               // Set the element that we have to be what we want next in case the vision fails
-              ElementType have =
-                  trustElementVision ? clawVision.getCurrentElementType() : nextElement;
+              ElementType have = nextElement;
               LightState correctState = lights.getStateFromElements(nextElement, have);
 
               if (lights.getState() != correctState && lights.canDisplayInfo()) {
@@ -238,8 +222,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         new RunCommand(
             () -> {
               // Set the element that we have to be what we want next in case the vision fails
-              ElementType have =
-                  trustElementVision ? clawVision.getCurrentElementType() : nextElement;
+              ElementType have = nextElement;
               LightState correctState = lights.getStateFromElements(nextElement, have);
 
               if (correctState == LightState.CONE) correctState = LightState.INTAKE_CONE;
@@ -249,10 +232,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
                 lights.requestTransition(correctState);
               }
             }));
-
-    // rightStick.topRight().onTrue(drivetrain.transitionCommand(DrivetrainState.DOCKING));
-    // rightStick.topLeft().onTrue(drivetrain.setPositiveDockDirectionCommand(false));
-
   }
 
   private void initializeDriveTab() {
@@ -451,17 +430,10 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public ArmMode getHighScoreMode() {
-    if (trustElementVision) {
-      if (clawVision.getState() == ClawVision.VisionState.ELEMENT_TYPE
-          && clawVision.getCurrentElementType() == Constants.ElementType.Cube) {
-        return ArmMode.HIGH_CUBE;
-      } else return ArmMode.SEEKING_HIGH;
+    if (nextElement == Cone) {
+      return ArmMode.SEEKING_HIGH;
     } else {
-      if (nextElement == Cone) {
-        return ArmMode.SEEKING_HIGH;
-      } else {
-        return ArmMode.HIGH_CUBE;
-      }
+      return ArmMode.HIGH_CUBE;
     }
   }
 
@@ -494,9 +466,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
   }
 
   public Command setTurretToIntake() {
-    return new ParallelCommandGroup(
-        turret.transitionCommand(TurretState.INTAKING),
-        clawVision.transitionCommand(VisionState.CONE_DETECTOR));
+    return new ParallelCommandGroup(turret.transitionCommand(TurretState.INTAKING));
   }
 
   public void scheduleEndgameBuzz() {
@@ -544,10 +514,6 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   public BaseVision bv() {
     return baseVision;
-  }
-
-  public ClawVision cv() {
-    return clawVision;
   }
 
   public Lights lights() {

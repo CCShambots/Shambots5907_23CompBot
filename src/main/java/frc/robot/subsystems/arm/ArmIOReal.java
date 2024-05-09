@@ -9,11 +9,9 @@ import static frc.robot.Constants.applyCurrentLimit;
 
 import com.ctre.phoenix6.controls.Follower;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.ShamLib.motors.talonfx.MotionMagicTalonFX;
 import frc.robot.ShamLib.sensor.ThroughBoreEncoder;
 import frc.robot.commands.WhileDisabledInstantCommand;
-import java.util.function.BooleanSupplier;
 
 public class ArmIOReal implements ArmIO {
 
@@ -105,21 +103,6 @@ public class ArmIOReal implements ArmIO {
   public Command setShoulderFollower() {
     return new WhileDisabledInstantCommand(
         () -> shoulderFollower.setControl(new Follower(shoulderLeader.getDeviceID(), false)));
-  }
-
-  @Override
-  public Command calculateElevatorFF(Trigger increment, BooleanSupplier interrupt) {
-    return elevator.calculateKV(ELEVATOR_GAINS.getS(), 0.05, increment, interrupt);
-  }
-
-  @Override
-  public Command calculateWristFF(Trigger increment, BooleanSupplier interrupt) {
-    return wrist.calculateKV(WRIST_GAINS.getS(), 0.05, increment, interrupt);
-  }
-
-  @Override
-  public Command calculateShoulderFF(Trigger increment, BooleanSupplier interrupt) {
-    return shoulderLeader.calculateKV(SHOULDER_GAINS.getS(), 0.05, increment, interrupt);
   }
 
   @Override

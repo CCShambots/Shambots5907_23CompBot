@@ -13,6 +13,8 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -26,6 +28,9 @@ import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
+import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
+import frc.robot.ShamLib.swerve.odometry.OdometryBoundingBox;
+import frc.robot.subsystems.BaseVision.CamSettings;
 import frc.robot.util.LUT;
 import frc.robot.util.kinematics.ArmState;
 import frc.robot.util.math.Range;
@@ -40,6 +45,23 @@ public final class Constants {
   public static BuildMode currentBuildMode = BuildMode.REPLAY;
 
   public static boolean AT_COMP = false;
+
+  public static final class PhysicalConstants {
+    public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT;
+
+    public static final OdometryBoundingBox FIELD_BOUNDING_BOX =
+        new OdometryBoundingBox(
+            new Translation2d(), new Translation2d(Units.feetToMeters(54), Units.feetToMeters(27)));
+
+    static {
+      try {
+        APRIL_TAG_FIELD_LAYOUT =
+            AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      } catch (Exception e) {
+        throw new RuntimeException("Could not load AprilTag field layout from WPI");
+      }
+    }
+  }
 
   public static final class Testing {
 
@@ -114,6 +136,13 @@ public final class Constants {
     public static final double STANDARD_ROTATION =
         (STANDARD_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double STANDARD_ROT_ACCEL = STANDARD_ROTATION * 3;
+
+    public static final SwerveSpeedLimits STANDARD_SPEED =
+        new SwerveSpeedLimits(
+            STANDARD_LINEAR_SPEED,
+            STANDARD_LINEAR_ACCELERATION,
+            STANDARD_ROTATION,
+            STANDARD_ROT_ACCEL);
 
     // Max speeds (turbo button)
     public static final double MAX_LINEAR_SPEED = 5;
@@ -214,8 +243,11 @@ public final class Constants {
     public static final int APRIL_TAG_PIPELINE = 0;
     public static final int RETRO_PIPELINE = 1;
 
-    public static DoubleSupplier BASE_X_OFFSET_SUPPLIER;
-    public static BooleanSupplier BASE_HAS_TARGET_SUPPLIER;
+    public static final CamSettings BASE_LIMELIGHT_SETTINGS =
+        new CamSettings("base_ll", new Pose3d(), Units.feetToMeters(18), 0.4, 2.0, 0.33, 1.0);
+
+    public static DoubleSupplier BASE_X_OFFSET_SUPPLIER = () -> 0;
+    public static BooleanSupplier BASE_HAS_TARGET_SUPPLIER = () -> false;
 
     // Claw
     public static final int CONE_DETECTOR_PIPELINE = 0;

@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -40,6 +39,15 @@ public class Turret extends StateMachine<Turret.TurretState> {
   private boolean enforceStartAngle = false;
   private double startAngle = 0;
 
+  /**
+   * @param io
+   * @param towardSupplier
+   * @param awaySupplier
+   * @param clawHasTarget Remnant from claw vision code
+   * @param clawVisionOffset Remnant from old claw vision code
+   * @param leftSupplier
+   * @param rightSupplier
+   */
   public Turret(
       TurretIO io,
       BooleanSupplier towardSupplier,
@@ -257,16 +265,5 @@ public class Turret extends StateMachine<Turret.TurretState> {
       setTarget(startAngle);
       enforceStartAngle = false;
     }
-  }
-
-  @Override
-  protected void additionalSendableData(SendableBuilder builder) {
-    // builder.addDoubleProperty("angle", () -> toDegrees(getTurretAngle()), null);
-    builder.addDoubleProperty("target", () -> toDegrees(getTurretTarget()), null);
-    builder.addDoubleProperty("absolute", () -> inputs.potentiometerAngle, null);
-    // builder.addDoubleProperty("relative", () -> toDegrees(turret.getEncoderPosition()), null);
-    // builder.addDoubleProperty("error", () -> Math.abs(toDegrees(getTurretTarget()) -
-    // toDegrees((getTurretAngle()))), null);
-    // builder.addBooleanProperty("is busy", () -> isBusy(), null);
   }
 }

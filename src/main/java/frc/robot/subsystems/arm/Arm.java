@@ -7,7 +7,6 @@ import static java.lang.Math.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -516,60 +515,5 @@ public class Arm extends StateMachine<Arm.ArmMode> {
         -shoulderProtusion * cos(turretRot),
         0.53 + getElevatorTarget() + shoulderLength * sin(getShoulderTarget()),
         new Rotation3d(Math.PI / 2 - getShoulderTarget() - getWristTarget(), 0, turretRot));
-  }
-
-  @Override
-  protected void additionalSendableData(SendableBuilder builder) {
-
-    // builder.addDoubleProperty("elevator/output", () -> Units.metersToInches(getElevatorHeight()),
-    // null);
-    builder.addDoubleProperty(
-        "elevator/height", () -> Units.metersToInches(getElevatorHeight()), null);
-    builder.addDoubleProperty(
-        "elevator/target", () -> Units.metersToInches(getElevatorTarget()), null);
-    // builder.addDoubleProperty("elevator/error", () ->
-    // getError(Units.metersToInches(getElevatorTarget()),
-    // Units.metersToInches(getElevatorHeight())), null);
-
-    // builder.addDoubleProperty("shoulder/velo", () -> toDegrees(shoulder.getEncoderVelocity()),
-    // null);
-    builder.addDoubleProperty(
-        "shoulder/motor-angle", () -> toDegrees(inputs.shoulderMotorPos), null);
-    builder.addDoubleProperty("shoulder/target", () -> toDegrees(getShoulderTarget()), null);
-    builder.addDoubleProperty(
-        "shoulder/absolute-angle", () -> toDegrees(inputs.shoulderAbsolutePos), null);
-
-    builder.addDoubleProperty(
-        "shoulder/absolute-error",
-        () -> getError(inputs.shoulderAbsolutePos, toDegrees(getShoulderTarget())),
-        null);
-    builder.addDoubleProperty(
-        "shoulder/motor-error",
-        () -> getError(toDegrees(inputs.shoulderMotorPos), toDegrees(getShoulderTarget())),
-        null);
-
-    // builder.addDoubleProperty("shoulder/shoulder-target-velo", () ->
-    // toDegrees(shoulderPID.getSetpoint().velocity), null);
-    // builder.addDoubleProperty("shoulder/shoulder-target-pos", () ->
-    // toDegrees(shoulderPID.getSetpoint().position), null);
-
-    // builder.addDoubleProperty("wrist/velocity_error", () ->
-    // toDegrees(wristPID.getVelocityError()), null);
-    // builder.addDoubleProperty("wrist/position_error", () ->
-    // toDegrees(wristPID.getPositionError()), null);
-    builder.addDoubleProperty(
-        "wrist/absolute-angle", () -> toDegrees(inputs.wristAbsolutePos), null);
-    builder.addDoubleProperty("wrist/motor-angle", () -> toDegrees(inputs.wristMotorPos), null);
-    builder.addDoubleProperty("wrist/target", () -> toDegrees(getWristTarget()), null);
-    // builder.addDoubleProperty("wrist/velo", () -> toDegrees(wrist.getEncoderVelocity()), null);
-
-    builder.addDoubleProperty(
-        "wrist/absolute-error",
-        () -> getError(toDegrees(inputs.wristAbsolutePos), toDegrees(getWristTarget())),
-        null);
-    builder.addDoubleProperty(
-        "wrist/motor-error",
-        () -> getError(toDegrees(inputs.wristMotorPos), toDegrees(getWristTarget())),
-        null);
   }
 }

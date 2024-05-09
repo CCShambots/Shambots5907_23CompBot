@@ -6,7 +6,6 @@ import static frc.robot.Constants.Lights.CONE_RGB;
 import static frc.robot.subsystems.Lights.LightState.*;
 
 import com.ctre.phoenix.led.Animation;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -140,7 +139,4 @@ public class Lights extends StateMachine<Lights.LightState> {
     setState(DISABLED);
     candle.animate(DISABLED_ANIMATION);
   }
-
-  @Override
-  protected void additionalSendableData(SendableBuilder builder) {}
 }

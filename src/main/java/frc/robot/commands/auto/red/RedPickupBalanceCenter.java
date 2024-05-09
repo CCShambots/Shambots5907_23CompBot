@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.BaseAutoRoute;
 import frc.robot.commands.auto.ScoreFirstElementCommand;
-import frc.robot.subsystems.ClawVision.VisionState;
 import frc.robot.subsystems.Drivetrain.DrivetrainState;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmMode;
@@ -23,7 +22,6 @@ public class RedPickupBalanceCenter extends BaseAutoRoute {
         rc.waitForReady(),
         rc.dt().resetGyroCommand(new Rotation2d()),
         new ScoreFirstElementCommand(rc),
-        rc.cv().transitionCommand(VisionState.CONE_DETECTOR),
         rc.arm().openClaw(),
         new ParallelCommandGroup(
             rc.dt().transitionCommand(DrivetrainState.DRIVING_OVER_CHARGE_STATION),
