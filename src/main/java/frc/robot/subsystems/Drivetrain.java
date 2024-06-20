@@ -11,28 +11,25 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDrivetrain.AutoBalance;
 import frc.robot.ShamLib.HID.CommandFlightStick;
-import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.*;
-import frc.robot.ShamLib.swerve.module.ModuleInfo;
 import frc.robot.ShamLib.swerve.module.RealignModuleCommand;
 import frc.robot.ShamLib.swerve.module.SwerveModule;
 import frc.robot.commands.drivetrain.AutoBalanceCommand;
 import frc.robot.commands.drivetrain.DockChargingStationCommand;
 import frc.robot.commands.drivetrain.DriveOverChargeStationCommand;
 import java.util.List;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -47,6 +44,8 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
   @AutoLogOutput private SwerveModuleState[] moduleStates;
 
+  private SpeedMode speedMode;
+
   public Drivetrain(DoubleSupplier x, DoubleSupplier y, DoubleSupplier theta) {
     super("Drivetrain", DrivetrainState.UNDETERMINED, DrivetrainState.class);
 
@@ -56,71 +55,11 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     getOdoPose = this::getPose;
 
-    drive =
-        new SwerveDrive(
-            Constants.currentBuildMode,
-            PIGEON_ID,
-            DRIVE_GAINS,
-            TURN_GAINS,
-            STANDARD_LINEAR_SPEED,
-            STANDARD_LINEAR_ACCELERATION,
-            STANDARD_ROTATION,
-            STANDARD_ROT_ACCEL,
-            MAX_TURN_SPEED,
-            MAX_TURN_ACCEL,
-            new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO),
-            new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION),
-            !Constants.AT_COMP,
-            "drivetrain",
-            "",
-            Constants.getCurrentLimit(),
-            this,
-            () -> false,
-            0.02,
-            ModuleInfo.generateModuleInfo(
-                MK4i,
-                L2,
-                MODULE_1_DRIVE_ID,
-                MODULE_1_TURN_ID,
-                MODULE_1_ENCODER_ID,
-                MODULE_1_OFFSET,
-                moduleOffsets[0],
-                false,
-                false,
-                false),
-            ModuleInfo.generateModuleInfo(
-                MK4i,
-                L2,
-                MODULE_2_DRIVE_ID,
-                MODULE_2_TURN_ID,
-                MODULE_2_ENCODER_ID,
-                MODULE_2_OFFSET,
-                moduleOffsets[1],
-                false,
-                true,
-                true),
-            ModuleInfo.generateModuleInfo(
-                MK4i,
-                L2,
-                MODULE_3_DRIVE_ID,
-                MODULE_3_TURN_ID,
-                MODULE_3_ENCODER_ID,
-                MODULE_3_OFFSET,
-                moduleOffsets[2],
-                false,
-                true,
-                true),
-            ModuleInfo.generateModuleInfo(
-                MK4i,
-                L2,
-                MODULE_4_DRIVE_ID,
-                MODULE_4_TURN_ID,
-                MODULE_4_ENCODER_ID,
-                MODULE_4_OFFSET,
-                moduleOffsets[3],
-                false,
-                true,
-                true));
+    SWERVE_CONFIG.subsystem = this;
+    // TODO"
+    SWERVE_CONFIG.flipTrajectory = () -> false;
+
+    drive = new SwerveDrive(SWERVE_CONFIG);
 
     defineTransitions();
     defineStateCommands();
@@ -140,14 +79,14 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
               stopModules();
             }));
 
-    addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
+    addTransition(DrivetrainState.TELEOP_DRIVE_STANDARD, DrivetrainState.DOCKING);
 
     addTransition(
-        DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
+        DrivetrainState.TELEOP_DRIVE_STANDARD, DrivetrainState.DRIVING_OVER_CHARGE_STATION);
 
-    addOmniTransition(
-        DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE,
-        new InstantCommand(() -> setFieldRelative(true)));
+    addOmniTransition(DrivetrainState.TELEOP_DRIVE_STANDARD);
+
+    addOmniTransition(DrivetrainState.TELEOP_DRIVE_MAX);
 
     addOmniTransition(DrivetrainState.TRAJECTORY, new InstantCommand());
 
@@ -155,9 +94,9 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     addTransition(DrivetrainState.TRAJECTORY, DrivetrainState.DOCKING);
     addTransition(DrivetrainState.DOCKING, DrivetrainState.BALANCING);
 
-    addTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, DrivetrainState.DOCKING);
-    addTransition(DrivetrainState.DOCKING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
-    addTransition(DrivetrainState.BALANCING, DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+    addTransition(DrivetrainState.TELEOP_DRIVE_STANDARD, DrivetrainState.DOCKING);
+    addTransition(DrivetrainState.DOCKING, DrivetrainState.TELEOP_DRIVE_STANDARD);
+    addTransition(DrivetrainState.BALANCING, DrivetrainState.TELEOP_DRIVE_STANDARD);
 
     // addTransition(DrivetrainState.GOING_OVER_CHARGE_STATION, DrivetrainState.DOCKING);
     addOmniTransition(DrivetrainState.DOCKING);
@@ -166,7 +105,21 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   }
 
   private void defineStateCommands() {
-    registerStateCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE, getTeleopDriveCommand());
+    registerStateCommand(
+        DrivetrainState.TELEOP_DRIVE_STANDARD,
+        new ParallelCommandGroup(
+            getTeleopDriveCommand(STANDARD_SPEED),
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> speedMode != SpeedMode.STANDARD),
+                transitionCommand(DrivetrainState.TELEOP_DRIVE_MAX))));
+
+    registerStateCommand(
+        DrivetrainState.TELEOP_DRIVE_MAX,
+        new ParallelCommandGroup(
+            getTeleopDriveCommand(MAX_SPEED),
+            new SequentialCommandGroup(
+                new WaitUntilCommand(() -> speedMode != SpeedMode.MAX),
+                transitionCommand(DrivetrainState.TELEOP_DRIVE_STANDARD))));
 
     registerAutoBalanceCommands();
 
@@ -183,7 +136,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     registerStateCommand(
         DrivetrainState.DOCKING,
         new SequentialCommandGroup(
-            new InstantCommand(() -> setFieldRelative(true)),
             new DockChargingStationCommand(this, () -> positiveDockDirection ? 1 : -1),
             new ConditionalCommand(
                 transitionCommand(DrivetrainState.BALANCING),
@@ -212,7 +164,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
             transitionCommand(DrivetrainState.IDLE)));
   }
 
-  private DriveCommand getTeleopDriveCommand() {
+  private DriveCommand getTeleopDriveCommand(SwerveSpeedLimits speeds) {
     return new DriveCommand(
         drive,
         x,
@@ -221,13 +173,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
         Constants.ControllerConversions.DEADBAND,
         Constants.ControllerConversions.conversionFunction,
         this,
-        new SwerveSpeedLimits(
-            STANDARD_LINEAR_SPEED,
-            STANDARD_LINEAR_ACCELERATION,
-            STANDARD_ROTATION,
-            STANDARD_ROT_ACCEL),
-        new SwerveSpeedLimits(
-            MAX_LINEAR_SPEED, MAX_LINEAR_ACCELERATION, MAX_ROTATION, MAX_ROT_ACCEL));
+        speeds);
   }
 
   public void enableTeleopAutobalanceControls(CommandFlightStick left, CommandFlightStick right) {
@@ -270,10 +216,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     return drive.isFieldRelative();
   }
 
-  public void setFieldRelative(boolean v) {
-    drive.setFieldRelative(v);
-  }
-
   public void addVisionMeasurements(TimestampedPoseEstimator.TimestampedVisionUpdate measurement) {
     drive.addTimestampedVisionMeasurements(List.of(measurement));
   }
@@ -288,11 +230,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
   public ChassisSpeeds getChassisSpeeds() {
     return drive.getChassisSpeeds();
-  }
-
-  // TODO: remove
-  public Field2d getField() {
-    return drive.getField();
   }
 
   /**
@@ -367,7 +304,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     drive.resetOdometryPose(drive.getPose());
 
-    requestTransition(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE);
+    requestTransition(DrivetrainState.TELEOP_DRIVE_STANDARD);
   }
 
   @Override
@@ -414,10 +351,6 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     }
   }
 
-  public void setSpeedMode(SpeedMode mode) {
-    drive.setSpeedMode(mode.ordinal());
-  }
-
   public ChassisSpeeds getTargetChassisSpeed() {
     return drive.getTargetChassisSpeeds();
   }
@@ -432,24 +365,16 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
     return Math.hypot(target.vxMetersPerSecond, target.vyMetersPerSecond);
   }
 
-  private double[] poseToArray(Pose2d pose) {
-    return new double[] {pose.getX(), pose.getY(), pose.getRotation().getRadians()};
-  }
-
-  @Override
-  public Map<String, Sendable> additionalSendables() {
-    return Map.of(
-        "field", drive.getField(),
-        "module-1", drive.getModules().get(0),
-        "module-2", drive.getModules().get(1),
-        "module-3", drive.getModules().get(2),
-        "module-4", drive.getModules().get(3));
+  public void setSpeedMode(SpeedMode mode) {
+    this.speedMode = mode;
   }
 
   public enum DrivetrainState {
     UNDETERMINED,
     X_SHAPE,
-    FIELD_ORIENTED_TELEOP_DRIVE,
+    TELEOP_DRIVE_STANDARD,
+    TELEOP_DRIVE_MAX,
+
     TRAJECTORY,
     IDLE,
     DOCKING,
@@ -468,7 +393,7 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
   }
 
   public enum SpeedMode {
-    NORMAL,
-    TURBO
+    STANDARD,
+    MAX
   }
 }

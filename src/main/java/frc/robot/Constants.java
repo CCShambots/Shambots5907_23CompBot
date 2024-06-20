@@ -5,18 +5,23 @@ package frc.robot;
 
 import static com.ctre.phoenix.led.LarsonAnimation.BounceMode.Front;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
+import static frc.robot.ShamLib.swerve.module.ModuleInfo.SwerveModuleSpeedLevel.L2;
+import static frc.robot.ShamLib.swerve.module.ModuleInfo.SwerveModuleType.MK4i;
 import static java.lang.Math.PI;
 import static java.lang.Math.toRadians;
 
 import com.ctre.phoenix.led.*;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -28,7 +33,9 @@ import frc.robot.ShamLib.Candle.RGBSegmentInfo;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
+import frc.robot.ShamLib.swerve.SwerveDriveConfig;
 import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
+import frc.robot.ShamLib.swerve.module.ModuleInfo;
 import frc.robot.ShamLib.swerve.odometry.OdometryBoundingBox;
 import frc.robot.subsystems.BaseVision.CamSettings;
 import frc.robot.util.LUT;
@@ -91,8 +98,8 @@ public final class Constants {
     public static final int PROX_PORT = 9;
   }
 
-  public static final SupplyCurrentLimitConfiguration CURRENT_LIMIT =
-      new SupplyCurrentLimitConfiguration(true, 20, 20, 0.1);
+  public static final CurrentLimitsConfigs CURRENT_LIMIT =
+      new CurrentLimitsConfigs().withSupplyCurrentLimit(20).withSupplyCurrentLimitEnable(true);
 
   public static final class ControllerConversions {
 
@@ -150,6 +157,10 @@ public final class Constants {
     public static final double MAX_ROTATION = (MAX_LINEAR_SPEED / rotationRadius) * (2 * PI);
     public static final double MAX_ROT_ACCEL = MAX_ROTATION * 3;
 
+    public static final SwerveSpeedLimits MAX_SPEED =
+        new SwerveSpeedLimits(
+            MAX_LINEAR_SPEED, MAX_LINEAR_ACCELERATION, MAX_ROTATION, MAX_ROT_ACCEL);
+
     // Min speed to allow turbo button to work
     public static final double MIN_TURBO_SPEED = 2.5;
 
@@ -163,17 +174,28 @@ public final class Constants {
       new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2) // front right
     };
 
+    public static final Matrix<N3, N1> STATE_STD_DEVIATIONS = VecBuilder.fill(0.003, 0.003, 0.0002);
+
     public static final double P_HOLDANGLETELE = 0.25;
     public static final double I_HOLDANGLETELE = 0;
     public static final double D_HOLDANGLETELE = 0;
+
+    public static final PIDGains HOLD_ANGLE_GAINS_TELE =
+        new PIDGains(P_HOLDANGLETELE, I_HOLDANGLETELE, D_HOLDANGLETELE);
 
     public static final double P_HOLDANGLEAUTO = 5;
     public static final double I_HOLDANGLEAUTO = 0;
     public static final double D_HOLDANGLEAUTO = 0;
 
+    public static final PIDGains HOLD_ANGLE_GAINS_AUTO =
+        new PIDGains(P_HOLDANGLEAUTO, I_HOLDANGLEAUTO, D_HOLDANGLEAUTO);
+
     public static final double P_HOLDTRANSLATION = 3;
     public static final double I_HOLDTRANSLATION = 0;
     public static final double D_HOLDTRANSLATION = 0;
+
+    public static final PIDGains HOLD_TRANSLATION_GAINS =
+        new PIDGains(P_HOLDTRANSLATION, I_HOLDTRANSLATION, D_HOLDTRANSLATION);
 
     public static final SwerveModuleState STOPPED_STATE =
         new SwerveModuleState(0, new Rotation2d());
@@ -211,8 +233,85 @@ public final class Constants {
     public static final int MODULE_4_ENCODER_ID = 17;
     public static final double MODULE_4_OFFSET = 30.585938;
 
+    public static ModuleInfo MODULE_1_INFO =
+        ModuleInfo.generateModuleInfo(
+            MK4i,
+            L2,
+            MODULE_1_DRIVE_ID,
+            MODULE_1_TURN_ID,
+            MODULE_1_ENCODER_ID,
+            MODULE_1_OFFSET,
+            moduleOffsets[0],
+            false,
+            false,
+            false);
+
+    public static ModuleInfo MODULE_2_INFO =
+        ModuleInfo.generateModuleInfo(
+            MK4i,
+            L2,
+            MODULE_2_DRIVE_ID,
+            MODULE_2_TURN_ID,
+            MODULE_2_ENCODER_ID,
+            MODULE_2_OFFSET,
+            moduleOffsets[1],
+            false,
+            true,
+            true);
+
+    public static ModuleInfo MODULE_3_INFO =
+        ModuleInfo.generateModuleInfo(
+            MK4i,
+            L2,
+            MODULE_3_DRIVE_ID,
+            MODULE_3_TURN_ID,
+            MODULE_3_ENCODER_ID,
+            MODULE_3_OFFSET,
+            moduleOffsets[2],
+            false,
+            true,
+            true);
+
+    public static ModuleInfo MODULE_4_INFO =
+        ModuleInfo.generateModuleInfo(
+            MK4i,
+            L2,
+            MODULE_4_DRIVE_ID,
+            MODULE_4_TURN_ID,
+            MODULE_4_ENCODER_ID,
+            MODULE_4_OFFSET,
+            moduleOffsets[3],
+            false,
+            true,
+            true);
+
     public static Supplier<Pose2d> getOdoPose;
     public static Supplier<Rotation2d> getDrivetrainAngle;
+
+    public static final SwerveDriveConfig SWERVE_CONFIG = new SwerveDriveConfig();
+
+    static {
+      SWERVE_CONFIG.setModuleInfos(MODULE_1_INFO, MODULE_2_INFO, MODULE_3_INFO, MODULE_4_INFO);
+      SWERVE_CONFIG.pigeon2ID = PIGEON_ID;
+      SWERVE_CONFIG.gyroCanbus = "";
+
+      SWERVE_CONFIG.moduleDriveGains = SwerveModule.DRIVE_GAINS;
+      SWERVE_CONFIG.moduleTurnGains = SwerveModule.TURN_GAINS;
+
+      SWERVE_CONFIG.maxModuleTurnVelo = SwerveModule.MAX_TURN_SPEED;
+      SWERVE_CONFIG.maxModuleTurnAccel = SwerveModule.MAX_TURN_ACCEL;
+
+      SWERVE_CONFIG.moduleCanbus = "drivetrain";
+
+      SWERVE_CONFIG.standardSpeedLimits = STANDARD_SPEED;
+
+      SWERVE_CONFIG.autoThetaGains = HOLD_ANGLE_GAINS_AUTO;
+      SWERVE_CONFIG.translationGains = HOLD_TRANSLATION_GAINS;
+      SWERVE_CONFIG.currentLimit = CURRENT_LIMIT;
+
+      SWERVE_CONFIG.standardDeviations = null;
+      SWERVE_CONFIG.loopPeriod = loopPeriodSecs;
+    }
   }
 
   public static final class SwerveModule {

@@ -6,8 +6,8 @@ import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
-import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
-import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.STANDARD;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.MAX;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -178,7 +178,7 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
     addOmniTransition(
         State.TRAVELING,
         new ParallelCommandGroup(
-            drivetrain.transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE),
+            drivetrain.transitionCommand(DrivetrainState.TELEOP_DRIVE_MAX),
             turret.transitionCommand(Turret.TurretState.CARDINALS)));
 
     addTransition(
@@ -324,15 +324,16 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  if (arm.getState() == ArmMode.STOWED) drivetrain.setSpeedMode(TURBO);
+                  if (arm.getState() == ArmMode.STOWED) drivetrain.setSpeedMode(MAX);
                 }));
-    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+    leftStick.trigger().onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(STANDARD)));
+
     new Trigger(() -> arm.getState() != ArmMode.STOWED)
-        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(NORMAL)));
+        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(STANDARD)));
 
     new Trigger(() -> arm.getState() == ArmMode.STOWED)
         .and(leftStick.trigger().negate())
-        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(TURBO)));
+        .onTrue(new InstantCommand(() -> drivetrain.setSpeedMode(MAX)));
 
     operatorCont
         .a()
