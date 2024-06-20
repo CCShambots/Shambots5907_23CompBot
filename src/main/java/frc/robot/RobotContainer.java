@@ -6,8 +6,8 @@ import static edu.wpi.first.wpilibj.GenericHID.RumbleType.kBothRumble;
 import static frc.robot.Constants.ElementType.*;
 import static frc.robot.Constants.Vision.BASE_LIMELIGHT_POSE;
 import static frc.robot.Constants.alliance;
-import static frc.robot.subsystems.Drivetrain.SpeedMode.STANDARD;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.MAX;
+import static frc.robot.subsystems.Drivetrain.SpeedMode.STANDARD;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose3d;
