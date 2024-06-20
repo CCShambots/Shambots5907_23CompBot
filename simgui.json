@@ -7,7 +7,17 @@
       "/Shuffleboard/Drive/Auto Route": "String Chooser",
       "/Shuffleboard/Drive/SWITCH ALLIANCE": "Command",
       "/Shuffleboard/Drive/SYNC ALLIANCE": "Command",
-      "/Shuffleboard/Drive/TOGGLE ELEMENT VISION": "Command"
+      "/Shuffleboard/Drive/TOGGLE ELEMENT VISION": "Command",
+      "/SmartDashboard/ArmState Chooser": "String Chooser",
+      "/SmartDashboard/Base VisionState Chooser": "String Chooser",
+      "/SmartDashboard/ClawState Chooser": "String Chooser",
+      "/SmartDashboard/DrivetrainState Chooser": "String Chooser",
+      "/SmartDashboard/LightsState Chooser": "String Chooser",
+      "/SmartDashboard/RobotState Chooser": "String Chooser",
+      "/SmartDashboard/turretState Chooser": "String Chooser"
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   }
 }

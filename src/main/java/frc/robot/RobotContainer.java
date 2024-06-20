@@ -9,7 +9,6 @@ import static frc.robot.Constants.alliance;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.NORMAL;
 import static frc.robot.subsystems.Drivetrain.SpeedMode.TURBO;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,9 +43,9 @@ import frc.robot.subsystems.turret.TurretIOSim;
 public class RobotContainer extends StateMachine<RobotContainer.State> {
 
   // Declare HIDs
-  private CommandFlightStick leftStick = new CommandFlightStick(0);
-  private CommandFlightStick rightStick = new CommandFlightStick(1);
-  private final CommandXboxController operatorCont = new CommandXboxController(2);
+  private CommandFlightStick leftStick = new CommandFlightStick(1);
+  private CommandFlightStick rightStick = new CommandFlightStick(2);
+  private final CommandXboxController operatorCont = new CommandXboxController(0);
 
   // Declare subsystems
   private final BaseVision baseVision;
@@ -140,7 +139,8 @@ public class RobotContainer extends StateMachine<RobotContainer.State> {
 
     NamedCommands.registerCommand("extend", arm.transitionCommand(ArmMode.SEEKING_HIGH));
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = new SendableChooser<>();
 
     initializeDriveTab();
 

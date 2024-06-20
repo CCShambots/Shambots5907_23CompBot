@@ -43,6 +43,10 @@ public class BaseVision extends StateMachine<BaseVision.BaseVisionState> {
 
     super("Base Vision", BaseVisionState.UNDETERMINED, BaseVisionState.class);
 
+    this.initialCameraPose = initialCameraPose;
+
+    this.turretAngleSupplier = turretAngleSupplier;
+
     this.cam =
         new PVApriltagCam(
             "limelight-base",
@@ -59,10 +63,6 @@ public class BaseVision extends StateMachine<BaseVision.BaseVisionState> {
 
     applyPreAndPostProcesses(
         cam, settings.ambiguityThreshold(), settings.distanceFromLastEstimateScalar());
-
-    this.initialCameraPose = initialCameraPose;
-
-    this.turretAngleSupplier = turretAngleSupplier;
 
     // addOmniTransition(
     // BaseVisionState.APRILTAG, new InstantCommand(() -> ll.setPipeline(APRIL_TAG_PIPELINE)));

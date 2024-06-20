@@ -15,9 +15,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.ShamLib.SMF.StateMachine;
+import frc.robot.ShamLib.WhileDisabledInstantCommand;
 import frc.robot.commands.turret.NewTurretManualControlCommand;
 import frc.robot.commands.turret.TurretCardinalsCommand;
 import java.util.function.BooleanSupplier;
@@ -73,7 +75,8 @@ public class Turret extends StateMachine<Turret.TurretState> {
     defineTransitions();
     registerStateCommands();
 
-    pullAbsoluteAngle();
+    new WaitCommand(1).andThen(new WhileDisabledInstantCommand(this::pullAbsoluteAngle)).schedule();
+    // pullAbsoluteAngle();
   }
 
   private void defineTransitions() {

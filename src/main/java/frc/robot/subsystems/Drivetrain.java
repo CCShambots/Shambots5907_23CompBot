@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.event.EventLoop;
@@ -171,13 +170,13 @@ public class Drivetrain extends StateMachine<Drivetrain.DrivetrainState> {
 
     registerAutoBalanceCommands();
 
-    registerStateCommand(
-        DrivetrainState.PATHFINDING,
-        drive
-            .createPathFindingCommand(
-                new Pose2d(
-                    Units.feetToMeters(54) / 2, Units.feetToMeters(27) / 2, new Rotation2d()))
-            .andThen(transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
+    // registerStateCommand(
+    //     DrivetrainState.PATHFINDING,
+    //     drive
+    //         .createPathFindingCommand(
+    //             new Pose2d(
+    //                 Units.feetToMeters(54) / 2, Units.feetToMeters(27) / 2, new Rotation2d()))
+    //         .andThen(transitionCommand(DrivetrainState.FIELD_ORIENTED_TELEOP_DRIVE)));
   }
 
   private void registerAutoBalanceCommands() {
